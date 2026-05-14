@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        LocalSend — Share files to nearby devices, no internet needed
 License:        MIT
 URL:            https://localsend.org
-Source0:        LocalSend-%{pkg_version}-linux-x86-64.tar.gz
+Source0:        LocalSend-%{version}-linux-x86-64.tar.gz
 
 BuildArch:      x86_64
 AutoReqProv:    no

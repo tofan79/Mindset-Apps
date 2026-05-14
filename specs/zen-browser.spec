@@ -6,6 +6,9 @@ License:        MPL-2.0
 URL:            https://zen-browser.app
 Source0:        zen.linux-x86_64.tar.xz
 
+# Pre-built binary, skip RPATH check
+%global __brp_check_rpaths 0
+
 BuildArch:      x86_64
 AutoReqProv:    no
 
