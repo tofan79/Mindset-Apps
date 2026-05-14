@@ -69,9 +69,9 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/zen-browser.spec
           cp "${{ env.TAR_PATTERN }}" ~/rpmbuild/SOURCES/
-          rpmbuild -bs ~/rpmbuild/SPECS/zen-browser.spec \
-            --define "pkg_version $VER"
+          rpmbuild -bs ~/rpmbuild/SPECS/zen-browser.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT
 
