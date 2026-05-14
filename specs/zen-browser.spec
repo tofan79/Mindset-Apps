@@ -28,7 +28,7 @@ It offers a calmer browsing experience with a clean interface.
 
 %install
 install -d %{buildroot}/opt/zen-browser
-cp -r . %{buildroot}/opt/zen-browser/
+cp -r zen/* %{buildroot}/opt/zen-browser/
 
 install -d %{buildroot}%{_bindir}
 ln -s /opt/zen-browser/zen %{buildroot}%{_bindir}/zen-browser
