@@ -71,6 +71,7 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           FILENAME="${{ env.TAR_PATTERN }}"
           FILENAME="${FILENAME/\{VERSION\}/$VER}"
+          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
           wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${FILENAME}"
 
       - name: Build SRPM
