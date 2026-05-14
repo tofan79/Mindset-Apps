@@ -60,7 +60,7 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: |
           VER="${{ steps.upstream.outputs.version }}"
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/${VER}/${{ env.TAR_PATTERN }}" -O source.tar.xz
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/${VER}/${{ env.TAR_PATTERN }}"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -69,7 +69,7 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
-          cp source.tar.xz ~/rpmbuild/SOURCES/
+          cp "${{ env.TAR_PATTERN }}" ~/rpmbuild/SOURCES/
           rpmbuild -bs ~/rpmbuild/SPECS/zen-browser.spec \
             --define "pkg_version $VER"
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
