@@ -72,8 +72,8 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           tar xzf "${{ env.APP_NAME }}-${VER}.tar.gz"
           cd "${{ env.APP_NAME }}-${VER}"
-          cargo vendor
-          tar czf ../vendor.tar.gz vendor/
+          cargo vendor vendor > cargo-config.toml
+          tar czf ../vendor.tar.gz vendor/ cargo-config.toml
           cd ..
 
       - name: Build SRPM
