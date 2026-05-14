@@ -62,6 +62,7 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           FILENAME="${{ env.TAR_PATTERN }}"
           FILENAME="${FILENAME/\{VERSION\}/$VER}"
+          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
           wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${FILENAME}"
 
       - name: Build SRPM
@@ -72,6 +73,7 @@ jobs:
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
           cp "$FILENAME" ~/rpmbuild/SOURCES/
+          echo "FILENAME=$FILENAME"
           rpmbuild -bs ~/rpmbuild/SPECS/localsend.spec \
             --define "pkg_version $VER"
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
