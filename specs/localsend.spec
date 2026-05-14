@@ -6,8 +6,9 @@ License:        MIT
 URL:            https://localsend.org
 Source0:        LocalSend-%{version}-linux-x86-64.tar.gz
 
-# Pre-built binary, skip RPATH check
-%global __brp_check_rpaths 0
+# Pre-built binary, skip RPATH and debuginfo checks
+%global debug_package %{nil}
+%global __brp_check_rpaths %{nil}
 
 BuildArch:      x86_64
 AutoReqProv:    no
