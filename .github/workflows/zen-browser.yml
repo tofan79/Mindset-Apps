@@ -53,7 +53,7 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y rpm rpmbuild wget
+          sudo apt-get install -y rpm rpm-build wget
           pip install copr-cli --quiet
 
       - name: Download tar.xz
