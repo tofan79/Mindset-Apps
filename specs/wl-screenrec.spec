@@ -34,13 +34,7 @@ software encoding via FFmpeg.
 %setup -q -n wl-screenrec-%{version}
 tar xzf %{SOURCE1}
 mkdir -p .cargo
-cat > .cargo/config.toml << 'EOF'
-[source.crates-io]
-replace-with = "vendored-sources"
-
-[source.vendored-sources]
-directory = "vendor"
-EOF
+cp cargo-config.toml .cargo/config.toml
 
 %build
 CARGO_NET_OFFLINE=true cargo build --release --locked
