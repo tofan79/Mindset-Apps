@@ -71,7 +71,7 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           FILENAME="${{ env.TAR_PATTERN }}"
           FILENAME="${FILENAME/\{VERSION\}/$VER}"
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${FILENAME}" -O source.tar.gz
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${FILENAME}"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -81,7 +81,7 @@ jobs:
           SPECNAME=$(basename ${{ env.SPEC_FILE }})
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
-          cp source.tar.gz ~/rpmbuild/SOURCES/
+          cp "$FILENAME" ~/rpmbuild/SOURCES/
           rpmbuild -bs ~/rpmbuild/SPECS/${SPECNAME} \
             --define "pkg_version $VER"
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
