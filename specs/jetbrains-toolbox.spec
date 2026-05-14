@@ -16,7 +16,7 @@ AutoReqProv:    no
 Requires:       fuse
 Requires:       glib2
 Requires:       libxslt
-Requires:       libxss
+Requires:       libXScrnSaver
 Requires:       nss
 Requires:       xcb-util-keysyms
 
