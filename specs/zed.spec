@@ -26,7 +26,7 @@ Zed is a high-performance, multiplayer code editor.
 
 %install
 install -d %{buildroot}/opt/zed
-cp -r zed/* %{buildroot}/opt/zed/
+cp -r zed.app/* %{buildroot}/opt/zed/
 
 install -d %{buildroot}%{_bindir}
 ln -s /opt/zed/bin/zed %{buildroot}%{_bindir}/zed
