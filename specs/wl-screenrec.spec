@@ -21,7 +21,10 @@ BuildRequires:  pkgconfig(libdrm)
 
 BuildRequires:  ffmpeg-free-devel
 
-Requires:       ffmpeg-free
+Requires:       libavcodec.so.62()(64bit)
+Requires:       libavutil.so.60()(64bit)
+Requires:       libavformat.so.62()(64bit)
+Requires:       libswscale.so.9()(64bit)
 Requires:       libdrm
 Requires:       libva
 
