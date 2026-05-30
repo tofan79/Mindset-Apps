@@ -33,14 +33,6 @@ BuildRequires:  libglvnd-devel
 BuildRequires:  libdrm-devel
 BuildRequires:  mesa-libgbm-devel
 
-Requires:       wayland-server >= 1.23.1
-Requires:       wlroots0.19
-Requires:       xkbcommon
-Requires:       libinput >= 1.27.1
-Requires:       libpcre2-8
-Requires:       pixman-1
-Requires:       libcjson
-
 %description
 mango is a Wayland compositor based on wlroots and scenefx,
 built with a focus on eye-candy and user experience.
