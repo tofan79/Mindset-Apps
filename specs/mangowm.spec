@@ -73,7 +73,7 @@ popd
 %{_datadir}/xdg-desktop-portal/mango-portals.conf
 %dir %{_sysconfdir}/mango
 %config(noreplace) %{_sysconfdir}/mango/config.conf
-%{_libdir}/libscenefx-0.4.so.*
+%{_libdir}/libscenefx-0.4.so
 
 %changelog
 * Thu May 28 2026 mindset <mindset@copr> - %{pkg_version}-1
