@@ -45,12 +45,11 @@ mango is a Wayland compositor based on wlroots and scenefx,
 built with a focus on eye-candy and user experience.
 
 %prep
-%setup -q -n mango-%{version}
-%setup -q -T -D -b 1
+%autosetup -n mango-%{version} -a 1
 
 %build
 # Build bundled scenefx
-pushd scenefx-%{scenefx_version}
+pushd ../scenefx-%{scenefx_version}
 %meson -Dexamples=false
 %meson_build
 %meson_install
@@ -62,6 +61,9 @@ export PKG_CONFIG_PATH="%{buildroot}%{_libdir}/pkgconfig${PKG_CONFIG_PATH:+:${PK
 %meson_build
 
 %install
+pushd ../scenefx-%{scenefx_version}
+%meson_install
+popd
 %meson_install
 
 %files
