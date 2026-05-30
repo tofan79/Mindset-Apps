@@ -14,7 +14,6 @@ License:            LGPL-3.0-only AND GPL-3.0-only
 URL:                https://github.com/quickshell-mirror/quickshell
 Source0:            %{url}/archive/%{commit}/%{name}-%{commit}.tar.gz
 
-BuildRequires:      breakpad-static
 BuildRequires:      cmake
 BuildRequires:      cmake(Qt6Core)
 BuildRequires:      cmake(Qt6DBus)
@@ -24,7 +23,6 @@ BuildRequires:      cmake(Qt6WaylandClient)
 BuildRequires:      gcc-c++
 BuildRequires:      git
 BuildRequires:      ninja-build
-BuildRequires:      pkgconfig(breakpad)
 BuildRequires:      pkgconfig(CLI11)
 BuildRequires:      pkgconfig(gbm)
 BuildRequires:      pkgconfig(jemalloc)
