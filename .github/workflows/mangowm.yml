@@ -1,6 +1,12 @@
 name: "mangowm - COPR Auto Build"
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/mangowm.yml"
+      - "specs/mangowm.spec"
   schedule:
     - cron: '0 4 */3 * *'
   workflow_dispatch:
