@@ -31,6 +31,7 @@ BuildRequires:  pkgconfig(xcb-icccm)
 BuildRequires:  wayland-protocols-devel
 BuildRequires:  libglvnd-devel
 BuildRequires:  libdrm-devel
+BuildRequires:  mesa-libgbm-devel
 
 Requires:       wayland-server >= 1.23.1
 Requires:       wlroots0.19
@@ -48,15 +49,14 @@ built with a focus on eye-candy and user experience.
 %autosetup -n mango-%{version} -a 1
 
 %build
-# Build bundled scenefx
+# Build bundled scenefx (no install, use uninstalled .pc)
 pushd scenefx-%{scenefx_version}
 %meson -Dexamples=false
 %meson_build
-%meson_install
 popd
 
 # Build mangowm against bundled scenefx
-export PKG_CONFIG_PATH="%{buildroot}%{_libdir}/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
+export PKG_CONFIG_PATH="$(pwd)/scenefx-%{scenefx_version}/redhat-linux-build/meson-uninstalled${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
 %meson
 %meson_build
 
