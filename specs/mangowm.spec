@@ -4,7 +4,7 @@
 Name:           mangowm
 Version:        %{pkg_version}
 Release:        1%{?dist}
-Summary:        mango — A Wayland compositor based on wlroots and scenefx
+Summary:        Mango Wayland compositor based on wlroots and scenefx
 
 License:        MIT
 URL:            https://github.com/mangowm/mango
@@ -65,6 +65,12 @@ pushd scenefx-%{scenefx_version}
 %meson_install
 popd
 %meson_install
+
+# scenefx is bundled only to satisfy mango's runtime dependency in this COPR
+# package. Do not ship development headers/pkgconfig files from the bundled
+# build, otherwise rpmbuild fails on unpackaged files.
+rm -rf %{buildroot}%{_includedir}/scenefx-0.4
+rm -f %{buildroot}%{_libdir}/pkgconfig/scenefx-0.4.pc
 
 %files
 %{_bindir}/mango
