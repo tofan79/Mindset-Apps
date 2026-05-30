@@ -49,7 +49,7 @@ built with a focus on eye-candy and user experience.
 
 %build
 # Build bundled scenefx
-pushd ../scenefx-%{scenefx_version}
+pushd scenefx-%{scenefx_version}
 %meson -Dexamples=false
 %meson_build
 %meson_install
@@ -61,7 +61,7 @@ export PKG_CONFIG_PATH="%{buildroot}%{_libdir}/pkgconfig${PKG_CONFIG_PATH:+:${PK
 %meson_build
 
 %install
-pushd ../scenefx-%{scenefx_version}
+pushd scenefx-%{scenefx_version}
 %meson_install
 popd
 %meson_install
