@@ -84,6 +84,10 @@ jobs:
           copr_url = https://copr.fedorainfracloud.org
           EOF
 
+      - name: Reset additional repos
+        if: steps.check.outputs.skip == 'false'
+        run: copr-cli modify --repo "" ${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }}
+
       - name: Submit to COPR
         if: steps.check.outputs.skip == 'false'
         run: copr-cli build ${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
