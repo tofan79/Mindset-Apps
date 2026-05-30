@@ -53,7 +53,7 @@ jobs:
         run: |
           sudo apt-get update -q
           sudo apt-get install -y rpm build-essential wget
-          pip install copr-cli --quiet
+          pip install copr-cli rich --quiet
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -80,6 +80,15 @@ jobs:
           copr_url = https://copr.fedorainfracloud.org
           EOF
 
+      - name: Add build repos to project
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          REPOS=""
+          for REL in 42 43 44; do
+            REPOS="$REPOS --repo https://copr.fedorainfracloud.org/coprs/mindolver/scenefx/repo/fedora-${REL}/mindolver-scenefx-fedora-${REL}.repo"
+          done
+          copr-cli modify $REPOS ${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }} || true
+
       - name: Submit to COPR
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
+        run: copr-cli build ${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
