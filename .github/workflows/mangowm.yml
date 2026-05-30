@@ -86,8 +86,8 @@ jobs:
 
       - name: Reset additional repos
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli modify --repo "" ${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }}
+        run: copr-cli modify --repo "" ${{ env.COPR_PROJECT }}
 
       - name: Submit to COPR
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli build ${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
+        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
