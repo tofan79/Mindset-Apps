@@ -53,7 +53,7 @@ jobs:
         run: |
           sudo apt-get update -q
           sudo apt-get install -y rpm build-essential wget
-          pip install copr-cli rich --quiet
+          pip install copr-cli --quiet
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -63,7 +63,11 @@ jobs:
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/mangowm.spec
+          # Download mangowm source
           wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/${VER}.tar.gz" -O ~/rpmbuild/SOURCES/mangowm-${VER}.tar.gz
+          # Download bundled scenefx source
+          SCENEFX_VER=$(grep scenefx_version ~/rpmbuild/SPECS/mangowm.spec | head -1 | sed 's/.*scenefx_version //')
+          wget -q "https://github.com/wlrfx/scenefx/archive/refs/tags/${SCENEFX_VER}.tar.gz" -O ~/rpmbuild/SOURCES/scenefx-${SCENEFX_VER}.tar.gz
           rpmbuild -bs ~/rpmbuild/SPECS/mangowm.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT
@@ -79,15 +83,6 @@ jobs:
           token    = ${{ secrets.COPR_TOKEN }}
           copr_url = https://copr.fedorainfracloud.org
           EOF
-
-      - name: Add build repos to project
-        if: steps.check.outputs.skip == 'false'
-        run: |
-          REPOS=""
-          for REL in 42 43 44; do
-            REPOS="$REPOS --repo https://copr.fedorainfracloud.org/coprs/mindolver/scenefx/repo/fedora-${REL}/mindolver-scenefx-fedora-${REL}.repo"
-          done
-          copr-cli modify $REPOS ${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }} || true
 
       - name: Submit to COPR
         if: steps.check.outputs.skip == 'false'
