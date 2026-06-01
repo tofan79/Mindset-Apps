@@ -80,13 +80,13 @@ Built with full features: Network (NetworkManager), Bluetooth, PipeWire, etc.
 %install
 %cmake_install
 
-# Remove vendored files we don't want to package
-rm -rf %{buildroot}%{_includedir}/{cpptrace,ctrace,dwarf.h,libdwarf.h,zstd.h,zdict.h,zstd_errors.h}
-rm -rf %{buildroot}%{_libdir}/{libcpptrace*,libdwarf*,libzstd*}
-rm -rf %{buildroot}%{_libdir}/cmake/{cpptrace,libdwarf,zstd}
+# We use VENDOR_CPPTRACE=ON and ship the bundled libs
+# Remove other bundled files we don't need
+rm -rf %{buildroot}%{_includedir}/{dwarf.h,libdwarf.h,zstd.h,zdict.h,zstd_errors.h}
+rm -rf %{buildroot}%{_libdir}/{libdwarf*,libzstd*}
+rm -rf %{buildroot}%{_libdir}/cmake/{libdwarf,zstd}
 rm -rf %{buildroot}%{_libdir}/pkgconfig/{libdwarf.pc,libzstd.pc}
-rm -rf %{buildroot}%{_datadir}/cpptrace
-find %{buildroot}%{_debuginfodir} -name '*cpptrace*' -o -name '*libdwarf*' -o -name '*zstd*' 2>/dev/null | xargs rm -f 2>/dev/null || true
+find %{buildroot}%{_debuginfodir} -name '*libdwarf*' -o -name '*zstd*' 2>/dev/null | xargs rm -f 2>/dev/null || true
 
 %files
 %license LICENSE
@@ -99,6 +99,8 @@ find %{buildroot}%{_debuginfodir} -name '*cpptrace*' -o -name '*libdwarf*' -o -n
 %{_datadir}/applications/org.quickshell.desktop
 %{_datadir}/icons/hicolor/scalable/apps/org.quickshell.svg
 %{_libdir}/qt6/qml/Quickshell
+%{_libdir}/libcpptrace*
+%{_libdir}/cmake/cpptrace
 
 %changelog
 * Sat May 30 2026 mindset <mindset@copr> - %{version}-%{release}
