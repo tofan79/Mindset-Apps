@@ -6,7 +6,6 @@ Personal COPR repository — auto-build dari GitHub Releases resmi + source buil
 
 ```bash
 sudo dnf copr enable mindset/Mindset-Apps
-sudo dnf install mangowm quickshell zen-browser localsend zed jetbrains-toolbox
 sudo dnf update
 ```
 
@@ -15,7 +14,6 @@ sudo dnf update
 | App | Source | Update |
 |-----|--------|--------|
 | mangowm | [mangowm/mango](https://github.com/mangowm/mango) | tiap 3 hari |
-| quickshell | [quickshell-mirror/quickshell](https://github.com/quickshell-mirror/quickshell) | tiap 7 hari |
 | zen-browser | [zen-browser/desktop](https://github.com/zen-browser/desktop) | tiap 3 hari |
 | localsend | [localsend/localsend](https://github.com/localsend/localsend) | tiap 3 hari |
 | zed | [zed-industries/zed](https://github.com/zed-industries/zed) | tiap 3 hari |
@@ -27,14 +25,12 @@ sudo dnf update
 Mindset-Apps/
 ├── .github/workflows/
 │   ├── mangowm.yml
-│   ├── quickshell.yml
 │   ├── zen-browser.yml
 │   ├── localsend.yml
 │   ├── zed.yml
 │   └── jetbrains-toolbox.yml
 ├── specs/
 │   ├── mangowm.spec
-│   ├── quickshell.spec
 │   ├── zen-browser.spec
 │   ├── localsend.spec
 │   ├── zed.spec
