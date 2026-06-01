@@ -19,7 +19,7 @@ sudo dnf update
 | zen-browser | [zen-browser/desktop](https://github.com/zen-browser/desktop) | tiap 3 hari |
 | localsend | [localsend/localsend](https://github.com/localsend/localsend) | tiap 3 hari |
 | zed | [zed-industries/zed](https://github.com/zed-industries/zed) | tiap 3 hari |
-| jetbrains-toolbox | [JetBrains/toolbox](https://github.com/JetBrains/toolbox) | tiap 3 hari |
+| jetbrains-toolbox | [jetbrains.com/toolbox](https://jetbrains.com/toolbox) | tiap 3 hari |
 
 ## Struktur Repo
 
