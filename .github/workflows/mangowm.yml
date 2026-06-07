@@ -29,6 +29,10 @@ jobs:
           VER=$(curl -s \
             "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest" \
             | jq -r '.tag_name' | sed 's/^v//')
+          if [ -z "$VER" ] || [ "$VER" = "null" ]; then
+            echo "❌ Error: Could not fetch upstream version"
+            exit 1
+          fi
           echo "version=$VER" >> $GITHUB_OUTPUT
           echo "▶ Upstream: $VER"
 
@@ -37,7 +41,7 @@ jobs:
         run: |
           CURRENT=$(curl -s \
             "https://copr.fedorainfracloud.org/api_3/package/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
-            | jq -r '.builds.latest.source_package.version // "none"' 2>/dev/null || echo "none")
+            | jq -r '.builds[0].source_package.version // "none"' 2>/dev/null || echo "none")
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "▶ COPR: $CURRENT"
 
@@ -58,24 +62,53 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y rpm build-essential wget
+          sudo apt-get install -y rpm build-essential wget jq
           pip install copr-cli --quiet
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
         id: srpm
         run: |
+          set -e
           VER="${{ steps.upstream.outputs.version }}"
+          echo "📦 Building SRPM for version: $VER"
+          
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
+          
+          # Substitute version in spec file
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/mangowm.spec
+          
           # Download mangowm source
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/${VER}.tar.gz" -O ~/rpmbuild/SOURCES/mangowm-${VER}.tar.gz
+          echo "📥 Downloading mangowm source..."
+          if ! wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/v${VER}.tar.gz" -O ~/rpmbuild/SOURCES/mangowm-${VER}.tar.gz; then
+            echo "❌ Failed to download mangowm source"
+            exit 1
+          fi
+          
           # Download bundled scenefx source
-          SCENEFX_VER=$(grep scenefx_version ~/rpmbuild/SPECS/mangowm.spec | head -1 | sed 's/.*scenefx_version //')
-          wget -q "https://github.com/wlrfx/scenefx/archive/refs/tags/${SCENEFX_VER}.tar.gz" -O ~/rpmbuild/SOURCES/scenefx-${SCENEFX_VER}.tar.gz
-          rpmbuild -bs ~/rpmbuild/SPECS/mangowm.spec
+          echo "📥 Downloading scenefx source..."
+          SCENEFX_VER=$(grep "scenefx_version" ~/rpmbuild/SPECS/mangowm.spec | head -1 | sed 's/.*scenefx_version //' | tr -d ' ')
+          echo "   SceneFX version: $SCENEFX_VER"
+          
+          if ! wget -q "https://github.com/wlrfx/scenefx/archive/refs/tags/${SCENEFX_VER}.tar.gz" -O ~/rpmbuild/SOURCES/scenefx-${SCENEFX_VER}.tar.gz; then
+            echo "❌ Failed to download scenefx source"
+            exit 1
+          fi
+          
+          # Build SRPM
+          echo "🔨 Building SRPM..."
+          if ! rpmbuild -bs ~/rpmbuild/SPECS/mangowm.spec; then
+            echo "❌ rpmbuild failed"
+            exit 1
+          fi
+          
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
+          if [ -z "$SRPM" ]; then
+            echo "❌ No SRPM file found"
+            exit 1
+          fi
+          echo "✅ SRPM built: $SRPM"
           echo "path=$SRPM" >> $GITHUB_OUTPUT
 
       - name: Setup COPR credentials
@@ -89,11 +122,55 @@ jobs:
           token    = ${{ secrets.COPR_TOKEN }}
           copr_url = https://copr.fedorainfracloud.org
           EOF
+          chmod 600 ~/.config/copr
+          
+          # Verify credentials
+          if ! grep -q "username\|login\|token" ~/.config/copr; then
+            echo "❌ Error: COPR credentials not properly configured"
+            exit 1
+          fi
+          echo "✅ COPR credentials configured"
 
-      - name: Reset additional repos
+      - name: Verify COPR connectivity
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli modify --repo "" ${{ env.COPR_PROJECT }}
+        run: |
+          echo "🔍 Testing COPR connection..."
+          if copr-cli status > /dev/null 2>&1; then
+            echo "✅ COPR connection successful"
+          else
+            echo "⚠️ Warning: Could not verify COPR status, proceeding anyway..."
+          fi
 
       - name: Submit to COPR
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
+        run: |
+          set -e
+          SRPM_PATH="${{ steps.srpm.outputs.path }}"
+          echo "📤 Submitting SRPM to COPR: $SRPM_PATH"
+          
+          if [ ! -f "$SRPM_PATH" ]; then
+            echo "❌ Error: SRPM file not found at $SRPM_PATH"
+            exit 1
+          fi
+          
+          BUILD_OUTPUT=$(copr-cli build "${{ env.COPR_PROJECT }}" "$SRPM_PATH" 2>&1) || {
+            echo "❌ COPR build submission failed:"
+            echo "$BUILD_OUTPUT"
+            exit 1
+          }
+          
+          echo "✅ Build submitted successfully"
+          echo "$BUILD_OUTPUT"
+          
+          # Extract build ID if available
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Build ID: \K[0-9]+' || echo "unknown")
+          echo "📋 Build ID: $BUILD_ID"
+
+      - name: Post-build notification
+        if: steps.check.outputs.skip == 'false' && always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "🎉 COPR build process completed successfully!"
+          else
+            echo "❌ COPR build process failed!"
+          fi
