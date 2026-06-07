@@ -67,6 +67,7 @@ rm -f %{buildroot}%{_libdir}/pkgconfig/scenefx-0.4.pc
 %files
 %{_bindir}/mango
 %{_bindir}/mmsg
+%{_mandir}/man1/mmsg.1*
 %{_datadir}/wayland-sessions/mango.desktop
 %{_datadir}/xdg-desktop-portal/mango-portals.conf
 %dir %{_sysconfdir}/mango
