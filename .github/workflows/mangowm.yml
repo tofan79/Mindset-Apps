@@ -171,7 +171,7 @@ jobs:
           fi
           
           # Submit build without watching
-          BUILD_OUTPUT=$(copr-cli build "${{ env.COPR_PROJECT }}" "$SRPM_PATH" --no-wait 2>&1) || {
+          BUILD_OUTPUT=$(copr-cli build "${{ env.COPR_PROJECT }}" "$SRPM_PATH" --nowait 2>&1) || {
             echo "❌ COPR build submission failed:"
             echo "$BUILD_OUTPUT"
             exit 1
