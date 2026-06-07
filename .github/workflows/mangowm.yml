@@ -170,7 +170,8 @@ jobs:
             exit 1
           fi
           
-          BUILD_OUTPUT=$(copr-cli build "${{ env.COPR_PROJECT }}" "$SRPM_PATH" 2>&1) || {
+          # Submit build without watching
+          BUILD_OUTPUT=$(copr-cli build "${{ env.COPR_PROJECT }}" "$SRPM_PATH" --no-wait 2>&1) || {
             echo "❌ COPR build submission failed:"
             echo "$BUILD_OUTPUT"
             exit 1
@@ -179,9 +180,10 @@ jobs:
           echo "✅ Build submitted successfully"
           echo "$BUILD_OUTPUT"
           
-          # Extract build ID if available
-          BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Build ID: \K[0-9]+' || echo "unknown")
+          # Extract build ID
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Created builds: \K[0-9]+' || echo "unknown")
           echo "📋 Build ID: $BUILD_ID"
+          echo "🔗 Check build status: https://copr.fedorainfracloud.org/coprs/${{ secrets.COPR_USERNAME }}/${{ env.COPR_PROJECT }}/build/$BUILD_ID/"
 
       - name: Post-build notification
         if: steps.check.outputs.skip == 'false' && always()
