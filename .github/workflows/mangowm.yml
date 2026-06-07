@@ -62,7 +62,7 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y rpm build-essential wget jq
+          sudo apt-get install -y rpm build-essential wget jq curl
           pip install copr-cli --quiet
 
       - name: Build SRPM
@@ -79,11 +79,23 @@ jobs:
           # Substitute version in spec file
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/mangowm.spec
           
-          # Download mangowm source
+          # Download mangowm source with retry logic
           echo "📥 Downloading mangowm source..."
-          if ! wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/v${VER}.tar.gz" -O ~/rpmbuild/SOURCES/mangowm-${VER}.tar.gz; then
-            echo "❌ Failed to download mangowm source"
-            exit 1
+          DOWNLOAD_URL="https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/v${VER}.tar.gz"
+          echo "   URL: $DOWNLOAD_URL"
+          
+          if wget --timeout=30 --tries=3 "$DOWNLOAD_URL" -O ~/rpmbuild/SOURCES/mangowm-${VER}.tar.gz 2>&1; then
+            echo "✅ Downloaded mangowm source successfully"
+          else
+            echo "⚠️  Failed to download with v prefix, trying without v..."
+            DOWNLOAD_URL="https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/${VER}.tar.gz"
+            echo "   URL: $DOWNLOAD_URL"
+            if wget --timeout=30 --tries=3 "$DOWNLOAD_URL" -O ~/rpmbuild/SOURCES/mangowm-${VER}.tar.gz 2>&1; then
+              echo "✅ Downloaded mangowm source successfully (without v prefix)"
+            else
+              echo "❌ Failed to download mangowm source from both URLs"
+              exit 1
+            fi
           fi
           
           # Download bundled scenefx source
@@ -91,7 +103,12 @@ jobs:
           SCENEFX_VER=$(grep "scenefx_version" ~/rpmbuild/SPECS/mangowm.spec | head -1 | sed 's/.*scenefx_version //' | tr -d ' ')
           echo "   SceneFX version: $SCENEFX_VER"
           
-          if ! wget -q "https://github.com/wlrfx/scenefx/archive/refs/tags/${SCENEFX_VER}.tar.gz" -O ~/rpmbuild/SOURCES/scenefx-${SCENEFX_VER}.tar.gz; then
+          SCENEFX_URL="https://github.com/wlrfx/scenefx/archive/refs/tags/${SCENEFX_VER}.tar.gz"
+          echo "   URL: $SCENEFX_URL"
+          
+          if wget --timeout=30 --tries=3 "$SCENEFX_URL" -O ~/rpmbuild/SOURCES/scenefx-${SCENEFX_VER}.tar.gz 2>&1; then
+            echo "✅ Downloaded scenefx source successfully"
+          else
             echo "❌ Failed to download scenefx source"
             exit 1
           fi
