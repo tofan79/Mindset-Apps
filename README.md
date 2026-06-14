@@ -13,7 +13,6 @@ sudo dnf update
 
 | App | Source | Update |
 |-----|--------|--------|
-| mangowm | [mangowm/mango](https://github.com/mangowm/mango) | tiap 3 hari |
 | zen-browser | [zen-browser/desktop](https://github.com/zen-browser/desktop) | tiap 3 hari |
 | localsend | [localsend/localsend](https://github.com/localsend/localsend) | tiap 3 hari |
 | zed | [zed-industries/zed](https://github.com/zed-industries/zed) | tiap 3 hari |
@@ -24,13 +23,11 @@ sudo dnf update
 ```
 Mindset-Apps/
 ├── .github/workflows/
-│   ├── mangowm.yml
 │   ├── zen-browser.yml
 │   ├── localsend.yml
 │   ├── zed.yml
 │   └── jetbrains-toolbox.yml
 ├── specs/
-│   ├── mangowm.spec
 │   ├── zen-browser.spec
 │   ├── localsend.spec
 │   ├── zed.spec
