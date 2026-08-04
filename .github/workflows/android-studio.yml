@@ -2,7 +2,7 @@ name: "android-studio - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 4 */3 * *'   # tiap 3 hari, jam 04.00 UTC
+    - cron: '0 4 * * 1'   # tiap hari Senin, jam 04.00 UTC
   workflow_dispatch:
 
 env:
