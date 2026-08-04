@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        IntelliJ IDEA Community Edition — Leading Java and Kotlin IDE
 License:        Apache-2.0
 URL:            https://www.jetbrains.com/idea/
-Source0:        ideaIC-%{pkg_version}.tar.gz
+Source0:        idea-%{pkg_version}.tar.gz
 
 # Pre-built binary
 %global debug_package %{nil}
