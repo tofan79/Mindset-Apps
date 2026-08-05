@@ -31,7 +31,7 @@ install -d %{buildroot}/opt/ab-download-manager
 cp -r * %{buildroot}/opt/ab-download-manager/
 
 install -d %{buildroot}%{_bindir}
-ln -s /opt/ab-download-manager/bin/ABDownloadManager %{buildroot}%{_bindir}/abdownloadmanager
+ln -s /opt/ab-download-manager/ABDownloadManager/bin/ABDownloadManager %{buildroot}%{_bindir}/abdownloadmanager
 
 install -d %{buildroot}%{_datadir}/applications
 cat > %{buildroot}%{_datadir}/applications/ab-download-manager.desktop << 'EOF'
@@ -39,8 +39,8 @@ cat > %{buildroot}%{_datadir}/applications/ab-download-manager.desktop << 'EOF'
 Name=AB Download Manager
 GenericName=Download Manager
 Comment=Fast & powerful download manager
-Exec=/opt/ab-download-manager/bin/ABDownloadManager %U
-Icon=/opt/ab-download-manager/lib/ABDownloadManager.png
+Exec=/opt/ab-download-manager/ABDownloadManager/bin/ABDownloadManager %U
+Icon=/opt/ab-download-manager/ABDownloadManager/lib/ABDownloadManager.png
 Terminal=false
 Type=Application
 Categories=Network;FileTransfer;
@@ -53,5 +53,6 @@ EOF
 %{_datadir}/applications/ab-download-manager.desktop
 
 %changelog
-* Tue Aug 05 2026 mindset <mindset@copr> - %{pkg_version}-1
+* Wed Aug 05 2026 mindset <mindset@copr> - %{pkg_version}-1
+- Fix Exec/Icon/symlink path (ABDownloadManager/ subdir)
 - Initial COPR package
