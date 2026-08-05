@@ -1,4 +1,4 @@
-name: "intellij-idea-community - COPR Auto Build"
+name: "intellij-idea - COPR Auto Build"
 
 on:
   schedule:
@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 
 env:
-  APP_NAME:       "intellij-idea-community"
-  JETBRAINS_CODE: "IIC"           # IntelliJ IDEA Community
+  APP_NAME:       "intellij-idea"
+  JETBRAINS_CODE: "IIU"           # Unified IntelliJ IDEA
   COPR_PROJECT:   "Mindset-Apps"
-  SPEC_FILE:      "specs/intellij-idea-community.spec"
+  SPEC_FILE:      "specs/intellij-idea.spec"
 
 jobs:
   check-and-build:
