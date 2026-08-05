@@ -1,0 +1,104 @@
+name: "software-center - COPR Auto Build"
+
+on:
+  schedule:
+    - cron: '0 3 */3 * *'   # tiap 3 hari, jam 03.00 UTC
+  workflow_dispatch:
+
+env:
+  APP_NAME:       "software-center"
+  GITHUB_REPO:    "tofan79/software-center"
+  COPR_PROJECT:   "Mindset-Apps"
+  SPEC_FILE:      "specs/software-center.spec"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Get upstream version (latest git tag)
+        id: upstream
+        run: |
+          VER=$(curl -s \
+            "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest" \
+            | jq -r '.tag_name // empty' | sed 's/^v//')
+          [ -z "$VER" ] && VER=$(git ls-remote --tags "https://github.com/${{ env.GITHUB_REPO }}.git" \
+            | awk -F/ '{print $3}' | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^v//' | sort -V | tail -1)
+          [ -z "$VER" ] && VER="1.0.0"
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "▶ Upstream: $VER"
+
+      - name: Get current COPR version
+        id: copr
+        run: |
+          CURRENT=$(curl -s \
+            "https://copr.fedorainfracloud.org/api_3/package/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '.builds.latest.source_package.version // "none"')
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        run: |
+          UP="${{ steps.upstream.outputs.version }}"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "$UP" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y rpm build-essential wget
+          pip install copr-cli --quiet
+
+      - name: Download source tarball
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          FILENAME="${{ env.APP_NAME }}-${VER}.tar.gz"
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/v${VER}.tar.gz" -O "$FILENAME" \
+            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/${VER}.tar.gz" -O "$FILENAME" \
+            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/heads/main.tar.gz" -O "$FILENAME"
+          # GitHub archives have a "<repo>-<ref>" top dir; rename so %setup matches.
+          mkdir -p extract
+          tar -xzf "$FILENAME" -C extract
+          D=$(ls extract)
+          mv "extract/$D" "${{ env.APP_NAME }}-${VER}"
+          tar -czf "$FILENAME" "${{ env.APP_NAME }}-${VER}"
+          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
+          sed -i "s/^Version:.*/Version:        $VER/" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          cp "$FILENAME" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
+          echo "path=$SRPM" >> $GITHUB_OUTPUT
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Submit to COPR
+        if: steps.check.outputs.skip == 'false'
+        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}

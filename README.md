@@ -19,6 +19,7 @@ sudo dnf update
 | intellij-idea | [JetBrains API](https://www.jetbrains.com/idea/) | tiap 7 hari |
 | android-studio | [developer.android.com](https://developer.android.com/studio) | tiap 7 hari |
 | ab-download-manager | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) | tiap 7 hari |
+| software-center | source build (git tag) | tiap 3 hari |
 
 ## Struktur Repo
 
@@ -30,14 +31,16 @@ Mindset-Apps/
 │   ├── zed.yml
 │   ├── intellij-idea.yml
 │   ├── android-studio.yml
-│   └── ab-download-manager.yml
+│   ├── ab-download-manager.yml
+│   └── software-center.yml
 ├── specs/
 │   ├── zen-browser.spec
 │   ├── localsend.spec
 │   ├── zed.spec
 │   ├── intellij-idea.spec
 │   ├── android-studio.spec
-│   └── ab-download-manager.spec
+│   ├── ab-download-manager.spec
+│   └── software-center.spec
 └── README.md
 ```
 
