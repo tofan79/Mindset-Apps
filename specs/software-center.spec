@@ -5,7 +5,7 @@ Version:        1.0.0
 Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
-License:        GPL-3.0-or-later
+License:        GPL-3.0
 # TODO: set the real project homepage before publishing
 URL:            https://example.invalid/software-center
 Source0:        %{name}-%{version}.tar.gz
