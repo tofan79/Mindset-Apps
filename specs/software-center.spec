@@ -14,6 +14,7 @@ BuildRequires:  rust
 BuildRequires:  cargo
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
+BuildRequires:  dbus-devel
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 
