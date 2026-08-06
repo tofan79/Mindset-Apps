@@ -19,7 +19,7 @@ sudo dnf update
 | intellij-idea | [JetBrains API](https://www.jetbrains.com/idea/) | tiap 7 hari |
 | android-studio | [developer.android.com](https://developer.android.com/studio) | tiap 7 hari |
 | ab-download-manager | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) | tiap 7 hari |
-| software-center | source build (git tag) | tiap 3 hari |
+| software-center | source build (git tag) | manual |
 
 ## Struktur Repo
 
