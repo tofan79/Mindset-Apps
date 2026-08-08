@@ -20,6 +20,8 @@ sudo dnf update
 | android-studio | [developer.android.com](https://developer.android.com/studio) | tiap 7 hari (Rabu) |
 | ab-download-manager | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) | tiap 7 hari (Kamis) |
 | onlyoffice-desktopeditors | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | tiap 7 hari (Jumat) |
+| heroic-launcher | [Heroic-Games-Launcher/HeroicGamesLauncher](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher) | tiap 7 hari (Sabtu) |
+| zoom | [zoom.us/download](https://zoom.us/download) | tiap 7 hari (Minggu) |
 | software-center | [tofan79/software-center](https://github.com/tofan79/software-center) | manual |
 
 ## Struktur Repo
@@ -34,6 +36,8 @@ Mindset-Apps/
 │   ├── android-studio.yml
 │   ├── ab-download-manager.yml
 │   ├── onlyoffice-desktopeditors.yml
+│   ├── heroic-launcher.yml
+│   ├── zoom.yml
 │   └── software-center.yml
 ├── specs/
 │   ├── zen-browser.spec
@@ -43,6 +47,8 @@ Mindset-Apps/
 │   ├── android-studio.spec
 │   ├── ab-download-manager.spec
 │   ├── onlyoffice-desktopeditors.spec
+│   ├── heroic-launcher.spec
+│   ├── zoom.spec
 │   └── software-center.spec
 └── README.md
 ```
