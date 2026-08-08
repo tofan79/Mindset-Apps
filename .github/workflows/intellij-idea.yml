@@ -2,7 +2,7 @@ name: "intellij-idea - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 3 * * 1'   # tiap hari Senin, jam 03.00 UTC
+    - cron: '0 3 * * 1'   # tiap hari Senin, jam 03.00 UTC (tiap 7 hari)
   workflow_dispatch:
 
 env:
