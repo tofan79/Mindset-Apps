@@ -2,7 +2,7 @@ name: "ab-download-manager - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 5 * * 1'   # tiap hari Senin, jam 05.00 UTC
+    - cron: '0 5 * * 4'   # tiap hari Kamis, jam 05.00 UTC (tiap 7 hari)
   workflow_dispatch:
 
 env:
