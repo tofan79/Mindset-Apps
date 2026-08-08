@@ -32,14 +32,14 @@ install -d %{buildroot}/opt/android-studio
 cp -r . %{buildroot}/opt/android-studio/
 
 install -d %{buildroot}%{_bindir}
-ln -s /opt/android-studio/bin/studio.sh %{buildroot}%{_bindir}/android-studio
+ln -s /opt/android-studio/bin/studio %{buildroot}%{_bindir}/android-studio
 
 install -d %{buildroot}%{_datadir}/applications
 cat > %{buildroot}%{_datadir}/applications/android-studio.desktop << 'EOF'
 [Desktop Entry]
 Name=Android Studio
 Comment=Android Studio — The official Android IDE
-Exec=/opt/android-studio/bin/studio.sh %f
+Exec=/opt/android-studio/bin/studio %f
 Icon=/opt/android-studio/bin/studio.png
 Terminal=false
 Type=Application
