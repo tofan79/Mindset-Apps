@@ -55,6 +55,7 @@ jobs:
           pip install copr-cli --quiet
 
       - name: Download official RPM
+        id: download
         if: steps.check.outputs.skip == 'false'
         run: |
           VER="${{ steps.upstream.outputs.version }}"
