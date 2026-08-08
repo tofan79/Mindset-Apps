@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           software-center
-Version:        1.0.0
+Version:        1.0.5
 Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
@@ -81,6 +81,16 @@ install -Dm644 resources/software-center-tray.desktop \
 %{_sysconfdir}/xdg/autostart/software-center-tray.desktop
 
 %changelog
+* Sat Aug 08 2026 mindset <mindset@users.noreply.github.com> - 1.0.5-1
+- Perbaiki deteksi installed (desktop file + mapping flatpak-to-rpm):
+  Telegram & Zed kini akurat di Installed/Home/detail.
+- Grid/List toggle + sort (nama, terbaru update, installed first) di
+  halaman kategori dan halaman sumber DNF/Flatpak.
+- Halaman sidebar baru DNF & Flatpak; picker install sumber dikontekstualisasi
+  (DNF page -> native saja, Flatpak page -> flatpak System/User).
+- Field "updated" (tanggal rilis AppStream) diisi dari atribut date/timestamp.
+- Search dirapikan: tab DNF | Flatpak (AppImage tab dihapus).
+
 * Wed Aug 05 2026 mindset <mindset@users.noreply.github.com> - 1.0.0-1
 - Initial Software Center package: Qt6/QML frontend + tray daemon.
 - Replaces the legacy rakuos-software package (webapps, KNS add-ons, and
