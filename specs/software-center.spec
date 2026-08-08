@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           software-center
-Version:        1.0.5
+Version:        1.0.6
 Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
@@ -81,6 +81,19 @@ install -Dm644 resources/software-center-tray.desktop \
 %{_sysconfdir}/xdg/autostart/software-center-tray.desktop
 
 %changelog
+* Sat Aug 08 2026 mindset <mindset@users.noreply.github.com> - 1.0.6-1
+- Perbaiki sinkronisasi CLI/GUI: semua query dnf5 read-only
+  (check-update, list --installed, repoquery, repo list) kini pakai
+  --skip-file-locks sehingga tidak lagi berebut /var/lib/dnf/system-repo.lock
+  dengan `dnf upgrade` dari terminal.
+- Perbaiki tray beku: update check daemon dijalankan di task terpisah,
+  message loop tetap responsif untuk Open/Quit; trigger refresh UI ditulis
+  setelah cache selesai.
+- Tambah timeout 20s pada pengecekan GNOME extension (sebelumnya bisa
+  menggantung tanpa batas).
+- Daemon kini memverifikasi PID UI via cmdline (bukan hanya /proc), jadi
+  pid file basi tidak lagi membuat "Open Software Center" diam saja.
+
 * Sat Aug 08 2026 mindset <mindset@users.noreply.github.com> - 1.0.5-1
 - Perbaiki deteksi installed (desktop file + mapping flatpak-to-rpm):
   Telegram & Zed kini akurat di Installed/Home/detail.
