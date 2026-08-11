@@ -6,8 +6,7 @@ Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
 License:        GPL-3.0-or-later
-# TODO: set the real project homepage before publishing
-URL:            https://example.invalid/software-center
+URL:            https://github.com/tofan79/software-center
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  rust
