@@ -1,49 +1,75 @@
 # Mindset-Apps COPR
 
-Personal COPR repository — auto-build dari GitHub Releases resmi + source build.
+Personal COPR repository that tracks upstream releases and rebuilds them as RPMs,
+so Fedora users can install current versions of these apps with plain `dnf`.
 
-## Cara Pakai
+[![COPR](https://img.shields.io/badge/COPR-mindset%2FMindset--Apps-brightgreen)](https://copr.fedorainfracloud.org/coprs/mindset/Mindset-Apps/)
+
+## Enable the repository
 
 ```bash
 sudo dnf copr enable mindset/Mindset-Apps
 sudo dnf update
 ```
 
-## Apps yang Tersedia
+After that, install any app from the table below, e.g.:
 
-| App | Source | Update |
-|-----|--------|--------|
-| zen-browser | [zen-browser/desktop](https://github.com/zen-browser/desktop) | tiap 3 hari |
-| zed | [zed-industries/zed](https://github.com/zed-industries/zed) | tiap 3 hari |
-| intellij-idea | [JetBrains API](https://www.jetbrains.com/idea/) | tiap 7 hari (Senin) |
-| localsend | [localsend/localsend](https://github.com/localsend/localsend) | tiap 7 hari (Selasa) |
-| android-studio | [developer.android.com](https://developer.android.com/studio) | tiap 7 hari (Rabu) |
-| ab-download-manager | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) | tiap 7 hari (Kamis) |
-| onlyoffice-desktopeditors | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | tiap 7 hari (Jumat) |
-| heroic-launcher | [Heroic-Games-Launcher/HeroicGamesLauncher](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher) | tiap 7 hari (Sabtu) |
-| zoom | [zoom.us/download](https://zoom.us/download) | tiap 7 hari (Minggu) |
-| software-center | [tofan79/software-center](https://github.com/tofan79/software-center) | manual |
+```bash
+sudo dnf install zen-browser
+```
 
-## Struktur Repo
+## Available packages
+
+| Package | Upstream source | Update schedule |
+|---------|-----------------|-----------------|
+| `zen-browser` | [zen-browser/desktop](https://github.com/zen-browser/desktop) | every 3 days |
+| `zed` | [zed-industries/zed](https://github.com/zed-industries/zed) | every 3 days |
+| `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) | weekly (Mon) |
+| `localsend` | [localsend/localsend](https://github.com/localsend/localsend) | weekly (Tue) |
+| `android-studio` | [Android Studio](https://developer.android.com/studio) | weekly (Wed) |
+| `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) | weekly (Thu) |
+| `onlyoffice-desktopeditors` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | weekly (Fri) |
+| `heroic-launcher` | [Heroic-Games-Launcher/HeroicGamesLauncher](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher) | weekly (Sat) |
+| `zoom` | [Zoom](https://zoom.us/download) | weekly (Sun) |
+| `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) | manual (on release) |
+
+## How it works
+
+Each app has a dedicated workflow that:
+
+1. **Reads the upstream version** — from the latest GitHub release, the vendor
+   API, or the vendor's download page.
+2. **Reads the current COPR version** — from the last *succeeded* build.
+3. **Smart Skip** — if the versions match, the workflow exits immediately
+   (no build). Only when upstream publishes something new does it rebuild and
+   submit a fresh SRPM to COPR.
+4. **Builds & submits** — downloads the upstream artifact, renders the spec,
+   builds an SRPM, and pushes it to COPR via `copr-cli`.
+
+The `software-center` package is special-cased: its source lives in its own
+repository and is only built when you create a new release tag there, so it is
+triggered manually.
+
+## Repository layout
 
 ```
 Mindset-Apps/
-├── .github/workflows/
+├── .github/workflows/   # one workflow per package
 │   ├── zen-browser.yml
-│   ├── localsend.yml
 │   ├── zed.yml
 │   ├── intellij-idea.yml
+│   ├── localsend.yml
 │   ├── android-studio.yml
 │   ├── ab-download-manager.yml
 │   ├── onlyoffice-desktopeditors.yml
 │   ├── heroic-launcher.yml
 │   ├── zoom.yml
 │   └── software-center.yml
-├── specs/
+├── specs/               # one RPM spec per package
 │   ├── zen-browser.spec
-│   ├── localsend.spec
 │   ├── zed.spec
 │   ├── intellij-idea.spec
+│   ├── localsend.spec
 │   ├── android-studio.spec
 │   ├── ab-download-manager.spec
 │   ├── onlyoffice-desktopeditors.spec
@@ -53,6 +79,16 @@ Mindset-Apps/
 └── README.md
 ```
 
-## Smart Skip
+## Development
 
-Tiap workflow cek versi upstream vs COPR sebelum build. Kalau sama → stop (<1 menit). Kalau beda → build + push (~5-10 menit).
+- **Add a package:** create `specs/<name>.spec` and
+  `.github/workflows/<name>.yml`, mirroring the structure of an existing entry.
+- **Run a build manually:** open
+  [Actions](https://github.com/tofan79/Mindset-Apps/actions), select the
+  workflow, and press *Run workflow*.
+- **Skipped runs** complete in under a minute; real builds take 5–10 minutes.
+
+## License
+
+Individual packages carry their own upstream licenses (see each `.spec`).
+Workflows and specs in this repository are provided as-is for personal use.
