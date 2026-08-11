@@ -29,8 +29,11 @@ jobs:
         id: copr
         run: |
           CURRENT=$(curl -s \
-            "https://copr.fedorainfracloud.org/api_3/package/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
-            | jq -r '.builds.latest.source_package.version // "none"')
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          # COPR mengembalikan versi dengan suffix release ("1.17.0-1"); buang
+          # suffix-nya agar cocok dengan tag upstream ("1.17.0") saat dibandingkan.
+          CURRENT="${CURRENT%-*}"
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "▶ COPR: $CURRENT"
 
