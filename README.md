@@ -29,9 +29,8 @@ sudo dnf install zen-browser
 | `android-studio` | [Android Studio](https://developer.android.com/studio) | weekly (Wed) |
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) | weekly (Thu) |
 | `onlyoffice-desktopeditors` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | weekly (Fri) |
-| `heroic-launcher` | [Heroic-Games-Launcher/HeroicGamesLauncher](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher) | weekly (Sat) |
 | `zoom` | [Zoom](https://zoom.us/download) | weekly (Sun) |
-| `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) | manual (on release) |
+| `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) | daily (auto) |
 
 ## How it works
 
@@ -47,8 +46,8 @@ Each app has a dedicated workflow that:
    builds an SRPM, and pushes it to COPR via `copr-cli`.
 
 The `software-center` package is special-cased: its source lives in its own
-repository and is only built when you create a new release tag there, so it is
-triggered manually.
+repository and is rebuilt automatically (daily) whenever a new release tag
+appears there.
 
 ## Repository layout
 
@@ -62,7 +61,6 @@ Mindset-Apps/
 │   ├── android-studio.yml
 │   ├── ab-download-manager.yml
 │   ├── onlyoffice-desktopeditors.yml
-│   ├── heroic-launcher.yml
 │   ├── zoom.yml
 │   └── software-center.yml
 ├── specs/               # one RPM spec per package
@@ -73,7 +71,6 @@ Mindset-Apps/
 │   ├── android-studio.spec
 │   ├── ab-download-manager.spec
 │   ├── onlyoffice-desktopeditors.spec
-│   ├── heroic-launcher.spec
 │   ├── zoom.spec
 │   └── software-center.spec
 └── README.md
