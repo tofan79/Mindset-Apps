@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           software-center
-Version:        1.0.10
+Version:        1.0.11
 Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
@@ -81,6 +81,26 @@ install -Dm644 resources/software-center-tray.desktop \
 %{_sysconfdir}/xdg/autostart/software-center-tray.desktop
 
 %changelog
+* Tue Aug 11 2026 mindset <mindset@users.noreply.github.com> - 1.0.11-1
+- Fix freeze UI startup: repoquery --unneeded (dnf5) yang berjalan sinkron saat
+  app dibuka (SettingsPage Component.onCompleted) diubah jadi async — tidak
+  lagi mengunci UI. Load Installed (runtimes), repositori, dan unused packages
+  semua dipindah ke pola async load/poll/read.
+- Fix deadlock native install/remove: run_scenter_stream (pkexec dnf5) kini
+  men-drain stderr di thread terpisah — dnf5 yang menulis >64KB ke stderr tidak
+  lagi menggantung saat instal .rpm lokal.
+- Optimasi search/browse: get_installed_packages kini pakai SATU `rpm -qa`
+  (bukan satu proses rpm per paket) + batch --whatprovides untuk virtual
+  provides — pencarian jauh lebih cepat.
+- Optimasi cache repoquery: clear_repo_cache() dihapus dari check-update; cache
+  hanya invalidasi saat metadata repo benar-benar berubah. Logika freshness
+  diperbaiki (sebelumnya terbalik).
+- Fix unused packages: repoquery --unneeded pakai --qf "%{name}" (sebelumnya
+  menampilkan version-release.arch, bukan nama).
+- Fix icon 404: fallback Flathub CDN hanya untuk app dari remote flathub.
+- Screenshot detail page cache:true (tidak re-download tiap buka).
+- Hapus dead code: install_stream (packages), install_ref_stream (flatpak).
+
 * Sat Aug 08 2026 mindset <mindset@users.noreply.github.com> - 1.0.10-1
 - Detail page: dropdown pilihan sumber (Fedora (DNF) / Flathub System/User)
   kini disembunyikan saat aplikasi sudah terinstall — cukup tombol Remove.
