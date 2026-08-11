@@ -25,4 +25,4 @@ jobs:
           EOF
 
       - name: Delete package
-        run: copr-cli delete-package Mindset-Apps heroic-launcher
+        run: copr-cli delete-package --name heroic-launcher Mindset-Apps
