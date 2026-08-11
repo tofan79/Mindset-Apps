@@ -1,8 +1,8 @@
 name: "software-center - COPR Auto Build"
 
 on:
-  # Manual only: source ada di repo sendiri (tofan79/software-center),
-  # build dipicu manual setelah buat release baru.
+  schedule:
+    - cron: '0 6 * * *'   # tiap hari, jam 06.00 UTC (Smart Skip otomatis kalau versi sama)
   workflow_dispatch:
 
 env:

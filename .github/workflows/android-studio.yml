@@ -22,7 +22,7 @@ jobs:
         run: |
           # Ambil URL download Linux langsung dari halaman resmi
           DL_URL=$(curl -s "${{ env.DL_PAGE }}" \
-            | grep -oE 'https://edgedl\.me\.gvt1\.com/android/studio/ide-zips/[0-9.]+/android-studio-[a-z0-9]+-linux\.tar\.gz' \
+            | grep -oE 'https://edgedl\.me\.gvt1\.com/android/studio/ide-zips/[0-9.]+/android-studio-[a-z0-9-]+-linux\.tar\.gz' \
             | head -1)
           if [ -z "$DL_URL" ]; then
             echo "❌ Tidak menemukan URL download Android Studio"
