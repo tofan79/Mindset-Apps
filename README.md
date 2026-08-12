@@ -31,6 +31,7 @@ sudo dnf install zen-browser
 | `onlyoffice-desktopeditors` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | weekly (Fri) |
 | `zoom` | [Zoom](https://zoom.us/download) | weekly (Sun) |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) | daily (auto) |
+| `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) | every 3 days |
 
 ## How it works
 
@@ -62,7 +63,8 @@ Mindset-Apps/
 │   ├── ab-download-manager.yml
 │   ├── onlyoffice-desktopeditors.yml
 │   ├── zoom.yml
-│   └── software-center.yml
+│   ├── software-center.yml
+│   └── stirling-pdf.yml
 ├── specs/               # one RPM spec per package
 │   ├── zen-browser.spec
 │   ├── zed.spec
@@ -72,7 +74,8 @@ Mindset-Apps/
 │   ├── ab-download-manager.spec
 │   ├── onlyoffice-desktopeditors.spec
 │   ├── zoom.spec
-│   └── software-center.spec
+│   ├── software-center.spec
+│   └── stirling-pdf.spec
 └── README.md
 ```
 
