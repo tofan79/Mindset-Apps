@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           software-center
-Version:        1.0.11
+Version:        1.0.12
 Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
