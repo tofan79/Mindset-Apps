@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           software-center
-Version:        1.0.12
+Version:        1.0.13
 Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
@@ -26,6 +26,14 @@ Requires:       polkit
 Requires:       rpm
 Requires:       appstream
 Requires:       appstream-data
+# AppImage support — archive extraction, AppImage runtime, desktop-file refresh
+Requires:       unzip
+Requires:       7zip
+Requires:       tar
+Requires:       coreutils
+# Backend helpers — dnf process detection, desktop-file cache update
+Requires:       procps-ng
+Requires:       desktop-file-utils
 
 %description
 Software Center is a modern app store for Fedora and derivatives. It lets you
@@ -80,24 +88,56 @@ install -Dm644 resources/software-center-tray.desktop \
 %{_sysconfdir}/xdg/autostart/software-center-tray.desktop
 
 %changelog
+* Thu Aug 13 2026 mindset <mindset@users.noreply.github.com> - 1.0.13-1
+- AppImage update kini berfungsi penuh di UI: check updates manual menyertakan
+  AppImage (sebelumnya `appimages: []` hardcoded), tombol Update per-item /
+  Update all / Update section memanggil updateAppImage() yang benar (sebelumnya
+  jatuh ke dnf upgrade dan gagal), dan versi setelah update benar (fallback ke
+  new_version hasil check saat binary baru tanpa X-AppImage-Version).
+- Uninstall AppImage kini menghapus juga preview icon cache local-icons —
+  tidak ada sisa file. Re-install mempertahankan update settings (update source/
+  URL/pattern) yang sudah diatur pengguna.
+- Filter warning log QML QQuickImage (404 ikon Flathub, issue #1) via
+  is_noise()/NoiseFilter — log bersih.
+- Requires baru untuk AppImage: unzip, 7zip, tar, coreutils, procps-ng,
+  desktop-file-utils.
+- Clippy bersih seluruh workspace.
+
+* Wed Aug 12 2026 mindset <mindset@users.noreply.github.com> - 1.0.12-1
+- Fix tab Flatpak Repositories di Settings selalu kosong ("No Flatpak remotes
+  configured") padahal backend benar: assignment hasil parse ditulis sebagai
+  `remotes = ...` (bukan `flatpakTab.remotes = ...`) di dalam Timer.onTriggered,
+  sehingga QML men-resolve ke global property dan error "Invalid write to global
+  property" — data tidak pernah tersimpan. Semua assignment kini di-prefiks
+  eksplisit dengan `flatpakTab.` (remotes, hasFlathub, hasFlathubSystem/User,
+  hasCosmic*).
+- Log aktivitas baru: setiap aksi di-log ke /tmp/software-center/activity.log
+  ber-timestamp (navigasi halaman, install/remove/upgrade, repo & remote DNF/
+  Flatpak, clean cache, search, detail, local file install) + error QML/Qt
+  kini ikut tertangkap ke /tmp/software-center/software-center.log (env_logger
+  dialihkan ke file + stderr), jadi masalah bisa didiagnosis tanpa terminal.
+
 * Tue Aug 11 2026 mindset <mindset@users.noreply.github.com> - 1.0.11-1
 - Fix freeze UI startup: repoquery --unneeded (dnf5) yang berjalan sinkron saat
   app dibuka (SettingsPage Component.onCompleted) diubah jadi async — tidak
   lagi mengunci UI. Load Installed (runtimes), repositori, dan unused packages
-  semua dipindah ke pola async load/poll/read.
-- Fix deadlock native install/remove: run_scenter_stream (pkexec dnf5) kini
-  men-drain stderr di thread terpisah — dnf5 yang menulis >64KB ke stderr tidak
-  lagi menggantung saat instal .rpm lokal.
+  semua dipindah ke pola async load/poll/read (backend load/poll/read + timer QML).
+- Fix deadlock native install/remove: run_scenter_stream (pkexec dnf5 install/remove)
+  kini men-drain stderr di thread terpisah — dnf5 yang menulis >64KB ke stderr
+  tidak lagi menghentikan proses selamanya saat instal .rpm lokal.
 - Optimasi search/browse: get_installed_packages kini pakai SATU `rpm -qa`
-  (bukan satu proses rpm per paket) + batch --whatprovides untuk virtual
-  provides — pencarian jauh lebih cepat.
-- Optimasi cache repoquery: clear_repo_cache() dihapus dari check-update; cache
-  hanya invalidasi saat metadata repo benar-benar berubah. Logika freshness
-  diperbaiki (sebelumnya terbalik).
-- Fix unused packages: repoquery --unneeded pakai --qf "%{name}" (sebelumnya
-  menampilkan version-release.arch, bukan nama).
-- Fix icon 404: fallback Flathub CDN hanya untuk app dari remote flathub.
-- Screenshot detail page cache:true (tidak re-download tiap buka).
+  (bukan satu proses rpm per paket) + batch `rpm -q --whatprovides` untuk
+  virtual provides — pencarian jauh lebih cepat.
+- Optimasi cache repoquery: hapus clear_repo_cache() dari check-update; cache
+  hanya invalidasi saat metadata repo benar-benar berubah (repomd.xml lebih baru
+  dari cache). Logika freshness repo_cache_fresh diperbaiki (sebelumnya terbalik:
+  metadata baru ≥60s justru dianggap fresh).
+- Fix unused packages list: repoquery --unneeded kini pakai --qf "%{name}"
+  — sebelumnya parsing menampilkan version-release.arch, bukan nama paket.
+- Fix icon 404: fallback icon Flathub CDN hanya dipakai untuk app yang benar
+  berasal dari remote flathub — app remote lain (cosmic, dst) tidak lagi
+  menunjuk URL yang tidak ada.
+- Screenshot detail page kini pakai cache:true (tidak re-download tiap buka).
 - Hapus dead code: install_stream (packages), install_ref_stream (flatpak).
 
 * Sat Aug 08 2026 mindset <mindset@users.noreply.github.com> - 1.0.10-1
