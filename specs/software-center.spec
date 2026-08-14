@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           software-center
-Version:        1.0.13
+Version:        1.1.0
 Release:        1%{?dist}
 Summary:        Software Center — install and manage apps, Flatpaks, and system updates
 
@@ -31,6 +31,8 @@ Requires:       unzip
 Requires:       7zip
 Requires:       tar
 Requires:       coreutils
+# AppImage delta updates (.zsync). Falls back to full download when absent.
+Requires:       zsync
 # Backend helpers — dnf process detection, desktop-file cache update
 Requires:       procps-ng
 Requires:       desktop-file-utils
@@ -88,6 +90,20 @@ install -Dm644 resources/software-center-tray.desktop \
 %{_sysconfdir}/xdg/autostart/software-center-tray.desktop
 
 %changelog
+* Thu Aug 14 2026 mindset <mindset@users.noreply.github.com> - 1.1.0-1
+- Source update otomatis untuk AppImage populer (#5): RPCS3, Eden, DuckStation,
+  PCSX2, Youwee terdeteksi otomatis (badge 'auto source'). Perbandingan rilis
+  memakai tanggal untuk repo yang tag-nya bukan versi (DuckStation 'latest',
+  RPCS3 'build-hash'). AppImage lain tetap bisa ikut auto-update via Detail →
+  Update: pilih source (github/gitlab/codeberg/forgejo/url), isi owner/repo +
+  pattern, Save Settings.
+- Verifikasi checksum SHA256 sebelum install/update AppImage (#6): diambil dari
+  release body (termasuk format 'hash;size') atau sidecar (.sha256/.sha256sum);
+  update dibatalkan jika tidak cocok, berjalan normal jika tidak tersedia.
+- Rollback AppImage ke versi sebelumnya (#7): backup versi lama disimpan setelah
+  update; tombol 'Kembali ke versi sebelumnya' di halaman detail mengembalikannya
+  (bisa bolak-balik). Backup dibersihkan saat uninstall/cleanup.
+
 * Thu Aug 13 2026 mindset <mindset@users.noreply.github.com> - 1.0.13-1
 - AppImage update kini berfungsi penuh di UI: check updates manual menyertakan
   AppImage (sebelumnya `appimages: []` hardcoded), tombol Update per-item /
