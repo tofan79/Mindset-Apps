@@ -58,13 +58,9 @@ jobs:
           pip install copr-cli --quiet
 
       - name: Download official RPM
-        id: download
         if: steps.check.outputs.skip == 'false'
         run: |
-          VER="${{ steps.upstream.outputs.version }}"
           wget -q "https://zoom.us/client/latest/zoom_x86_64.rpm"
-          mv zoom_x86_64.rpm "${{ env.APP_NAME }}-${VER}.rpm"
-          echo "rpm_file=${{ env.APP_NAME }}-${VER}.rpm" >> $GITHUB_OUTPUT
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -74,8 +70,7 @@ jobs:
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
-          cp "${{ steps.download.outputs.rpm_file }}" ~/rpmbuild/SOURCES/
-          sed -i "s|Source0:.*|Source0: ${{ steps.download.outputs.rpm_file }}|" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          cp zoom_x86_64.rpm ~/rpmbuild/SOURCES/
           rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT

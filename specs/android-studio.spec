@@ -13,7 +13,6 @@ Source0:        android-studio-%{pkg_version}-linux.tar.gz
 BuildArch:      x86_64
 AutoReqProv:    no
 
-Requires:       java-25-openjdk
 Requires:       glib2
 Requires:       libXtst
 Requires:       libxcb
