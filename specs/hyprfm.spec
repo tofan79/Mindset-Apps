@@ -50,15 +50,10 @@ MimeType=inode/directory;
 StartupNotify=true
 EOF
 
-install -d %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
-cp %{buildroot}/opt/hyprfm/hyprfm.svg \
-   %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/hyprfm.svg 2>/dev/null || true
-
 %files
 /opt/hyprfm/
 %{_bindir}/hyprfm
 %{_datadir}/applications/hyprfm.desktop
-%{_datadir}/icons/hicolor/scalable/apps/hyprfm.svg
 
 %changelog
 * Wed Aug 26 2026 mindset <mindset@copr> - %{pkg_version}-1
