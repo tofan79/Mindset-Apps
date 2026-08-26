@@ -24,6 +24,12 @@ jobs:
           DL_URL=$(curl -s "${{ env.DL_PAGE }}" \
             | grep -oE 'https://edgedl\.me\.gvt1\.com/android/studio/ide-zips/[0-9.]+/android-studio-[a-z0-9-]+-linux\.tar\.gz' \
             | head -1)
+          # Fallback: coba domain alternatif
+          if [ -z "$DL_URL" ]; then
+            DL_URL=$(curl -s "${{ env.DL_PAGE }}" \
+              | grep -oE 'https://dl\.google\.com/android/studio/ide-zips/[0-9.]+/android-studio-[a-z0-9-]+-linux\.tar\.gz' \
+              | head -1)
+          fi
           if [ -z "$DL_URL" ]; then
             echo "❌ Tidak menemukan URL download Android Studio"
             exit 1

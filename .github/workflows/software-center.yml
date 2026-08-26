@@ -84,7 +84,7 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
-          sed -i "s/^Version:.*/Version:        $VER/" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
           cp "$FILENAME" ~/rpmbuild/SOURCES/
           rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
