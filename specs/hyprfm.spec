@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        HyprFM — A fast, keyboard-friendly file manager for Hyprland
 License:        MIT
 URL:            https://github.com/soyeb-jim285/hyprfm
-Source0:        HyprFM-v%{version}-x86_64.AppImage
+Source0:        hyprfm-%{version}.tar.gz
 
 %global debug_package %{nil}
 %global __brp_check_rpaths %{nil}
@@ -26,14 +26,11 @@ Miller columns, kinetic scrolling, drag & drop, async operations,
 rich previews, and a TOML-based theme system.
 
 %prep
-mkdir -p %{_builddir}/%{name}-%{version}
-cd %{_builddir}/%{name}-%{version}
-chmod +x %{SOURCE0}
-%{SOURCE0} --appimage-extract
+%setup -q -n squashfs-root
 
 %install
 install -d %{buildroot}/opt/hyprfm
-cp -r squashfs-root/* %{buildroot}/opt/hyprfm/
+cp -r * %{buildroot}/opt/hyprfm/
 
 install -d %{buildroot}%{_bindir}
 ln -s /opt/hyprfm/AppRun %{buildroot}%{_bindir}/hyprfm
