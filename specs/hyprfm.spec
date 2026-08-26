@@ -26,7 +26,8 @@ Miller columns, kinetic scrolling, drag & drop, async operations,
 rich previews, and a TOML-based theme system.
 
 %prep
-%setup -q -c -n hyprfm
+mkdir -p %{_builddir}/%{name}-%{version}
+cd %{_builddir}/%{name}-%{version}
 chmod +x %{SOURCE0}
 %{SOURCE0} --appimage-extract
 
