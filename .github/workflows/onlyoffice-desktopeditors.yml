@@ -2,7 +2,7 @@ name: "onlyoffice-desktopeditors - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 5 * * 5'   # tiap hari Jumat, jam 05.00 UTC (tiap 7 hari)
+    - cron: '0 5 * * 3'   # tiap hari Rabu, jam 05.00 UTC (tiap 7 hari)
   workflow_dispatch:
 
 env:
