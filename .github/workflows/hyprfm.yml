@@ -2,7 +2,7 @@ name: "hyprfm - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 3 * * 5'   # tiap hari Jumat, jam 03.00 UTC (tiap 7 hari)
+    - cron: '0 6 * * *'   # tiap hari, jam 06.00 UTC (skip otomatis kalau versi sama)
   workflow_dispatch:
 
 env:
