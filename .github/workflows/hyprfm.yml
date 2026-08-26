@@ -22,8 +22,12 @@ jobs:
         id: upstream
         run: |
           RELEASE_JSON=$(curl -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
-          VER=$(echo "$RELEASE_JSON" | jq -r '.tag_name' | sed 's/^v//')
-          # Check if the AppImage asset exists in this release
+          VER=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty' | sed 's/^v//')
+          # Fallback: git tags kalau release gak ada
+          [ -z "$VER" ] && VER=$(git ls-remote --tags "https://github.com/${{ env.GITHUB_REPO }}.git" \
+            | awk -F/ '{print $3}' | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^v//' | sort -V | tail -1)
+          [ -z "$VER" ] && { echo "⚠ No version found — skipping."; echo "skip=true" >> $GITHUB_OUTPUT; exit 0; }
+          # Check if AppImage asset exists
           APPIMAGE_EXISTS=$(echo "$RELEASE_JSON" | jq -r --arg pat "HyprFM-v${VER}-x86_64.AppImage" \
             '[.assets[]? | select(.name == $pat)] | length')
           if [ "$APPIMAGE_EXISTS" = "0" ]; then
@@ -71,10 +75,12 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: |
           VER="${{ steps.upstream.outputs.version }}"
-          FILENAME="${{ env.APPIMAGE_PATTERN }}"
-          FILENAME="${FILENAME/\{VERSION\}/$VER}"
+          # Try multiple filename patterns
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/HyprFM-v${VER}-x86_64.AppImage" \
+            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/HyprFM-${VER}-x86_64.AppImage" \
+            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/${VER}/HyprFM-v${VER}-x86_64.AppImage"
+          FILENAME=$(ls HyprFM*.AppImage)
           echo "FILENAME=$FILENAME" >> $GITHUB_ENV
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${FILENAME}"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
