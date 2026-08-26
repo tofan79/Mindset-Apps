@@ -20,19 +20,37 @@ sudo dnf install zen-browser
 
 ## Available packages
 
-| Package | Upstream source | Update schedule |
-|---------|-----------------|-----------------|
-| `zen-browser` | [zen-browser/desktop](https://github.com/zen-browser/desktop) | every 3 days |
-| `zed` | [zed-industries/zed](https://github.com/zed-industries/zed) | every 3 days |
-| `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) | weekly (Mon) |
-| `localsend` | [localsend/localsend](https://github.com/localsend/localsend) | weekly (Tue) |
-| `android-studio` | [Android Studio](https://developer.android.com/studio) | weekly (Wed) |
-| `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) | weekly (Thu) |
-| `onlyoffice-desktopeditors` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | weekly (Fri) |
-| `zoom` | [Zoom](https://zoom.us/download) | weekly (Sun) |
-| `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) | daily (auto) |
-| `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) | every 3 days |
-| `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) | daily |
+### Daily
+
+| Package | Upstream source |
+|---------|-----------------|
+| `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
+| `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
+| `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
+
+### Every 3 days
+
+| Package | Upstream source |
+|---------|-----------------|
+| `zen-browser` | [zen-browser/desktop](https://github.com/zen-browser/desktop) |
+| `zed` | [zed-industries/zed](https://github.com/zed-industries/zed) |
+| `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
+
+### Weekly — Monday
+
+| Package | Upstream source |
+|---------|-----------------|
+| `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
+| `android-studio` | [Android Studio](https://developer.android.com/studio) |
+
+### Weekly — Wednesday
+
+| Package | Upstream source |
+|---------|-----------------|
+| `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
+| `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
+| `onlyoffice-desktopeditors` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
+| `zoom` | [Zoom](https://zoom.us/download) |
 
 ## How it works
 
@@ -66,7 +84,8 @@ Mindset-Apps/
 │   ├── zoom.yml
 │   ├── software-center.yml
 │   ├── stirling-pdf.yml
-│   └── hyprfm.yml
+│   ├── hyprfm.yml
+│   └── obscura.yml
 ├── specs/               # one RPM spec per package
 │   ├── zen-browser.spec
 │   ├── zed.spec
@@ -78,7 +97,8 @@ Mindset-Apps/
 │   ├── zoom.spec
 │   ├── software-center.spec
 │   ├── stirling-pdf.spec
-│   └── hyprfm.spec
+│   ├── hyprfm.spec
+│   └── obscura.spec
 └── README.md
 ```
 

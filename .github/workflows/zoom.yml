@@ -2,7 +2,7 @@ name: "zoom - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 5 * * 0'   # tiap hari Minggu, jam 05.00 UTC (tiap 7 hari)
+    - cron: '0 5 * * 3'   # tiap hari Rabu, jam 05.00 UTC (tiap 7 hari)
   workflow_dispatch:
 
 env:

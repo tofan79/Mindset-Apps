@@ -2,7 +2,7 @@ name: "localsend - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 3 * * 2'   # tiap hari Selasa, jam 03.00 UTC (tiap 7 hari)
+    - cron: '0 3 * * 3'   # tiap hari Rabu, jam 03.00 UTC (tiap 7 hari)
   workflow_dispatch:
 
 env:
