@@ -1,0 +1,97 @@
+name: "ab-download-manager - COPR Auto Build"
+
+on:
+  schedule:
+    - cron: '0 23 * * 3'   # tiap Rabu, jam 06.00 WIB (23:00 UTC)
+  workflow_dispatch:
+
+env:
+  APP_NAME:       "ab-download-manager"
+  GITHUB_REPO:    "amir1376/ab-download-manager"
+  COPR_PROJECT:   "Mindset-Apps"
+  TAR_PATTERN:    "ABDownloadManager_%s_linux_x64.tar.gz"
+  SPEC_FILE:      "specs/ab-download-manager.spec"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Get upstream latest version
+        id: upstream
+        run: |
+          VER=$(curl -s \
+            "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest" \
+            | jq -r '.tag_name' | sed 's/^v//')
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "▶ Upstream: $VER"
+
+      - name: Get current COPR version
+        id: copr
+        run: |
+          CURRENT=$(curl -s \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          # COPR mengembalikan versi dengan suffix release ("1.17.0-1"); buang
+          # suffix-nya agar cocok dengan tag upstream ("1.17.0") saat dibandingkan.
+          CURRENT="${CURRENT%-*}"
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        run: |
+          UP="${{ steps.upstream.outputs.version }}"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "$UP" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y rpm build-essential wget
+          pip install copr-cli --quiet
+
+      - name: Download tar.gz
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          TAR="$(printf '${{ env.TAR_PATTERN }}' "$VER")"
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${TAR}"
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          TAR="$(printf '${{ env.TAR_PATTERN }}' "$VER")"
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          cp "$TAR" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
+          echo "path=$SRPM" >> $GITHUB_OUTPUT
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Submit to COPR
+        if: steps.check.outputs.skip == 'false'
+        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}

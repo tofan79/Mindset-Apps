@@ -1,0 +1,112 @@
+name: "hyprfm - COPR Auto Build"
+
+on:
+  schedule:
+    - cron: '0 23 * * *'   # tiap hari, jam 06.00 WIB (23:00 UTC)
+  workflow_dispatch:
+
+env:
+  APP_NAME:       "hyprfm"
+  GITHUB_REPO:    "soyeb-jim285/hyprfm"
+  COPR_PROJECT:   "Mindset-Apps"
+  APPIMAGE_PATTERN: "HyprFM-v{VERSION}-x86_64.AppImage"
+  SPEC_FILE:      "specs/hyprfm.spec"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Get upstream latest version
+        id: upstream
+        run: |
+          RELEASE_JSON=$(curl -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
+          VER=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty' | sed 's/^v//')
+          [ -z "$VER" ] && VER=$(git ls-remote --tags "https://github.com/${{ env.GITHUB_REPO }}.git" \
+            | awk -F/ '{print $3}' | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^v//' | sort -V | tail -1)
+          [ -z "$VER" ] && { echo "⚠ No version found — skipping."; echo "skip=true" >> $GITHUB_OUTPUT; exit 0; }
+          APPIMAGE_EXISTS=$(echo "$RELEASE_JSON" | jq -r --arg pat "HyprFM-v${VER}-x86_64.AppImage" \
+            '[.assets[]? | select(.name == $pat)] | length')
+          if [ "$APPIMAGE_EXISTS" = "0" ]; then
+            echo "⚠ Upstream $VER has no AppImage — skipping."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "▶ Upstream: $VER"
+
+      - name: Get current COPR version
+        id: copr
+        run: |
+          CURRENT=$(curl -s \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          CURRENT="${CURRENT%-*}"
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        run: |
+          if [ "${{ steps.upstream.outputs.skip }}" = "true" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          UP="${{ steps.upstream.outputs.version }}"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "$UP" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y rpm build-essential wget libfuse2
+          pip install copr-cli --quiet
+
+      - name: Download & extract AppImage
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/HyprFM-v${VER}-x86_64.AppImage" \
+            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/HyprFM-${VER}-x86_64.AppImage" \
+            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/${VER}/HyprFM-v${VER}-x86_64.AppImage"
+          FILENAME=$(ls HyprFM*.AppImage)
+          chmod +x "$FILENAME"
+          "./$FILENAME" --appimage-extract
+          tar -czf "hyprfm-${VER}.tar.gz" squashfs-root/
+          echo "TARBALL=hyprfm-${VER}.tar.gz" >> $GITHUB_ENV
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/hyprfm.spec
+          cp "$TARBALL" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/hyprfm.spec
+          SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
+          echo "path=$SRPM" >> $GITHUB_OUTPUT
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Submit to COPR
+        if: steps.check.outputs.skip == 'false'
+        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
