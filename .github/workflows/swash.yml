@@ -2,7 +2,7 @@ name: "swash - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 21 * * 1'   # tiap Senin, jam 04.00 WIB (21:00 UTC)
+    - cron: '0 17 * * 0'   # tiap Senin, jam 00.00 WIB (17:00 UTC)
   workflow_dispatch:
 
 env:

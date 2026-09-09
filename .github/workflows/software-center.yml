@@ -2,7 +2,7 @@ name: "software-center - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 23 * * *'   # tiap hari, jam 06.00 WIB (23:00 UTC)
+    - cron: '0 17 * * *'   # tiap hari, jam 00.00 WIB (17:00 UTC)
   workflow_dispatch:
 
 env:
