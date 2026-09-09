@@ -1,16 +1,15 @@
-name: "onlyoffice-desktopeditors - COPR Auto Build"
+name: "swash - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '30 22 * * 3'   # tiap Rabu, jam 05.30 WIB (22:30 UTC)
+    - cron: '0 21 * * 1'   # tiap Senin, jam 04.00 WIB (21:00 UTC)
   workflow_dispatch:
 
 env:
-  APP_NAME:       "onlyoffice-desktopeditors"
-  GITHUB_REPO:    "ONLYOFFICE/DesktopEditors"
+  APP_NAME:       "swash"
+  GITHUB_REPO:    "ItsLemmy/swash"
   COPR_PROJECT:   "Mindset-Apps"
-  RPM_PATTERN:    "onlyoffice-desktopeditors.x86_64.rpm"
-  SPEC_FILE:      "specs/onlyoffice-desktopeditors.spec"
+  SPEC_FILE:      "specs/swash.spec"
 
 jobs:
   check-and-build:
@@ -33,8 +32,8 @@ jobs:
           CURRENT=$(curl -s \
             "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
             | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
-          # COPR mengembalikan versi dengan suffix release ("1.17.0-1"); buang
-          # suffix-nya agar cocok dengan tag upstream ("1.17.0") saat dibandingkan.
+          # COPR mengembalikan versi dengan suffix release ("1.5.1-1"); buang
+          # suffix-nya agar cocok dengan tag upstream ("1.5.1") saat dibandingkan.
           CURRENT="${CURRENT%-*}"
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "▶ COPR: $CURRENT"
@@ -59,12 +58,12 @@ jobs:
           sudo apt-get install -y rpm build-essential wget
           pip install copr-cli --quiet
 
-      - name: Download official RPM
+      - name: Download source tarball
         if: steps.check.outputs.skip == 'false'
         run: |
           VER="${{ steps.upstream.outputs.version }}"
-          RPM="${{ env.RPM_PATTERN }}"
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${RPM}"
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/v${VER}.tar.gz" \
+            -O "swash-v${VER}.tar.gz"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -73,9 +72,9 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
-          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
-          cp "${{ env.RPM_PATTERN }}" ~/rpmbuild/SOURCES/
-          rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/swash.spec
+          cp "swash-v${VER}.tar.gz" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/swash.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT
 
