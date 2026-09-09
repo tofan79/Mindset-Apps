@@ -28,7 +28,7 @@ Images can be opened directly or read from standard input.
 
 %prep
 %autosetup -n swash-%{version}
-%patch0 -p1
+%patch1 -p1
 
 %build
 %meson --buildtype=release
