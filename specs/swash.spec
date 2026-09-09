@@ -6,7 +6,7 @@ Summary:        Fast screenshot annotator and lightweight image editor
 License:        GPL-3.0-or-later
 URL:            https://github.com/ItsLemmy/swash
 Source0:        swash-v%{version}.tar.gz
-Source1:        swash-savedir.patch
+Patch0:         swash-savedir.patch
 
 BuildRequires:  meson
 BuildRequires:  ninja-build
@@ -28,7 +28,7 @@ Images can be opened directly or read from standard input.
 
 %prep
 %autosetup -n swash-%{version}
-%patch1 -p1
+%patch -P 0 -p1
 
 %build
 %meson --buildtype=release
