@@ -1,0 +1,15 @@
+--- a/src/window.c	2026-09-09 19:43:25.048609073 +0700
++++ b/src/window.c	2026-09-09 19:43:15.248573813 +0700
+@@ -2490,6 +2490,12 @@
+   gtk_file_dialog_set_initial_name(dialog,
+                                    suggested_name != NULL ? suggested_name : "image.png");
+ 
++  const char *swash_save_dir = g_getenv("SWASH_SAVE_DIR");
++  if (swash_save_dir != NULL && *swash_save_dir != '\0') {
++    g_autoptr(GFile) directory = g_file_new_for_path(swash_save_dir);
++    gtk_file_dialog_set_initial_folder(dialog, directory);
++  }
++
+   gtk_file_dialog_save(dialog,
+                        GTK_WINDOW(self),
+                        NULL,

@@ -1,11 +1,12 @@
 Name:           swash
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Fast screenshot annotator and lightweight image editor
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/ItsLemmy/swash
 Source0:        swash-v%{version}.tar.gz
+Source1:        swash-savedir.patch
 
 BuildRequires:  meson
 BuildRequires:  ninja-build
@@ -27,6 +28,7 @@ Images can be opened directly or read from standard input.
 
 %prep
 %autosetup -n swash-%{version}
+%patch0 -p1
 
 %build
 %meson --buildtype=release
@@ -45,5 +47,6 @@ Images can be opened directly or read from standard input.
 %{_datadir}/icons/hicolor/512x512/apps/dev.lemmy.swash.png
 
 %changelog
-* Wed Sep 09 2026 mindset <mindset@copr> - %{pkg_version}-1
+* Wed Sep 09 2026 mindset <mindset@copr> - %{pkg_version}-2
+- Patch: honor SWASH_SAVE_DIR env as initial save folder in save dialog
 - Auto-updated from upstream GitHub Releases
