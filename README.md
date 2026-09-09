@@ -42,6 +42,7 @@ sudo dnf install zen-browser
 |---------|-----------------|
 | `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
+| `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
 
 ### Weekly — Wednesday
 
@@ -85,7 +86,8 @@ Mindset-Apps/
 │   ├── software-center.yml
 │   ├── stirling-pdf.yml
 │   ├── hyprfm.yml
-│   └── obscura.yml
+│   ├── obscura.yml
+│   └── swash.yml
 ├── specs/               # one RPM spec per package
 │   ├── zen-browser.spec
 │   ├── zed.spec
@@ -98,7 +100,8 @@ Mindset-Apps/
 │   ├── software-center.spec
 │   ├── stirling-pdf.spec
 │   ├── hyprfm.spec
-│   └── obscura.spec
+│   ├── obscura.spec
+│   └── swash.spec
 └── README.md
 ```
 
