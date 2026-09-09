@@ -2,7 +2,7 @@ name: "zed - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 0 */3 * *'   # tiap 3 hari, jam 07.00 WIB (00:00 UTC)
+    - cron: '0 17 */3 * *'   # tiap 3 hari, jam 00.00 WIB (17:00 UTC)
   workflow_dispatch:
 
 env:

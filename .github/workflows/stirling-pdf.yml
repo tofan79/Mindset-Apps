@@ -2,7 +2,7 @@ name: "stirling-pdf - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '30 23 */3 * *'   # tiap 3 hari, jam 06.30 WIB (23:30 UTC)
+    - cron: '0 17 */3 * *'   # tiap 3 hari, jam 00.00 WIB (17:00 UTC)
   workflow_dispatch:
 
 env:
