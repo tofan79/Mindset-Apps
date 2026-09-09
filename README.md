@@ -49,7 +49,7 @@ sudo dnf install zen-browser
 |---------|-----------------|
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
-| `onlyoffice-desktopeditors` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
+| `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
 | `zoom` | [Zoom](https://zoom.us/download) |
 
 ## How it works
@@ -80,7 +80,7 @@ Mindset-Apps/
 │   ├── localsend.yml
 │   ├── android-studio.yml
 │   ├── ab-download-manager.yml
-│   ├── onlyoffice-desktopeditors.yml
+│   ├── onlyoffice.yml
 │   ├── zoom.yml
 │   ├── software-center.yml
 │   ├── stirling-pdf.yml
@@ -93,7 +93,7 @@ Mindset-Apps/
 │   ├── localsend.spec
 │   ├── android-studio.spec
 │   ├── ab-download-manager.spec
-│   ├── onlyoffice-desktopeditors.spec
+│   ├── onlyoffice.spec
 │   ├── zoom.spec
 │   ├── software-center.spec
 │   ├── stirling-pdf.spec

@@ -1,4 +1,4 @@
-Name:           onlyoffice-desktopeditors
+Name:           onlyoffice
 Version:        %{pkg_version}
 Release:        1%{?dist}
 Summary:        ONLYOFFICE Desktop Editors
