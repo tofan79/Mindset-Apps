@@ -26,7 +26,7 @@ OCR text recognition through Tesseract, and copy-to-clipboard or save-to-file.
 Images can be opened directly or read from standard input.
 
 %prep
-%autosetup -n swash-v%{version}
+%autosetup -n swash-%{version}
 
 %build
 %meson --buildtype=release
