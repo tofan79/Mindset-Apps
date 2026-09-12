@@ -53,6 +53,12 @@ sudo dnf install zen-browser
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
 | `zoom` | [Zoom](https://zoom.us/download) |
 
+### Monthly — day 1
+
+| Package | Upstream source |
+|---------|-----------------|
+| `whitesur-gtk-theme` | [vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme) |
+
 ## How it works
 
 Each app has a dedicated workflow that:
