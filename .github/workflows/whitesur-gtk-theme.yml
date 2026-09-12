@@ -1,0 +1,106 @@
+name: "whitesur-gtk-theme - COPR Auto Build"
+
+on:
+  schedule:
+    - cron: '0 17 1 * *'   # tiap bulan tgl 1, jam 00.00 WIB (17:00 UTC)
+  workflow_dispatch:
+
+env:
+  APP_NAME:       "whitesur-gtk-theme"
+  GITHUB_REPO:    "vinceliuice/WhiteSur-gtk-theme"
+  COPR_PROJECT:   "Mindset-Apps"
+  SPEC_FILE:      "specs/whitesur-gtk-theme.spec"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Get upstream latest version (git tag)
+        id: upstream
+        run: |
+          # WhiteSur menandai release pakai tanggal (mis. 2026-09-10) dan
+          # tidak memakai GitHub releases/assets; versi datang dari git tags.
+          SRCVER=$(git ls-remote --tags "https://github.com/${{ env.GITHUB_REPO }}.git" \
+            | awk -F/ '{print $3}' | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | sort -r | head -1)
+          [ -z "$SRCVER" ] && { echo "⚠ No version found — skipping."; echo "skip=true" >> $GITHUB_OUTPUT; exit 0; }
+          echo "srcver=$SRCVER" >> $GITHUB_OUTPUT
+          # RPM tak boleh pakai dashes di Version → 2026-09-10 → 2026.09.10
+          VER="${SRCVER//-/.}"
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "▶ Upstream: $VER ($SRCVER)"
+
+      - name: Get current COPR version
+        id: copr
+        run: |
+          CURRENT=$(curl -s \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          CURRENT="${CURRENT%-*}"
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        run: |
+          if [ "${{ steps.upstream.outputs.skip }}" = "true" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          UP="${{ steps.upstream.outputs.version }}"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "$UP" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y rpm curl
+          pip install copr-cli --quiet
+
+      - name: Download upstream source archive
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          SRCVER="${{ steps.upstream.outputs.srcver }}"
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/${SRCVER}.tar.gz" \
+            -O "whitesur-${VER}.tar.gz"
+          echo "TARBALL=whitesur-${VER}.tar.gz" >> $GITHUB_ENV
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          SRCVER="${{ steps.upstream.outputs.srcver }}"
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/whitesur-gtk-theme.spec
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/whitesur-gtk-theme.spec
+          sed -i "s/%{pkg_srcver}/$SRCVER/g" ~/rpmbuild/SPECS/whitesur-gtk-theme.spec
+          cp "$TARBALL" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/whitesur-gtk-theme.spec
+          SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
+          echo "path=$SRPM" >> $GITHUB_OUTPUT
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Submit to COPR
+        if: steps.check.outputs.skip == 'false'
+        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
