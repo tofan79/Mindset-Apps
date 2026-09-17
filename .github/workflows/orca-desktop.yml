@@ -1,4 +1,4 @@
-name: "orca - COPR Auto Build"
+name: "orca-desktop - COPR Auto Build"
 
 on:
   schedule:
@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
 
 env:
-  APP_NAME:       "orca"
+  APP_NAME:       "orca-desktop"
   GITHUB_REPO:    "stablyai/orca"
   COPR_PROJECT:   "Mindset-Apps"
   APPIMAGE_NAME:  "orca-linux.AppImage"
-  SPEC_FILE:      "specs/orca.spec"
+  SPEC_FILE:      "specs/orca-desktop.spec"
 
 jobs:
   check-and-build:
@@ -78,9 +78,9 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
-          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/orca.spec
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/orca-desktop.spec
           cp "$TARBALL" ~/rpmbuild/SOURCES/
-          rpmbuild -bs ~/rpmbuild/SPECS/orca.spec
+          rpmbuild -bs ~/rpmbuild/SPECS/orca-desktop.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT
 

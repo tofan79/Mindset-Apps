@@ -1,4 +1,4 @@
-Name:           orca
+Name:           orca-desktop
 Version:        %{pkg_version}
 Release:        1%{?dist}
 Summary:        Orca — Multimodal AI-native code editor
@@ -25,31 +25,31 @@ terminal, browser, and app UIs.
 %setup -q -n squashfs-root
 
 %install
-install -d %{buildroot}/opt/orca
-cp -r * %{buildroot}/opt/orca/
+install -d %{buildroot}/opt/orca-desktop
+cp -r * %{buildroot}/opt/orca-desktop/
 
 install -d %{buildroot}%{_bindir}
-ln -s /opt/orca/AppRun %{buildroot}%{_bindir}/orca
+ln -s /opt/orca-desktop/AppRun %{buildroot}%{_bindir}/orca-desktop
 
 install -d %{buildroot}%{_datadir}/applications
-cat > %{buildroot}%{_datadir}/applications/orca.desktop << 'EOF'
+cat > %{buildroot}%{_datadir}/applications/orca-desktop.desktop << 'EOF'
 [Desktop Entry]
-Name=Orca
+Name=Orca Desktop
 GenericName=AI Code Editor
 Comment=Multimodal AI-native code editor
-Exec=/opt/orca/AppRun %U
-Icon=orca
+Exec=/opt/orca-desktop/AppRun %U
+Icon=orca-desktop
 Terminal=false
 Type=Application
 Categories=Development;IDE;
-StartupWMClass=orca
+StartupWMClass=orca-desktop
 EOF
 
 %files
-/opt/orca/
-%{_bindir}/orca
-%{_datadir}/applications/orca.desktop
+/opt/orca-desktop/
+%{_bindir}/orca-desktop
+%{_datadir}/applications/orca-desktop.desktop
 
 %changelog
 * Thu Sep 17 2026 mindset <mindset@copr> - %{pkg_version}-1
-- Auto-updated from upstream GitHub Releases
+- Renamed to orca-desktop to avoid clashing with Fedora's orca (screen reader)
