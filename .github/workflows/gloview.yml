@@ -10,6 +10,7 @@ env:
   GITHUB_REPO:    "fedsfarm/gloview"
   COPR_PROJECT:   "Mindset-Apps"
   SPEC_FILE:      "specs/gloview.spec"
+  FEDORA_BUILD:   "44"
 
 jobs:
   check-and-build:
@@ -53,6 +54,32 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Build gloview.so in Fedora container
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          VER="${{ steps.upstream.outputs.version }}"
+          docker run --rm -v "$PWD:/src" \
+            registry.fedoraproject.org/fedora:${{ env.FEDORA_BUILD }} \
+            bash -c '
+              set -eux
+              dnf -y install dnf-plugins-core
+              dnf -y copr enable lionheartp/Hyprland
+              dnf -y install cmake gcc-c++ make hyprland-devel mesa-libGL-devel lua-devel pkgconf-pkg-config
+              cd /src
+              wget -q "https://codeload.github.com/${{ env.GITHUB_REPO }}/tar.gz/refs/heads/main" -O gloview-main.tar.gz
+              tar xzf gloview-main.tar.gz
+              cd gloview-main
+              cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+              cmake --build build -j$(nproc)
+              cp build/gloview.so /src/gloview.so
+            '
+          mkdir -p "gloview-${VER}"
+          cp gloview.so "gloview-${VER}/"
+          tar -czf "gloview-${VER}.tar.gz" "gloview-${VER}"
+          md5sum -b "gloview-${VER}.tar.gz"
+          echo "TARBALL=gloview-${VER}.tar.gz" >> $GITHUB_ENV
+          echo "RPMVERSION=$VER" >> $GITHUB_ENV
+
       - name: Install dependencies
         if: steps.check.outputs.skip == 'false'
         run: |
@@ -60,20 +87,11 @@ jobs:
           sudo apt-get install -y rpm build-essential
           pip install copr-cli --quiet
 
-      - name: Download upstream source
-        if: steps.check.outputs.skip == 'false'
-        run: |
-          VER="${{ steps.upstream.outputs.version }}"
-          wget -q "https://codeload.github.com/${{ env.GITHUB_REPO }}/tar.gz/refs/heads/main" \
-            -O "gloview-${VER}.tar.gz"
-          tar -tzf "gloview-${VER}.tar.gz" | head -1
-          echo "TARBALL=gloview-${VER}.tar.gz" >> $GITHUB_ENV
-
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
         id: srpm
         run: |
-          VER="${{ steps.upstream.outputs.version }}"
+          VER="${{ env.RPMVERSION }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/gloview.spec
