@@ -64,7 +64,7 @@ jobs:
               set -eux
               dnf -y install dnf-plugins-core
               dnf -y copr enable lionheartp/Hyprland
-              dnf -y install cmake gcc-c++ make hyprland-devel mesa-libGL-devel lua-devel pkgconf-pkg-config
+              dnf -y install wget cmake gcc-c++ make hyprland-devel mesa-libGL-devel lua-devel pkgconf-pkg-config
               cd /src
               wget -q "https://codeload.github.com/${{ env.GITHUB_REPO }}/tar.gz/refs/heads/main" -O gloview-main.tar.gz
               tar xzf gloview-main.tar.gz
