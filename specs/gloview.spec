@@ -12,13 +12,6 @@ Source0:        gloview-%{version}.tar.gz
 BuildArch:      x86_64
 AutoReqProv:    no
 
-BuildRequires:  cmake
-BuildRequires:  gcc-c++
-BuildRequires:  hyprland-devel
-BuildRequires:  lua-devel
-BuildRequires:  mesa-libGL-devel
-BuildRequires:  pkgconfig
-
 Requires:       hyprland
 Requires:       mesa-libGL
 Requires:       lua-libs
@@ -28,20 +21,22 @@ GloView is a macOS Mission Control-style window overview plugin for Hyprland.
 Super+Tab toggles the overview, with a fully configurable keyboard layout and
 styling via the plugin:gloview:* keys.
 
+The plugin is pre-built in CI inside a Fedora 44 container with the
+lionheartp/Hyprland COPR enabled, so the chroot only packages the binary.
+
 %prep
-%setup -q -n gloview-main
+%setup -q -n gloview-%{version}
 
 %build
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j
+# Pre-built in the GitHub Actions workflow (gloview.so shipped in Source0)
 
 %install
 install -d %{buildroot}%{_libdir}
-install -m 0755 build/gloview.so %{buildroot}%{_libdir}/gloview.so
+install -m 0755 gloview.so %{buildroot}%{_libdir}/gloview.so
 
 %files
 %{_libdir}/gloview.so
 
 %changelog
 * Thu Sep 17 2026 mindset <mindset@copr> - %{pkg_version}-1
-- Initial COPR package from upstream source
+- Pre-built binary package (built in CI, packaged in COPR chroot)
