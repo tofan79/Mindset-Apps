@@ -57,7 +57,7 @@ sudo dnf install zen-browser
 
 | Package | Upstream source |
 |---------|-----------------|
-| `whitesur-gtk-theme` | [vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme) |
+| `gloview` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) |
 
 ## How it works
 
@@ -92,6 +92,7 @@ Mindset-Apps/
 │   ├── software-center.yml
 │   ├── stirling-pdf.yml
 │   ├── hyprfm.yml
+│   ├── gloview.yml
 │   ├── obscura.yml
 │   └── swash.yml
 ├── specs/               # one RPM spec per package
@@ -106,6 +107,7 @@ Mindset-Apps/
 │   ├── software-center.spec
 │   ├── stirling-pdf.spec
 │   ├── hyprfm.spec
+│   ├── gloview.spec
 │   ├── obscura.spec
 │   └── swash.spec
 └── README.md
