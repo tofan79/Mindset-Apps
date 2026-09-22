@@ -36,8 +36,6 @@ sudo dnf install zen-browser
 | `zed` | [zed-industries/zed](https://github.com/zed-industries/zed) |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
 | `orca-desktop` | [stablyai/orca](https://github.com/stablyai/orca) |
-| `opencode-cli` | [anomalyco/opencode](https://github.com/anomalyco/opencode) |
-| `opencode-desktop` | [anomalyco/opencode](https://github.com/anomalyco/opencode) |
 
 ### Weekly — Monday
 
