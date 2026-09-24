@@ -15,8 +15,13 @@ sudo dnf update
 After that, install any app from the table below, e.g.:
 
 ```bash
-sudo dnf install zen-browser
+sudo dnf install zoom
 ```
+
+> **Note:** `zen-browser`, `zed`, `gloview`, and `swash` are provided by the
+> [Terra](https://terra.fyralabs.com/) repository, so they are no longer built
+> here. Their workflow files are kept in the repo as disabled backups
+> (`*.yml.disabled`).
 
 ## Available packages
 
@@ -32,8 +37,6 @@ sudo dnf install zen-browser
 
 | Package | Upstream source |
 |---------|-----------------|
-| `zen-browser` | [zen-browser/desktop](https://github.com/zen-browser/desktop) |
-| `zed` | [zed-industries/zed](https://github.com/zed-industries/zed) |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
 | `orca-desktop` | [stablyai/orca](https://github.com/stablyai/orca) |
 
@@ -43,7 +46,6 @@ sudo dnf install zen-browser
 |---------|-----------------|
 | `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
-| `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
 
 ### Weekly — Wednesday
 
@@ -53,12 +55,6 @@ sudo dnf install zen-browser
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
 | `zoom` | [Zoom](https://zoom.us/download) |
-
-### Monthly — day 1
-
-| Package | Upstream source |
-|---------|-----------------|
-| `gloview` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) |
 
 ## How it works
 
@@ -82,35 +78,37 @@ appears there.
 ```
 Mindset-Apps/
 ├── .github/workflows/   # one workflow per package
-│   ├── zen-browser.yml
-│   ├── zed.yml
+│   ├── ab-download-manager.yml
+│   ├── android-studio.yml
+│   ├── hyprfm.yml
 │   ├── intellij-idea.yml
 │   ├── localsend.yml
-│   ├── android-studio.yml
-│   ├── ab-download-manager.yml
+│   ├── obscura.yml
 │   ├── onlyoffice.yml
-│   ├── zoom.yml
+│   ├── orca-desktop.yml
 │   ├── software-center.yml
 │   ├── stirling-pdf.yml
-│   ├── hyprfm.yml
-│   ├── gloview.yml
-│   ├── obscura.yml
-│   └── swash.yml
+│   ├── zoom.yml
+│   ├── gloview.yml.disabled      # kept as backup (handled by Terra)
+│   ├── swash.yml.disabled        # kept as backup (handled by Terra)
+│   ├── zed.yml.disabled          # kept as backup (handled by Terra)
+│   └── zen-browser.yml.disabled  # kept as backup (handled by Terra)
 ├── specs/               # one RPM spec per package
-│   ├── zen-browser.spec
-│   ├── zed.spec
+│   ├── ab-download-manager.spec
+│   ├── android-studio.spec
+│   ├── gloview.spec
+│   ├── hyprfm.spec
 │   ├── intellij-idea.spec
 │   ├── localsend.spec
-│   ├── android-studio.spec
-│   ├── ab-download-manager.spec
+│   ├── obscura.spec
 │   ├── onlyoffice.spec
-│   ├── zoom.spec
+│   ├── orca-desktop.spec
 │   ├── software-center.spec
 │   ├── stirling-pdf.spec
-│   ├── hyprfm.spec
-│   ├── gloview.spec
-│   ├── obscura.spec
-│   └── swash.spec
+│   ├── swash.spec
+│   ├── zed.spec
+│   ├── zen-browser.spec
+│   └── zoom.spec
 └── README.md
 ```
 
