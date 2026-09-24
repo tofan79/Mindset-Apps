@@ -32,6 +32,13 @@ sudo dnf install zoom
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
 | `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
+| `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
+
+### As needed (Qt releases)
+
+| Package | Upstream source |
+|---------|-----------------|
+| `qt6-imageformats` | [qt/qtimageformats](https://github.com/qt/qtimageformats) (WebP/TIFF/MNG plugins for Qt 6) |
 
 ### Every 3 days
 
@@ -81,11 +88,13 @@ Mindset-Apps/
 │   ├── ab-download-manager.yml
 │   ├── android-studio.yml
 │   ├── hyprfm.yml
+│   ├── hyprland-preview-share-picker.yml
 │   ├── intellij-idea.yml
 │   ├── localsend.yml
 │   ├── obscura.yml
 │   ├── onlyoffice.yml
 │   ├── orca-desktop.yml
+│   ├── qt6-imageformats.yml
 │   ├── software-center.yml
 │   ├── stirling-pdf.yml
 │   ├── zoom.yml
@@ -98,11 +107,13 @@ Mindset-Apps/
 │   ├── android-studio.spec
 │   ├── gloview.spec
 │   ├── hyprfm.spec
+│   ├── hyprland-preview-share-picker.spec
 │   ├── intellij-idea.spec
 │   ├── localsend.spec
 │   ├── obscura.spec
 │   ├── onlyoffice.spec
 │   ├── orca-desktop.spec
+│   ├── qt6-imageformats.spec
 │   ├── software-center.spec
 │   ├── stirling-pdf.spec
 │   ├── swash.spec
