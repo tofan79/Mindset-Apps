@@ -102,4 +102,7 @@ jobs:
 
       - name: Submit to COPR
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
+        # Hanya chroot fedora-44-x86_64: base image RakuOS adalah Fedora 44
+        # (Qt 6.11.2). Chroot lain (f43: Qt 6.10.3, dll) tidak kompatibel
+        # dengan versi qtimageformats ini dan akan menggagalkan seluruh build.
+        run: copr-cli build --chroot fedora-44-x86_64 ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
