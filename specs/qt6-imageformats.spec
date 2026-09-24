@@ -35,6 +35,11 @@ preview assets ship in WebP format.
 
 %files
 %{_libdir}/qt6/plugins/imageformats/*.so
+%{_libdir}/cmake/Qt6/FindLibmng.cmake
+%{_libdir}/cmake/Qt6/FindWrapJasper.cmake
+%{_libdir}/cmake/Qt6/FindWrapWebP.cmake
+%{_libdir}/cmake/Qt6Gui/*.cmake
+%{_libdir}/qt6/sbom/*.spdx
 %license LICENSES/LGPL-3.0-only.txt
 %license LICENSES/GPL-2.0-only.txt
 %license LICENSES/GPL-3.0-only.txt
