@@ -9,7 +9,7 @@ env:
   APP_NAME:       "qt6-imageformats"
   GITHUB_REPO:    "qt/qtimageformats"
   COPR_PROJECT:   "Mindset-Apps"
-  QT_TAG_PREFIX:  "v6.11"   # dipasangkan dengan qt6-qtbase di base image
+  QT_TAG_PREFIX:  "6.11"    # versi qt6-qtbase di base image (tanpa 'v')
   SPEC_FILE:      "specs/qt6-imageformats.spec"
 
 jobs:
@@ -22,8 +22,8 @@ jobs:
         id: upstream
         run: |
           VER=$(git ls-remote --tags "https://github.com/${{ env.GITHUB_REPO }}.git" \
-            | grep -oE "refs/tags/${{ env.QT_TAG_PREFIX }}\.[0-9]+" \
-            | sed 's/refs\/tags\///' | sort -V | tail -1)
+            | grep -oE "refs/tags/v${{ env.QT_TAG_PREFIX }}\.[0-9]+" \
+            | sed 's/refs\/tags\/v//' | sort -V | tail -1)
           if [ -z "$VER" ]; then
             echo "⚠ No v6.11 tag found — skipping."
             echo "skip=true" >> $GITHUB_OUTPUT
@@ -69,7 +69,7 @@ jobs:
       - name: Download source tarball (tag)
         if: steps.check.outputs.skip == 'false'
         run: |
-          VER="${{ steps.upstream.outputs.version }}"
+          VER="${{ steps.upstream.outputs.version }}"   # e.g. 6.11.2 (tanpa 'v')
           # Source0 di spec: .../v%{version}.tar.gz -> simpan dgn nama itu
           wget -q "https://codeload.github.com/${{ env.GITHUB_REPO }}/tar.gz/refs/tags/v${VER}" \
             -O "v${VER}.tar.gz"
