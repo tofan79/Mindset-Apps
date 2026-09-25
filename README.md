@@ -34,12 +34,6 @@ sudo dnf install zoom
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
 
-### As needed (Qt releases)
-
-| Package | Upstream source |
-|---------|-----------------|
-| `qt6-imageformats` | [qt/qtimageformats](https://github.com/qt/qtimageformats) (WebP/TIFF/MNG plugins for Qt 6) |
-
 ### Every 3 days
 
 | Package | Upstream source |
