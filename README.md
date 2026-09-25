@@ -75,49 +75,6 @@ The `software-center` package is special-cased: its source lives in its own
 repository and is rebuilt automatically (daily) whenever a new release tag
 appears there.
 
-## Repository layout
-
-```
-Mindset-Apps/
-├── .github/workflows/   # one workflow per package
-│   ├── ab-download-manager.yml
-│   ├── android-studio.yml
-│   ├── hyprfm.yml
-│   ├── hyprland-preview-share-picker.yml
-│   ├── intellij-idea.yml
-│   ├── kineticwe.yml
-│   ├── localsend.yml
-│   ├── obscura.yml
-│   ├── onlyoffice.yml
-│   ├── orca-desktop.yml
-│   ├── software-center.yml
-│   ├── stirling-pdf.yml
-│   ├── zoom.yml
-│   ├── gloview.yml.disabled      # kept as backup (handled by Terra)
-│   ├── swash.yml.disabled        # kept as backup (handled by Terra)
-│   ├── zed.yml.disabled          # kept as backup (handled by Terra)
-│   └── zen-browser.yml.disabled  # kept as backup (handled by Terra)
-├── specs/               # one RPM spec per package
-│   ├── ab-download-manager.spec
-│   ├── android-studio.spec
-│   ├── gloview.spec
-│   ├── hyprfm.spec
-│   ├── hyprland-preview-share-picker.spec
-│   ├── intellij-idea.spec
-│   ├── kineticwe.spec
-│   ├── localsend.spec
-│   ├── obscura.spec
-│   ├── onlyoffice.spec
-│   ├── orca-desktop.spec
-│   ├── software-center.spec
-│   ├── stirling-pdf.spec
-│   ├── swash.spec
-│   ├── zed.spec
-│   ├── zen-browser.spec
-│   └── zoom.spec
-└── README.md
-```
-
 ## Development
 
 - **Add a package:** create `specs/<name>.spec` and
