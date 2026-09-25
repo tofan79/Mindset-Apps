@@ -1,0 +1,166 @@
+name: "colloid-theme - COPR Auto Build"
+
+on:
+  schedule:
+    - cron: '0 17 * * *'
+  workflow_dispatch:
+
+env:
+  APP_NAME:       "colloid-theme"
+  GTK_REPO:       "vinceliuice/Colloid-gtk-theme"
+  ICON_REPO:      "vinceliuice/Colloid-icon-theme"
+  COPR_PROJECT:   "Mindset-Apps"
+  SPEC_FILE:      "specs/colloid-theme.spec"
+  CHROOT:         "fedora-44-x86_64"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Get upstream commits
+        id: upstream
+        shell: bash
+        run: |
+          set -euo pipefail
+          GTK_JSON=$(curl -fsSL --retry 3 "https://api.github.com/repos/${{ env.GTK_REPO }}/commits/main")
+          ICON_JSON=$(curl -fsSL --retry 3 "https://api.github.com/repos/${{ env.ICON_REPO }}/commits/main")
+          GTK_SHA=$(jq -er '.sha' <<<"$GTK_JSON")
+          ICON_SHA=$(jq -er '.sha' <<<"$ICON_JSON")
+          GTK_DATE=$(jq -er '.commit.committer.date' <<<"$GTK_JSON" | cut -c1-10 | tr -d '-')
+          ICON_DATE=$(jq -er '.commit.committer.date' <<<"$ICON_JSON" | cut -c1-10 | tr -d '-')
+          [[ "$GTK_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$ICON_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GTK_DATE" =~ ^[0-9]{8}$ ]]
+          [[ "$ICON_DATE" =~ ^[0-9]{8}$ ]]
+          GTK_SHORT="${GTK_SHA:0:8}"
+          ICON_SHORT="${ICON_SHA:0:8}"
+          VERSION="${GTK_DATE}.git${GTK_SHORT}.icon${ICON_DATE}.git${ICON_SHORT}"
+          {
+            echo "gtk_sha=$GTK_SHA"
+            echo "icon_sha=$ICON_SHA"
+            echo "version=$VERSION"
+          } >> "$GITHUB_OUTPUT"
+          echo "▶ Upstream GTK: $GTK_DATE.git$GTK_SHORT"
+          echo "▶ Upstream icons: $ICON_DATE.git$ICON_SHORT"
+
+      - name: Get current COPR version
+        id: copr
+        shell: bash
+        run: |
+          set -euo pipefail
+          CURRENT=$(curl -fsSL --retry 3 \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          CURRENT="${CURRENT%-*}"
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          UP="${{ steps.upstream.outputs.version }}"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "$UP" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y rpm build-essential wget curl jq
+          pip install copr-cli --quiet
+
+      - name: Download source archives
+        if: steps.check.outputs.skip == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          download_archive() {
+            local repo="$1"
+            local sha="$2"
+            local name="$3"
+            local output="$4"
+            local archive="${name}-${sha}.tar.gz"
+            local extract="${name}-extract"
+            local root="${name}-${sha}"
+            local entries
+
+            curl -fsSL --retry 3 \
+              "https://github.com/${repo}/archive/${sha}.tar.gz" \
+              -o "$archive"
+            rm -rf "$extract"
+            mkdir "$extract"
+            tar -xzf "$archive" -C "$extract"
+            entries=("$extract"/*)
+            if [ "${#entries[@]}" -ne 1 ] || [ ! -d "${entries[0]}" ]; then
+              echo "Invalid archive layout for $archive" >&2
+              exit 1
+            fi
+            mv "${entries[0]}" "$root"
+            rm -rf "$extract"
+            tar -czf "$archive" "$root"
+            tar -tzf "$archive" >/dev/null
+            printf '%s=%s\n' "$output" "$archive" >> "$GITHUB_ENV"
+          }
+
+          download_archive "${{ env.GTK_REPO }}" "${{ steps.upstream.outputs.gtk_sha }}" "colloid-gtk-theme" "GTK_FILENAME"
+          download_archive "${{ env.ICON_REPO }}" "${{ steps.upstream.outputs.icon_sha }}" "colloid-icon-theme" "ICON_FILENAME"
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          VER="${{ steps.upstream.outputs.version }}"
+          GTK_SHA="${{ steps.upstream.outputs.gtk_sha }}"
+          ICON_SHA="${{ steps.upstream.outputs.icon_sha }}"
+          mkdir -p "$HOME/rpmbuild"/{SPECS,SOURCES,SRPMS}
+          cp "${{ env.SPEC_FILE }}" "$HOME/rpmbuild/SPECS/${{ env.APP_NAME }}.spec"
+          sed -i \
+            -e "s/%{pkg_version}/$VER/g" \
+            -e "s/%{gtk_ref}/$GTK_SHA/g" \
+            -e "s/%{icon_ref}/$ICON_SHA/g" \
+            "$HOME/rpmbuild/SPECS/${{ env.APP_NAME }}.spec"
+          cp "$GTK_FILENAME" "$ICON_FILENAME" "$HOME/rpmbuild/SOURCES/"
+          rpmbuild -bs "$HOME/rpmbuild/SPECS/${{ env.APP_NAME }}.spec"
+          SRPMS=("$HOME"/rpmbuild/SRPMS/*.src.rpm)
+          if [ "${#SRPMS[@]}" -ne 1 ]; then
+            echo "Expected one SRPM, found ${#SRPMS[@]}" >&2
+            exit 1
+          fi
+          echo "path=${SRPMS[0]}" >> "$GITHUB_OUTPUT"
+          echo "▶ SRPM: ${SRPMS[0]}"
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Submit to COPR
+        if: steps.check.outputs.skip == 'false'
+        shell: bash
+        run: copr-cli build --chroot "${{ env.CHROOT }}" "${{ env.COPR_PROJECT }}" "${{ steps.srpm.outputs.path }}"

@@ -34,6 +34,7 @@ sudo dnf install zoom
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
 | `kineticwe` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
+| `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
 
 ### Every 3 days
 
