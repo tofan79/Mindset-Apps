@@ -1,15 +1,16 @@
-name: "swash - COPR Auto Build"
+name: "orca-ide - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 17 * * 0'   # tiap Senin, jam 00.00 WIB (17:00 UTC)
+    - cron: '0 0 * * *'   # tiap hari, jam 07.00 WIB (00:00 UTC)
   workflow_dispatch:
 
 env:
-  APP_NAME:       "swash"
-  GITHUB_REPO:    "ItsLemmy/swash"
+  APP_NAME:       "orca-ide"
+  GITHUB_REPO:    "stablyai/orca"
   COPR_PROJECT:   "Mindset-Apps"
-  SPEC_FILE:      "specs/swash.spec"
+  RPM_PREFIX:     "orca-ide"
+  SPEC_FILE:      "specs/orca-ide.spec"
 
 jobs:
   check-and-build:
@@ -20,9 +21,9 @@ jobs:
       - name: Get upstream latest version
         id: upstream
         run: |
-          VER=$(curl -s \
-            "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest" \
-            | jq -r '.tag_name' | sed 's/^v//')
+          RELEASE_JSON=$(curl -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
+          VER=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty' | sed 's/^v//')
+          [ -z "$VER" ] && { echo "⚠ No version found — skipping."; echo "skip=true" >> $GITHUB_OUTPUT; exit 0; }
           echo "version=$VER" >> $GITHUB_OUTPUT
           echo "▶ Upstream: $VER"
 
@@ -32,8 +33,6 @@ jobs:
           CURRENT=$(curl -s \
             "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
             | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
-          # COPR mengembalikan versi dengan suffix release ("1.5.1-1"); buang
-          # suffix-nya agar cocok dengan tag upstream ("1.5.1") saat dibandingkan.
           CURRENT="${CURRENT%-*}"
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "▶ COPR: $CURRENT"
@@ -41,6 +40,10 @@ jobs:
       - name: Smart Skip
         id: check
         run: |
+          if [ "${{ steps.upstream.outputs.skip }}" = "true" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           UP="${{ steps.upstream.outputs.version }}"
           CP="${{ steps.copr.outputs.version }}"
           if [ "$UP" = "$CP" ]; then
@@ -58,12 +61,13 @@ jobs:
           sudo apt-get install -y rpm build-essential wget
           pip install copr-cli --quiet
 
-      - name: Download source tarball
+      - name: Download official RPM
         if: steps.check.outputs.skip == 'false'
         run: |
           VER="${{ steps.upstream.outputs.version }}"
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/v${VER}.tar.gz" \
-            -O "swash-v${VER}.tar.gz"
+          RPM_FILENAME="${RPM_PREFIX}-${VER}.x86_64.rpm"
+          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${RPM_FILENAME}" -O "$RPM_FILENAME"
+          echo "RPM_FILENAME=$RPM_FILENAME" >> "$GITHUB_ENV"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -72,10 +76,9 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
-          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/swash.spec
-          cp "swash-v${VER}.tar.gz" ~/rpmbuild/SOURCES/
-          cp patches/swash-savedir.patch ~/rpmbuild/SOURCES/
-          rpmbuild -bs ~/rpmbuild/SPECS/swash.spec
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/orca-ide.spec
+          cp "$RPM_FILENAME" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/orca-ide.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT
 

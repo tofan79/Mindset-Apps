@@ -20,12 +20,11 @@ sudo dnf install zoom
 
 > **Note:** `zen-browser`, `zed`, `gloview`, and `swash` are provided by the
 > [Terra](https://terra.fyralabs.com/) repository, so they are no longer built
-> here. Their workflow files are kept in the repo as disabled backups
-> (`*.yml.disabled`).
+> here.
 
 ## Available packages
 
-### Daily
+### Daily — 07:00 WIB
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -35,25 +34,10 @@ sudo dnf install zoom
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
 | `kineticwe` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
-
-### Every 3 days
-
-| Package | Upstream source |
-|---------|-----------------|
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
-| `orca-desktop` | [stablyai/orca](https://github.com/stablyai/orca) |
-
-### Weekly — Monday
-
-| Package | Upstream source |
-|---------|-----------------|
+| `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
 | `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
-
-### Weekly — Wednesday
-
-| Package | Upstream source |
-|---------|-----------------|
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |

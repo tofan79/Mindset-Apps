@@ -2,7 +2,7 @@ name: "onlyoffice - COPR Auto Build"
 
 on:
   schedule:
-    - cron: '0 17 * * 2'   # tiap Rabu, jam 00.00 WIB (17:00 UTC)
+    - cron: '0 0 * * *'   # tiap hari, jam 07.00 WIB (00:00 UTC)
   workflow_dispatch:
 
 env:
