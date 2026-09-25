@@ -18,10 +18,6 @@ After that, install any app from the table below, e.g.:
 sudo dnf install zoom
 ```
 
-> **Note:** `zen-browser`, `zed`, `gloview`, and `swash` are provided by the
-> [Terra](https://terra.fyralabs.com/) repository, so they are no longer built
-> here.
-
 ## Available packages
 
 ### Daily — 07:00 WIB
