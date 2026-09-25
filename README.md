@@ -20,8 +20,6 @@ sudo dnf install zoom
 
 ## Available packages
 
-### Daily — 07:00 WIB
-
 | Package | Upstream source |
 |---------|-----------------|
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
