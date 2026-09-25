@@ -33,6 +33,7 @@ sudo dnf install zoom
 | `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
+| `kineticwe` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
 
 ### Every 3 days
 
@@ -84,11 +85,11 @@ Mindset-Apps/
 │   ├── hyprfm.yml
 │   ├── hyprland-preview-share-picker.yml
 │   ├── intellij-idea.yml
+│   ├── kineticwe.yml
 │   ├── localsend.yml
 │   ├── obscura.yml
 │   ├── onlyoffice.yml
 │   ├── orca-desktop.yml
-│   ├── qt6-imageformats.yml
 │   ├── software-center.yml
 │   ├── stirling-pdf.yml
 │   ├── zoom.yml
@@ -103,11 +104,11 @@ Mindset-Apps/
 │   ├── hyprfm.spec
 │   ├── hyprland-preview-share-picker.spec
 │   ├── intellij-idea.spec
+│   ├── kineticwe.spec
 │   ├── localsend.spec
 │   ├── obscura.spec
 │   ├── onlyoffice.spec
 │   ├── orca-desktop.spec
-│   ├── qt6-imageformats.spec
 │   ├── software-center.spec
 │   ├── stirling-pdf.spec
 │   ├── swash.spec
@@ -124,7 +125,7 @@ Mindset-Apps/
 - **Run a build manually:** open
   [Actions](https://github.com/tofan79/Mindset-Apps/actions), select the
   workflow, and press *Run workflow*.
-- **Skipped runs** complete in under a minute; real builds take 5–10 minutes.
+- **Skipped runs** complete in under a minute; most real builds take 5–10 minutes, while KineticWE can take longer because it builds several subpackages.
 
 ## License
 
