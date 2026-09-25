@@ -405,6 +405,8 @@ DESTDIR=%{buildroot} cmake --install "${KGA_BUILD}" --prefix %{_prefix}
 DESTDIR=%{buildroot} cmake --install %{_builddir}/kdecoration-build --prefix %{_prefix}
 %cmake_install
 DESTDIR=%{buildroot} cmake --install %{_builddir}/portal-build --prefix %{_prefix}
+sed -i '/^Exec=/a SystemdService=plasma-xdg-desktop-portal-kwe.service' \
+    %{buildroot}%{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.kwe.service
 DESTDIR=%{buildroot} meson install -C %{_builddir}/shell-build
 DESTDIR=%{buildroot} meson install -C %{_builddir}/greeter-build
 install -Dpm 0755 %{SOURCE9} %{buildroot}%{_bindir}/kineticwe-setup-greeter
