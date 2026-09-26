@@ -26,6 +26,8 @@ sudo dnf install zoom
 | `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
+| `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) (daily git build) |
+| `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
 | `kineticwe-git` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
