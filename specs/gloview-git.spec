@@ -17,7 +17,14 @@ BuildRequires:  pkgconfig(glesv2)
 # pkg_search_module() fallback list with an RPM boolean dependency.
 BuildRequires:  (pkgconfig(lua) or pkgconfig(lua5.4) or pkgconfig(luajit))
 
-Requires:       hyprland-git
+# Hyprland plugin: a .so is dlopen()ed into whichever compositor is present, so
+# bind to the one already installed instead of pulling a second, conflicting
+# build. hyprland-git hard-Conflicts: hyprland, so a flat "Requires: hyprland-git"
+# made any image that ships the release build (RakuOS main) unresolvable, and
+# on a system with neither installed it dragged the whole rolling compositor
+# (uwsm, hyprland-guiutils, xdg-desktop-portal-hyprland) in as a side effect.
+# (A if A else B) = "if A is installed, A must stay; otherwise B is required".
+Requires:       (hyprland-git if hyprland-git else hyprland)
 
 %description
 GloView is a macOS Mission Control-style overview/expo plugin for the
