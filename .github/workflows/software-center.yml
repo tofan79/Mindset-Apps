@@ -110,5 +110,29 @@ jobs:
           EOF
 
       - name: Submit to COPR
+        id: submit
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
+        run: |
+          # Status merah tetap dipertahankan (exit $RC) supaya kegagalan build
+          # tidak tertutupi, tapi build-id dikumpulkan supaya log chroot bisa
+          # diambil di step berikutnya tanpa perlu membuka COPR secara manual.
+          set +e
+          OUT=$(copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }} 2>&1)
+          RC=$?
+          printf '%s\n' "$OUT"
+          BID=$(printf '%s\n' "$OUT" | grep -oE 'Created builds: [0-9]+' | grep -oE '[0-9]+' | head -1)
+          echo "build_id=${BID:-unknown}" >> "$GITHUB_OUTPUT"
+          if [ "$RC" -eq 0 ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Build COPR ${BID:-unknown} gagal,	log chroot akan ditampilkan di bawah"
+          fi
+          exit $RC
+
+      - name: Dump COPR chroot log
+        if: always() && steps.check.outputs.skip == 'false' && steps.submit.outputs.ok == 'false'
+        uses: ./.github/actions/dump-copr-log
+        with:
+          build-id: ${{ steps.submit.outputs.build_id }}
+          chroots: "fedora-44-x86_64"

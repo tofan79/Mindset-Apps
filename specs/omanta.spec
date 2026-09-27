@@ -46,11 +46,14 @@ context-menu actions exposed as TOML files under %{_datadir}/omanta/actions.
 # tidak bergantung pada macros.cmake dari paket cmake. %make_build juga tidak
 # dipakai: %make_build memanggil make tanpa -C, sedangkan generator Ninja
 # hanya menghasilkan build.ninja dan tidak menulis Makefile sama sekali.
+# Flag -j sengaja tidak dipakai agar tidak bergantung pada makro job yang
+# bisa kosong, dan direktori build ditulis eksplisit supaya tidak ikut
+# berubah saat makro cmake berubah upstream.
 cmake -S . -B build -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=%{_prefix} \
   -DOMANTA_BUILD_TESTS=OFF
-cmake --build build -j%{_nproc_build}
+cmake --build build
 
 %install
 DESTDIR=%{buildroot} cmake --install build

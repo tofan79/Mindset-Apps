@@ -1,0 +1,83 @@
+name: Dump COPR chroot log
+description: Ambil log build COPR yang gagal dan cetak ke log GitHub Actions
+
+inputs:
+  build-id:
+    description: "ID build COPR (dari output copr-cli build)"
+    required: true
+  chroots:
+    description: "Chroot yang ingin log-nya ditampilkan, dipisah koma"
+    required: false
+    default: "fedora-44-x86_64"
+
+runs:
+  using: composite
+  steps:
+    - name: Fetch chroot logs
+      shell: bash
+      env:
+        BID: ${{ inputs.build-id }}
+        CHROOT_LIST: ${{ inputs.chroots }}
+        COPR_URL: https://copr.fedorainfracloud.org
+        COPR_LOGIN: ${{ secrets.COPR_LOGIN }}
+        COPR_TOKEN: ${{ secrets.COPR_TOKEN }}
+      run: |
+        set -uo pipefail
+
+        if [ -z "${BID}" ] || [ "${BID}" = "unknown" ]; then
+          echo "Tidak ada build-id, lewati."
+          exit 0
+        fi
+
+        AUTH="${COPR_LOGIN}:${COPR_TOKEN}"
+        if [ -z "${COPR_LOGIN}" ] || [ -z "${COPR_TOKEN}" ]; then
+          echo "::warning::Secret COPR_LOGIN/COPR_TOKEN kosong, tidak bisa mengambil log."
+          exit 0
+        fi
+
+        # Build lebih dulu mungkin belum selesai saat step ini jalan.
+        STATE=""
+        for _ in $(seq 1 20); do
+          DETAIL=$(curl -sS -u "${AUTH}" "${COPR_URL}/api_3/build/${BID}/" 2>/dev/null || true)
+          STATE=$(printf '%s' "${DETAIL}" | jq -r '.state // empty' 2>/dev/null || true)
+          case "${STATE}" in
+            succeeded|failed|canceled) break ;;
+          esac
+          sleep 15
+        done
+
+        echo "::group::COPR build ${BID} state=${STATE:-unknown}"
+        echo "Halaman build: ${COPR_URL}/coprs/build/${BID}/"
+        echo
+
+        if [ "${STATE}" = "succeeded" ]; then
+          echo "Build sukses, tidak ada log failure."
+          echo "::endgroup::"
+          exit 0
+        fi
+
+        # Path log di frontend COPR: /coprs/build/<id>/<id>-<state>/<chroot>/<chroot>.log.gz
+        # Path di server download memakai bentuk yang sama dengan state yang sama.
+        for CHROOT in ${CHROOT_LIST//,/ }; do
+          for BASE in "${COPR_URL}/coprs/build" \
+                      "https://download.copr.fedorainfracloud.org/results"; do
+            for P in "${BID}/${BID}-${STATE}/${CHROOT}/${CHROOT}.log.gz" \
+                     "${BID}/${BID}-${STATE}/${CHROOT}/chroot_build.log.gz"; do
+              URL="${BASE}/${P}"
+              CODE=$(curl -sS -u "${AUTH}" -o /tmp/copr-log.gz -w '%{http_code}' "${URL}" || echo 000)
+              if [ "${CODE}" = "200" ] && [ -s /tmp/copr-log.gz ]; then
+                echo "──── ${CHROOT} ────"
+                # Log chroot panjang; bagian akhir biasanya berisi error sebenarnya.
+                gzip -dc /tmp/copr-log.gz 2>/dev/null | tail -n 400 || cat /tmp/copr-log.gz | tail -n 400
+                FOUND=1
+                break 3
+              fi
+            done
+          done
+        done
+
+        if [ -z "${FOUND:-}" ]; then
+          echo "::warning::Tidak bisa mengambil log untuk build ${BID} (state=${STATE:-unknown})."
+          echo "Buka manual: ${COPR_URL}/coprs/build/${BID}/"
+        fi
+        echo "::endgroup::"

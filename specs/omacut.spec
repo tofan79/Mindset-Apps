@@ -32,10 +32,12 @@ by the ffmpeg command line tool and the interface with Qt Quick.
 mkdir -p build
 cd build
 # Panggil qmake6 langsung; makro %qmake6 tidak ada di semua instalasi rpm-build.
-# make dipanggil eksplisit karena %make_build selalu make polos tanpa -C, dan
-# qmake6 sudah menulis Makefile di direktori kerja saat ini.
+# %make_build dipakai apa adanya karena expand-nya adalah make polos tanpa -C,
+# sedangkan qmake6 sudah menulis Makefile di direktori kerja saat ini. Jangan
+# pakai %{_nproc_build}: makro itu tidak terdefinisi di Fedora 44 sehingga
+# make menerima "-j" tanpa angka dan gagal.
 qmake6 ../%{name}.pro
-make -j%{_nproc_build}
+%make_build
 
 %install
 # Tiap section rpm berjalan di shell terpisah yang berakar di source tree, jadi
