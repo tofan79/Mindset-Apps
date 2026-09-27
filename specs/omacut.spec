@@ -21,9 +21,9 @@ Requires:       xdg-desktop-portal
 Requires:       hicolor-icon-theme
 
 # rpm di Fedora 44 otomatis membuat subpaket debuginfo sekaligus debugsource.
-# %build/%install sudah berhasil, tetapi debugsource tidak punya satu pun file
+# build/install sudah berhasil, tetapi debugsource tidak punya satu pun file
 # sumber yang bisa dikumpulkan sehingga rpm berhenti dengan
-# "Empty %files file .../debugsourcefiles.list". Aplikasi pihak ketiga yang
+# "Empty files file .../debugsourcefiles.list". Aplikasi pihak ketiga yang
 # dibangun dari tarball tidak punya layout debugsource yang bisa dietakan, jadi
 # kedua subpaket itu dimatikan altogether.
 %global debug_package %{nil}
@@ -39,17 +39,17 @@ by the ffmpeg command line tool and the interface with Qt Quick.
 %build
 mkdir -p build
 cd build
-# Panggil qmake6 langsung; makro %qmake6 tidak ada di semua instalasi rpm-build.
-# %make_build dipakai apa adanya karena expand-nya adalah make polos tanpa -C,
+# Panggil qmake6 langsung; makro qmake6 tidak ada di semua instalasi rpm-build.
+# make_build dipakai apa adanya karena expand-nya adalah make polos tanpa -C,
 # sedangkan qmake6 sudah menulis Makefile di direktori kerja saat ini. Jangan
-# pakai %{_nproc_build}: makro itu tidak terdefinisi di Fedora 44 sehingga
+# pakai _nproc_build: makro itu tidak terdefinisi di Fedora 44 sehingga
 # make menerima "-j" tanpa angka dan gagal.
 qmake6 ../%{name}.pro
 %make_build
 
 %install
 # Tiap section rpm berjalan di shell terpisah yang berakar di source tree, jadi
-# path di %install relatif ke root source, bukan ke build/.
+# path di install relatif ke root source, bukan ke build/.
 install -Dpm0755 build/omacut %{buildroot}%{_bindir}/omacut
 install -Dpm0644 pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omacut.desktop
 install -Dpm0644 pkgbuild/omacut.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/omacut.svg

@@ -27,7 +27,7 @@ Requires:       hicolor-icon-theme
 # rpm di Fedora 44 otomatis membuat subpaket debuginfo sekaligus debugsource.
 # Untuk aplikasi pihak ketiga yang dibangun dari tarball tidak ada file sumber
 # yang bisa dikumpulkan ke debugsource, sehingga rpm berhenti dengan
-# "Empty %files file .../debugsourcefiles.list". Matikan keduanya.
+# "Empty files file .../debugsourcefiles.list". Matikan keduanya.
 %global debug_package %{nil}
 
 # Optional per-protocol backends, thumbnailers and the full-text search index.
@@ -48,9 +48,9 @@ context-menu actions exposed as TOML files under %{_datadir}/omanta/actions.
 %autosetup -n %{name}-%{version}
 
 %build
-# Pakai binary cmake langsung, bukan makro %cmake/%cmake_build, supaya spec
-# tidak bergantung pada macros.cmake dari paket cmake. %make_build juga tidak
-# dipakai: %make_build memanggil make tanpa -C, sedangkan generator Ninja
+# Pakai binary cmake langsung, bukan makro cmake/cmake_build, supaya spec
+# tidak bergantung pada macros.cmake dari paket cmake. make_build juga tidak
+# dipakai: make_build memanggil make tanpa -C, sedangkan generator Ninja
 # hanya menghasilkan build.ninja dan tidak menulis Makefile sama sekali.
 # Flag -j sengaja tidak dipakai agar tidak bergantung pada makro job yang
 # bisa kosong, dan direktori build ditulis eksplisit supaya tidak ikut
