@@ -32,14 +32,18 @@ by the ffmpeg command line tool and the interface with Qt Quick.
 mkdir -p build
 cd build
 # Panggil qmake6 langsung; makro %qmake6 tidak ada di semua instalasi rpm-build.
+# make dipanggil eksplisit karena %make_build selalu make polos tanpa -C, dan
+# qmake6 sudah menulis Makefile di direktori kerja saat ini.
 qmake6 ../%{name}.pro
-%make_build
+make -j%{_nproc_build}
 
 %install
-install -Dpm0755 omacut %{buildroot}%{_bindir}/omacut
-install -Dpm0644 ../pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omacut.desktop
-install -Dpm0644 ../pkgbuild/omacut.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/omacut.svg
-install -Dpm0644 ../LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
+# Tiap section rpm berjalan di shell terpisah yang berakar di source tree, jadi
+# path di %install relatif ke root source, bukan ke build/.
+install -Dpm0755 build/omacut %{buildroot}%{_bindir}/omacut
+install -Dpm0644 pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omacut.desktop
+install -Dpm0644 pkgbuild/omacut.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/omacut.svg
+install -Dpm0644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 
 %files
 %license %{_datadir}/licenses/%{name}/LICENSE
