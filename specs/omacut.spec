@@ -20,6 +20,14 @@ Requires:       ffmpeg-free
 Requires:       xdg-desktop-portal
 Requires:       hicolor-icon-theme
 
+# rpm di Fedora 44 otomatis membuat subpaket debuginfo sekaligus debugsource.
+# %build/%install sudah berhasil, tetapi debugsource tidak punya satu pun file
+# sumber yang bisa dikumpulkan sehingga rpm berhenti dengan
+# "Empty %files file .../debugsourcefiles.list". Aplikasi pihak ketiga yang
+# dibangun dari tarball tidak punya layout debugsource yang bisa dietakan, jadi
+# kedua subpaket itu dimatikan altogether.
+%global debug_package %{nil}
+
 %description
 A small video trimmer: open a clip, drag the handles on the timeline to set
 the start and end points, and write out the trimmed result. Rendering is done

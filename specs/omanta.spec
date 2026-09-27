@@ -24,6 +24,12 @@ BuildRequires:  qt6-qtsvg-devel
 Requires:       gvfs
 Requires:       hicolor-icon-theme
 
+# rpm di Fedora 44 otomatis membuat subpaket debuginfo sekaligus debugsource.
+# Untuk aplikasi pihak ketiga yang dibangun dari tarball tidak ada file sumber
+# yang bisa dikumpulkan ke debugsource, sehingga rpm berhenti dengan
+# "Empty %files file .../debugsourcefiles.list". Matikan keduanya.
+%global debug_package %{nil}
+
 # Optional per-protocol backends, thumbnailers and the full-text search index.
 # omanta degrades gracefully without them, so they stay recommended.
 Recommends:     gvfs-smb
