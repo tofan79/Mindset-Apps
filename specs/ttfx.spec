@@ -16,7 +16,7 @@ Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:   x86_64
 # Nonaktif secara default. Objek NASM di asm/ memakai alamat absolut sehingga
 # tidak Position Independent dan tidak bisa di-link ke executable PIE. dulu
-# ditulis %bcond_without asm, yang justru mengaktifkan asm secara default,
+# ditulis bcond_without asm, yang justru mengaktifkan asm secara default,
 # jadi build.rs tetap memanggil nasm dan link PIE tetap gagal.
 # Tetap bisa diaktifkan eksplisit dengan --with asm kalau upstream nanti
 # memperbaiki Position Independent Code-nya.
@@ -31,7 +31,7 @@ BuildRequires:  rust
 # rpm di Fedora 44 otomatis membuat subpaket debuginfo sekaligus debugsource.
 # Untuk aplikasi pihak ketiga yang dibangun dari tarball tidak ada file sumber
 # yang bisa dikumpulkan ke debugsource, sehingga rpm berhenti dengan
-# "Empty %files file .../debugsourcefiles.list". Matikan keduanya.
+# "Empty files file .../debugsourcefiles.list". Matikan keduanya.
 %global debug_package %{nil}
 
 %description
