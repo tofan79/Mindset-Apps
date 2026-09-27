@@ -38,6 +38,7 @@ Source6:        kdecoration-%{kdecoration_ref}.tar.gz
 Source8:        noctalia-greeter-%{noctalia_greeter_ref}.tar.gz
 Source9:        kineticwe-setup-greeter.sh
 Source10:       start-kineticwe.sh
+ExclusiveArch:   x86_64
 
 BuildRequires:  cmake
 BuildRequires:  ninja-build

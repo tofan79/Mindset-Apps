@@ -6,6 +6,7 @@ Summary:        Fast screenshot annotator and lightweight image editor (GTK4/lib
 License:        GPL-3.0-or-later
 URL:            https://github.com/ItsLemmy/swash
 Source0:        %{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 
 BuildRequires:  meson >= 0.59
 BuildRequires:  ninja-build
