@@ -10,6 +10,8 @@ Source0:        %{name}-%{version}.tar.gz
 # Build render variant (--features render). Rendering uses rustls so it does
 # NOT need OpenSSL/CMake for BoringSSL; V8/deno_core still need clang, perl,
 # python3 and ninja to compile from source.
+
+ExclusiveArch:   x86_64
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  gcc

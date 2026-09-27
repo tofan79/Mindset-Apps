@@ -8,6 +8,7 @@ URL:            https://github.com/WhySoBad/hyprland-preview-share-picker
 # Tarball dibuat workflow (git clone --recurse-submodules, submodule lib/hyprland-protocols
 # diwajibkan saat compile oleh wayland_scanner::generate_interfaces!)
 Source0:        %{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 
 BuildRequires:  cargo
 BuildRequires:  rust

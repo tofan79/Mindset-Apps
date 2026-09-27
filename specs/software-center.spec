@@ -8,6 +8,7 @@ Summary:        Software Center — install and manage apps, Flatpaks, and syste
 License:        GPL-3.0-or-later
 URL:            https://github.com/tofan79/software-center
 Source0:        %{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 
 BuildRequires:  rust
 BuildRequires:  cargo

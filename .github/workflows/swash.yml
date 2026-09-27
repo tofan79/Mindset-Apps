@@ -10,7 +10,6 @@ env:
   GH_PROJECT:   "ItsLemmy/swash"
   COPR_PROJECT: "Mindset-Apps"
   SPEC_FILE:    "specs/swash.spec"
-  CHROOT:       "fedora-44-x86_64"
 
 jobs:
   check-and-build:
@@ -117,4 +116,4 @@ jobs:
 
       - name: Submit to COPR
         if: steps.check.outputs.skip == 'false'
-        run: copr-cli build --chroot ${{ env.CHROOT }} ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}
+        run: copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }}

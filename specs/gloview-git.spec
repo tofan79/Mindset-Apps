@@ -6,6 +6,7 @@ Summary:        macOS Mission Control-style overview plugin for Hyprland (daily 
 License:        GPL-3.0-or-later
 URL:            https://github.com/fedsfarm/gloview
 Source0:        %{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 
 BuildRequires:  cmake >= 3.19
 BuildRequires:  gcc-c++
