@@ -38,7 +38,16 @@ Effects are available as subcommands, for example:
 
 %build
 export CARGO_NET_OFFLINE=false
+%if %{with asm}
 cargo build --release --locked
+%else
+# Fitur "asm" dinonaktifkan secara eksplisit, bukan dengan mengandalkan NASM
+# yang kebetulan ada atau tidak di chroot. Objek NASM di asm/ memakai alamat
+# absolut sehingga tidak Position Independent, dan karena itu tidak bisa
+# di-link ke executable PIE yang dibangun Fedora secara default.
+# build.rs lalu memakai engine Rust murni yang hasil visualnya identik.
+cargo build --release --locked --no-default-features
+%endif
 
 %install
 install -Dpm0755 target/release/ttfx %{buildroot}%{_bindir}/ttfx
