@@ -9,6 +9,12 @@ on:
         description: 'Build paksa walaupun versi sama (mis. setelah ubah spec)'
         type: boolean
         default: false
+
+# GITHUB_TOKEN dipakai untuk membaca tag upstream ONLYOFFICE/DesktopEditors
+# dengan batas rate yang jauh lebih longgar daripada request anonim.
+permissions:
+  contents: read
+
 env:
   APP_NAME:       "onlyoffice"
   GITHUB_REPO:    "ONLYOFFICE/DesktopEditors"
@@ -25,9 +31,32 @@ jobs:
       - name: Get upstream latest version
         id: upstream
         run: |
-          VER=$(curl -s \
-            "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest" \
-            | jq -r '.tag_name' | sed 's/^v//')
+          # api.github.com membatasi 60 permintaan/jam per IP untuk request tanpa
+          # token, dan runner GitHub berbagi IP. Kalau banyak workflow jalan
+          # bersamaan, responsnya bisa berupa objek error sehingga .tag_name
+          # bernilai null, URL download jadi .../download/vnull/... , dan run
+          # gagal dengan "wget exit 8" yang tidak menjelaskan penyebabnya.
+          # Pakai GITHUB_TOKEN (limit jauh lebih tinggi) dan fall back ke
+          # git ls-remote yang sama sekali tidak memakai REST API.
+          REPO="${{ env.GITHUB_REPO }}"
+          VER=$(curl -sS \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO}/releases/latest" \
+            | jq -r '.tag_name // empty' | sed 's/^v//' || true)
+
+          if [ -z "$VER" ] || [ "$VER" = "null" ]; then
+            echo "⚠️ REST API tidak mengembalikan tag, fallback ke git ls-remote"
+            VER=$(git ls-remote --tags --refs "https://github.com/${REPO}" \
+              | awk -F'refs/tags/' '{print $2}' | sed 's/^v//' \
+              | grep -E '^[0-9]+(\.[0-9]+)*$' | sort -V | tail -1)
+          fi
+
+          if [ -z "$VER" ]; then
+            echo "❌ Tidak bisa menentukan versi upstream untuk ${REPO}"
+            exit 1
+          fi
+
           echo "version=$VER" >> $GITHUB_OUTPUT
           echo "▶ Upstream: $VER"
 
@@ -71,7 +100,20 @@ jobs:
         run: |
           VER="${{ steps.upstream.outputs.version }}"
           RPM="${{ env.RPM_PATTERN }}"
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${RPM}"
+          URL="https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${RPM}"
+          echo "▶ Mengunduh: $URL"
+          wget -q -O "$RPM" "$URL" || {
+            echo "❌ Gagal mengunduh ${URL}"
+            exit 1
+          }
+          # Guard: jangan pernah lanjut dengan halaman error 404 yang tersimpan
+          # sebagai .rpm, karena %install akan gagal dengan pesan yang membingungkan.
+          rpm -qp "$RPM" > /dev/null || {
+            echo "❌ ${RPM} bukan RPM yang valid, kemungkinan halaman error"
+            head -c 200 "$RPM"; echo
+            exit 1
+          }
+          echo "▶ Ukuran: $(du -h "$RPM" | cut -f1)"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
