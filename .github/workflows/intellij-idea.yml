@@ -4,7 +4,11 @@ on:
   schedule:
     - cron: '0 0 * * *'   # tiap hari, jam 07.00 WIB (00:00 UTC)
   workflow_dispatch:
-
+    inputs:
+      force:
+        description: 'Build paksa walaupun versi sama (mis. setelah ubah spec)'
+        type: boolean
+        default: false
 env:
   APP_NAME:       "intellij-idea"
   JETBRAINS_CODE: "IIU"           # Unified IntelliJ IDEA
@@ -46,7 +50,10 @@ jobs:
         run: |
           UP="${{ steps.upstream.outputs.version }}"
           CP="${{ steps.copr.outputs.version }}"
-          if [ "$UP" = "$CP" ]; then
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "🔨 Force build diminta (versi $UP)"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          elif [ "$UP" = "$CP" ]; then
             echo "✅ Up-to-date ($UP), skip."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
