@@ -7,11 +7,17 @@ License:        MIT
 URL:            https://github.com/omacom/ttfx
 Source0:        %{name}-%{version}.tar.gz
 
-# The x86-64 assembly engine in asm/ is assembled by build.rs with NASM.
-# build.rs degrades to the pure Rust engine with a warning when NASM is
-# absent, so NASM is not strictly required to build.
+# The x86-64 assembly engine in asm/ is assembled by build.rs with NASM, but
+# those hand-written objects use absolute addressing and are not position
+# independent, so they cannot be linked into the PIE executable that Fedora
+# builds by default. Upstream build.rs falls back to the parity-exact pure
+# Rust engine with a warning when NASM is absent, and that is what we build
+# here. Enable the asm engine only once upstream assembles it as PIC.
 ExclusiveArch:   x86_64
+%bcond_without asm
+%if %{with asm}
 BuildRequires:  nasm
+%endif
 
 BuildRequires:  cargo
 BuildRequires:  rust
