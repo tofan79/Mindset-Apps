@@ -128,7 +128,7 @@ jobs:
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
             echo "ok=false" >> "$GITHUB_OUTPUT"
-            echo "::error::Build COPR ${BID:-unknown} gagal,	log chroot akan ditampilkan di bawah"
+            echo "::error::Build COPR ${BID:-unknown} gagal, log chroot akan ditampilkan di bawah"
           fi
           exit $RC
 
