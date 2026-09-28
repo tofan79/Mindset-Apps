@@ -101,6 +101,15 @@ jobs:
           copr_url = https://copr.fedorainfracloud.org
           EOF
 
+      - name: Sync COPR project chroots
+        if: steps.check.outputs.skip == 'false'
+        # Daftar chroot dibaca dari .github/copr-chroots.txt, satu sumber
+        # kebenaran untuk semua workflow. Menambah chroot baru (mis. Fedora
+        # 46/47) cukup edit file itu, tanpa mengubah workflow ini.
+        uses: ./.github/actions/sync-copr-chroots
+        with:
+          project: ${{ env.COPR_PROJECT }}
+
       - name: Submit to COPR
         id: submit
         if: steps.check.outputs.skip == 'false'
@@ -127,4 +136,3 @@ jobs:
         uses: ./.github/actions/dump-copr-log
         with:
           build-id: ${{ steps.submit.outputs.build_id }}
-          chroots: "fedora-44-x86_64"

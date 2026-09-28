@@ -6,9 +6,12 @@ inputs:
     description: "ID build COPR (dari output copr-cli build)"
     required: true
   chroots:
-    description: "Chroot yang ingin log-nya ditampilkan, dipisah koma"
+    description: >
+      Chroot yang ingin log-nya ditampilkan, dipisah koma. KOSONGKAN agar
+      action menentukannya sendiri dari build COPR (disarankan). Nilai ini
+      hanya sebagai override untuk kasus yang tidak biasa.
     required: false
-    default: "fedora-44-x86_64"
+    default: ""
 
 runs:
   using: composite
@@ -37,8 +40,42 @@ runs:
         PROJ=$(printf '%s' "${DETAIL}" | jq -r '.project_dirname // empty' 2>/dev/null || true)
         PKG=$(printf '%s' "${DETAIL}" | jq -r '.source_package.name // empty' 2>/dev/null || true)
 
+        # ---- Resolusi daftar chroot -------------------------------------
+        # Chroot TIDAK lagi ditulis manual di sini. Urutan prioritas:
+        #   1. input 'chroots' (override manual, biasanya kosong)
+        #   2. field .chroots dari API build — daftar chroot yang BENAR-BENAR
+        #      dipakai build ini, jadi otomatis mencakup chroot baru
+        #   3. file .github/copr-chroots.txt — sumber kebenaran repo
+        # Dengan begitu menambah Fedora 46/47 tidak perlu menyentuh action ini.
+        CHROOTS=""
+        SOURCE=""
+
+        if [ -n "${CHROOT_LIST:-}" ]; then
+          CHROOTS="${CHROOT_LIST//,/ }"
+          SOURCE="input workflow"
+        else
+          FROM_API=$(printf '%s' "${DETAIL}" \
+            | jq -r 'if (.chroots | type) == "array"
+                     then (.chroots | map(if type == "object" then .name // empty else . end)
+                           | map(select(. != null and . != "")) | join(" "))
+                     else "" end' 2>/dev/null || true)
+          if [ -n "${FROM_API}" ]; then
+            CHROOTS="${FROM_API}"
+            SOURCE="API build COPR"
+          elif [ -f .github/copr-chroots.txt ]; then
+            CHROOTS=$(sed -e 's/#.*$//' -e 's/[[:space:]]//g' .github/copr-chroots.txt \
+                      | grep -v '^$' | tr '\n' ' ')
+            SOURCE=".github/copr-chroots.txt"
+          fi
+        fi
+
         echo "::group::COPR build ${BID} state=${STATE:-unknown} (${OWNER:-?}/${PROJ:-?}/${PKG:-?})"
         echo "Halaman build: ${COPR_URL}/coprs/${OWNER}/${PROJ}/build/${BID}/"
+        if [ -n "${CHROOTS}" ]; then
+          echo "Chroot diperiksa (dari ${SOURCE}): ${CHROOTS}"
+        else
+          echo "::warning::Daftar chroot tidak bisa ditentukan otomatis."
+        fi
         echo
 
         if [ "${STATE}" = "succeeded" ]; then
@@ -57,8 +94,14 @@ runs:
         #   /results/<owner>/<project>/<chroot>/<build-id>-<nama-paket>/<file>
         # builder-live.log.gz adalah log rpmbuild lengkap, sedangkan
         # backend.log.gz hanya berisi pemeriksaan mock yang diharapkan.
+        #
+        # SEMUA chroot ikut diperiksa, bukan berhenti di log pertama. Build
+        # multi-chroot bisa gagal hanya di Fedora 45 atau rawhide sementara
+        # Fedora 44 hijau; dulu log Fedora 44 yang ditemukan duluan sehingga
+        # penyebab sebenarnya tidak pernah terlihat.
         FOUND=""
-        for CHROOT in ${CHROOT_LIST//,/ }; do
+        for CHROOT in ${CHROOTS}; do
+          GOT=""
           for FILE in builder-live.log.gz backend.log.gz; do
             URL="${DL_URL}/results/${OWNER}/${PROJ}/${CHROOT}/${BID}-${PKG}/${FILE}"
             CODE=$(curl -sS --max-time 60 -o /tmp/copr-log.gz -w '%{http_code}' "${URL}" 2>/dev/null || echo 000)
@@ -66,10 +109,12 @@ runs:
               echo "──── ${CHROOT} / ${FILE} ────"
               # Error asli ada di ujung log; bagian awal cuma persiapan chroot.
               gzip -dc /tmp/copr-log.gz 2>/dev/null | tail -n 120
+              GOT=1
               FOUND=1
-              break 2
+              break
             fi
           done
+          [ -n "${GOT}" ] || echo "──── ${CHROOT} / (tidak ada log) ────"
         done
 
         if [ -z "${FOUND}" ]; then
