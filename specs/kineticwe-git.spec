@@ -178,6 +178,14 @@ Requires:       libplasma
 # (built in-tree from src/plugins/kineticdecoration); neither Breeze nor the
 # distro kdecoration package is required.
 Requires:       breeze-icons
+# src/cursor.cpp hardcodes "breeze_cursors" as the fallback theme name, used
+# when the configured cursor cannot be resolved. Without this package that
+# fallback points at a directory that does not exist, so a missing or renamed
+# user cursor theme leaves the session with no cursor at all. This is the
+# cursor package only — it is NOT plasma-breeze, which would drag in the
+# whole Plasma desktop theme (colours, widgets, themes) and risk colliding
+# with the private org.kineticwe.decoration plugin above.
+Requires:       breeze-cursor-theme
 Requires:       kineticwe-noctalia = %{version}-%{release}
 Requires:       xorg-x11-server-Xwayland
 Requires:       hwdata
