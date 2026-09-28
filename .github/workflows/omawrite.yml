@@ -1,0 +1,156 @@
+name: "omawrite - COPR Auto Build"
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # tiap hari, jam 07.00 WIB (00:00 UTC)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Build paksa walaupun versi sama (mis. setelah ubah spec)'
+        type: boolean
+        default: false
+
+env:
+  APP_NAME:       "omawrite"
+  COPR_PROJECT:   "Mindset-Apps"
+  SPEC_FILE:      "specs/omawrite.spec"
+  UPSTREAM_REPO:  "omacom/omawrite"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Versi dari tag rilis terbaru (bukan commit branch). Tag diurutkan
+      # dengan sort -V, bukan memakai .[0].name, karena endpoint /tags GitHub
+      # tidak menjamin urutan semver — "v0.9.0" bisa muncul sebelum "v0.10.0".
+      - name: Get upstream latest tag
+        id: upstream
+        run: |
+          set -euo pipefail
+          VER=$(curl -fsSL --retry 3 \
+            "https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/tags?per_page=100" \
+            | jq -r '[.[].name | ltrimstr("v")] | sort -V | last')
+          [ -n "$VER" ] && [ "$VER" != "null" ] || { echo "no tags found"; exit 1; }
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "▶ Upstream: v$VER"
+
+      - name: Get current COPR version
+        id: copr
+        run: |
+          set -euo pipefail
+          CURRENT=$(curl -fsSL --retry 3 \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          # COPR mengembalikan versi dengan suffix release ("0.5.0-1"); buang
+          # suffix-nya agar cocok dengan tag upstream ("0.5.0") saat dibandingkan.
+          CURRENT="${CURRENT%-*}"
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        run: |
+          set -euo pipefail
+          UP="${{ steps.upstream.outputs.version }}"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "🔨 Force build diminta (versi $UP)"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          elif [ "$UP" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y rpm build-essential wget jq
+          pip install copr-cli --quiet
+
+      # Pakai endpoint archive/refs/tags (bukan /tarball/): yang ini menghasilkan
+      # direktori top-level omawrite-<versi>, sesuai dengan %autosetup di spec.
+      # Endpoint /tarball/ menamai foldernya omacom-omawrite-<sha> dan akan
+      # menggagalkan %prep.
+      - name: Download source tarball
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          VER="${{ steps.upstream.outputs.version }}"
+          FILENAME="${APP_NAME}-${VER}.tar.gz"
+          curl -fsSL --retry 3 \
+            "https://github.com/${{ env.UPSTREAM_REPO }}/archive/refs/tags/v${VER}.tar.gz" \
+            -o "$FILENAME"
+          echo "FILENAME=$FILENAME" >> "$GITHUB_ENV"
+          echo "▶ $FILENAME ($(du -h "$FILENAME" | cut -f1))"
+          echo "▶ Top-level: $(tar -tzf "$FILENAME" | head -1 | cut -d/ -f1)"
+          # %install dan %files butuh semuanya ada; gagal di sini lebih baik
+          # daripada gagal aneh di %install.
+          D="${APP_NAME}-${VER}"
+          tar -xzf "$FILENAME" -C /tmp
+          for f in LICENSE README.md omawrite.pro \
+                   pkgbuild/omawrite.desktop pkgbuild/omawrite.svg \
+                   fonts/OFL.txt; do
+            [ -s "/tmp/$D/$f" ] || { echo "missing required file: $f"; exit 1; }
+          done
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        run: |
+          set -euo pipefail
+          VER="${{ steps.upstream.outputs.version }}"
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          cp "$FILENAME" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
+          SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
+          echo "path=$SRPM" >> "$GITHUB_OUTPUT"
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Sync COPR project chroots
+        if: steps.check.outputs.skip == 'false'
+        uses: ./.github/actions/sync-copr-chroots
+        with:
+          project: ${{ env.COPR_PROJECT }}
+
+      - name: Submit to COPR
+        id: submit
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set +e
+          OUT=$(copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }} 2>&1)
+          RC=$?
+          printf '%s\n' "$OUT"
+          BID=$(printf '%s\n' "$OUT" | grep -oE 'Created builds: [0-9]+' | grep -oE '[0-9]+' | head -1)
+          echo "build_id=${BID:-unknown}" >> "$GITHUB_OUTPUT"
+          if [ "$RC" -eq 0 ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Build COPR ${BID:-unknown} gagal, log chroot akan ditampilkan di bawah"
+          fi
+          exit $RC
+
+      - name: Dump COPR chroot log
+        if: always() && steps.check.outputs.skip == 'false' && steps.submit.outputs.ok == 'false'
+        uses: ./.github/actions/dump-copr-log
+        with:
+          build-id: ${{ steps.submit.outputs.build_id }}
