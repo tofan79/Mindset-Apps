@@ -17,6 +17,7 @@ BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  qt6-qtmultimedia-devel
+BuildRequires:  pulseaudio-libs-devel
 
 # README upstream: "Install ... libpulse" — perekaman mikrofon lewat
 # PulseAudio-compatible server (PipeWire-Pulse pada sistem modern).
@@ -54,7 +55,7 @@ with the system dark/light mode.
 # %make_build dengan BUILDDIR terpisah; PKGBUILD upstream juga di dalam pohon.
 mkdir -p build
 pushd build
-%{__qmake6} ../monologue.pro
+qmake6 ../monologue.pro
 %make_build
 popd
 
