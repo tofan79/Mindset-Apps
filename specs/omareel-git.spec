@@ -55,6 +55,12 @@ BuildRequires:  turbojpeg-devel
 BuildRequires:  libevdev-devel
 BuildRequires:  wayland-devel
 
+# CMakeLists.txt baris 36-41: wayland-scanner dijalankan terhadap XML di
+# /usr/share/wayland-protocols/staging/... (ext-image-capture-source-v1 dst).
+# XML itu dimiliki wayland-protocols-devel; tanpa ini build gagal dengan
+# "No rule to make target .../ext-image-capture-source-v1.xml".
+BuildRequires:  wayland-protocols-devel
+
 # Pustaka runtime yang cocok dengan BuildRequires di atas.
 Requires:       layer-shell-qt
 Requires:       turbojpeg
@@ -95,7 +101,7 @@ encodes the commit date and short SHA, e.g. 20260928.gitabcdef1.
 %autosetup -n %{name}-%{version}
 
 %build
-%cmake -DOMAREEL_BUILD_HYPRLAND_PLUGIN=OFF
+%cmake -DOMAREEL_BUILD_HYPRLAND_PLUGIN=OFF -DBUILD_TESTING=OFF
 %cmake_build
 
 %install
