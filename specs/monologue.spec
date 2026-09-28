@@ -65,8 +65,6 @@ install -Dm644 pkgbuild/monologue.desktop \
 install -Dm644 pkgbuild/monologue.svg \
   %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/monologue.svg
 
-%license LICENSE
-
 %post
 for cmd in "gtk-update-icon-cache -q -t -f %{_datadir}/icons/hicolor" \
            "update-desktop-database -q"; do
