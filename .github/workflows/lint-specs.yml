@@ -31,38 +31,43 @@ jobs:
           fail=0
           : > /tmp/br.txt
           for f in specs/*.spec; do
-            # stdout dan stderr dipisah supaya pesan error rpmspec tidak ikut
-            # jadi "isi spec" yang lalu diparse sebagai dependency palsu.
-            if err=$(rpmspec -P --define "pkg_version 1.0" "$f" 2>/tmp/err.txt); then
-              n=$(grep -cE '^BuildRequires:' /tmp/parsed.txt 2>/dev/null || echo 0)
+            # rpmspec dijalankan SEKALI: stdout = spec hasil parse,
+            # stderr = diagnostik. Dipisah supaya pesan error rpmspec
+            # tidak ikut ter-"isi spec" dan jadi dependency palsu.
+            if rpmspec -P --define "pkg_version 1.0" "$f" >/tmp/parsed.txt 2>/tmp/err.txt; then
               echo "  ok   $f"
             else
               echo "  FAIL $f"
               echo "::error file=$f::rpmspec gagal: $(head -1 /tmp/err.txt)"
               fail=1
+              continue
             fi
-            rpmspec -P --define "pkg_version 1.0" "$f" 2>/dev/null > /tmp/parsed.txt || true
             # Ambil BuildRequires saja. Requires runtime di-skip: paket kita
             # memang boleh menarik dependensi yang belum ada di chroot.
+            #
+            # Urutan itu penting: filter baris BuildRequires dulu, baru
+            # buang prefix-nya, baru tokenisasi. Kalau dibalik, sed tidak
+            # akan pernah cocok karena baris sudah pecah jadi token.
             #
             # Parser awk di bawah wajib melewati operator versi DAN token
             # sesudahnya — kalau tidak, "cmake >= 3.21" akan menyisakan "3.21"
             # sebagai dependency palsu. pkgconfig(...) di-skip karena itu
             # dependency auto-generated yang rpm buat sendiri dan selalu
             # ikut ter-resolve bersama -devel pemilik .pc-nya.
-            awk '{
-                skip = 0
-                for (i = 1; i <= NF; i++) {
-                  t = $i
-                  if (skip) { skip = 0; continue }
-                  if (t ~ /^(>=|<=|==|!=|>|<)$/) { skip = 1; continue }
-                  if (t ~ /^pkgconfig\(/) { continue }
-                  gsub(/[()]/, "", t)
-                  if (t == "" || t ~ /^(or|and)$/) continue
-                  print t
-                }
-              }' /tmp/parsed.txt \
-              | sed -n 's/^BuildRequires:[[:space:]]*//p' >> /tmp/br.txt
+            grep -E '^BuildRequires:' /tmp/parsed.txt \
+              | sed -E 's/^BuildRequires:[[:space:]]*//' \
+              | awk '{
+                  skip = 0
+                  for (i = 1; i <= NF; i++) {
+                    t = $i
+                    if (skip) { skip = 0; continue }
+                    if (t ~ /^(>=|<=|==|!=|>|<)$/) { skip = 1; continue }
+                    if (t ~ /^pkgconfig\(/) { continue }
+                    gsub(/[()]/, "", t)
+                    if (t == "" || t ~ /^(or|and)$/) continue
+                    print t
+                  }
+                }' >> /tmp/br.txt
           done
           sort -u -o /tmp/br.txt /tmp/br.txt
           echo "---"
