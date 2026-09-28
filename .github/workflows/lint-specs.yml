@@ -51,9 +51,17 @@ jobs:
             #
             # Parser awk di bawah wajib melewati operator versi DAN token
             # sesudahnya — kalau tidak, "cmake >= 3.21" akan menyisakan "3.21"
-            # sebagai dependency palsu. pkgconfig(...) di-skip karena itu
-            # dependency auto-generated yang rpm buat sendiri dan selalu
-            # ikut ter-resolve bersama -devel pemilik .pc-nya.
+            # sebagai dependency palsu.
+            #
+            # pkgconfig(...) di-skip karena itu dependency auto-generated yang
+            # rpm buat sendiri dan selalu ikut ter-resolve bersama -devel
+            # pemilik .pc-nya. Polanya harus menerima kurung pembuka juga:
+            # gloview-git.spec menulis
+            #   (pkgconfig(lua) or pkgconfig(lua5.4) or pkgconfig(luajit))
+            # jadi token pertamanya adalah "(pkgconfig(lua)". Kalau hanya
+            # dicek dengan /^pkgconfig\(/, token itu lolos, lalu gsub
+            # menghapus semua kurung dan menyisakan dependency palsu
+            # bernama "pkgconfiglua".
             grep -E '^BuildRequires:' /tmp/parsed.txt \
               | sed -E 's/^BuildRequires:[[:space:]]*//' \
               | awk '{
@@ -62,7 +70,7 @@ jobs:
                     t = $i
                     if (skip) { skip = 0; continue }
                     if (t ~ /^(>=|<=|==|!=|>|<)$/) { skip = 1; continue }
-                    if (t ~ /^pkgconfig\(/) { continue }
+                    if (t ~ /^\(?pkgconfig\(/) { continue }
                     gsub(/[()]/, "", t)
                     if (t == "" || t ~ /^(or|and)$/) continue
                     print t
