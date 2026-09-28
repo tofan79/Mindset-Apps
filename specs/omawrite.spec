@@ -71,10 +71,6 @@ install -Dm644 pkgbuild/omawrite.desktop \
 install -Dm644 pkgbuild/omawrite.svg \
   %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/omawrite.svg
 
-# LICENSE = lisensi aplikasi (MIT), fonts/OFL.txt = lisensi font tertanam.
-%license LICENSE
-%license fonts/OFL.txt
-
 %post
 for cmd in "gtk-update-icon-cache -q -t -f %{_datadir}/icons/hicolor" \
            "update-desktop-database -q"; do
