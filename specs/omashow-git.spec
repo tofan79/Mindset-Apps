@@ -39,6 +39,9 @@ BuildRequires:  ffmpeg-free-devel
 # omashow.pro baris 110: PKGCONFIG += hunspell
 BuildRequires:  hunspell-devel
 
+# omashow.pro baris 66: LIBS += -lz (bundle writer memakai zlib langsung).
+BuildRequires:  zlib-devel
+
 # omashow.pro baris 179: PKGCONFIG += libetonyek-0.1 librevenge-0.0
 # librevenge-stream-0.0 (impor .odp/.odt). Nama .pc-nya diimpor apa adanya
 # dari LibreOffice/libetonyek upstream, bukan ditulis ulang, jadi BuildRequires
@@ -88,7 +91,7 @@ commit date and short SHA, e.g. 20260928.gitabcdef1.
 # ikuti pola itu agar berkas objek tetap terpisah dari source.
 mkdir -p build
 pushd build
-%{__qmake6} ../omashow.pro
+qmake6 ../omashow.pro
 %make_build
 popd
 
@@ -117,12 +120,6 @@ done
 # %post hanya meng printing perintahnya.
 install -Dm644 skills/omashow/SKILL.md \
   %{buildroot}%{_datadir}/omashow/skills/omashow
-
-# Lisensi wajib: GPL-3.0-or-later + daftar pihak ketiga yang memang
-# dipisah upstream jadi berkas sendiri.
-%license LICENSE
-%license THIRD-PARTY-NOTICES.md
-%license src/ui/icons/LICENSE.lucide
 
 %post
 # thrice: ikon hicolor, database MIME (omashow mendaftarkan tipe
