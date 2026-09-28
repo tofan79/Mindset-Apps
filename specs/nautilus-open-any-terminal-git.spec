@@ -38,6 +38,11 @@ Requires:       gettext-runtime
 
 %global debug_package %{nil}
 
+# RPM Version "20260916.git0e34f87a" bukan versi PEP 440 yang valid, jadi
+# setuptools_scm melempar InvalidVersion. Untuk Python, ubah ".git" -> "+git"
+# (local version identifier): 20260916+git0e34f87a.
+%global pep440_version %(echo %{version} | sed 's/\.git/+git/')
+
 %description
 Nautilus extension that adds a "Open in Terminal" style context menu entry
 which lets you pick a terminal emulator other than gnome-terminal. The
@@ -58,17 +63,15 @@ the commit date and short SHA, e.g. 20260928.gitabcdef1.
 # setuptools_scm tidak bisa menemukan .git di dalam tarball SRPM, jadi
 # versikan diteruskan lewat env var. Nilai "0.0.0" hanya perantara —
 # versi RPM yang dipakai rpm adalah %{version} di header.
-SETUPTOOLS_SCM_PRETEND_VERSION=%{version} \
+SETUPTOOLS_SCM_PRETEND_VERSION=%{pep440_version} \
   %py3_build
 
 %install
-SETUPTOOLS_SCM_PRETEND_VERSION=%{version} \
+SETUPTOOLS_SCM_PRETEND_VERSION=%{pep440_version} \
   %py3_install
 
-# setup.py hanya menyalin *.xml dan mencetak "Run glib-compile-schemas" —
-# tidak pernah memanggilnya. Skema GSettings tanpa .gschema.Compiled tidak
-# terbaca, jadi kompilasi dilakukan di sini, bukan mengandalkan %post.
-%glib_compile_schemas %{buildroot}%{_datadir}/glib-2.0/schemas
+# Skema GSettings TIDAK dikompilasi/dikirim di sini: gschemas.compiled dimiliki
+# glib2 dan dikompilasi ulang otomatis oleh file trigger glib2 di Fedora.
 
 # setup.py InstallCommand mendaftarkan modul ke BOTH
 # share/nautilus-python/extensions dan share/caja-python/extensions
@@ -89,10 +92,10 @@ update-desktop-database -q >/dev/null 2>&1 || :
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/nautilus_open_any_terminal/
+%{python3_sitelib}/nautilus_open_any_terminal-*.egg-info/
 %{_datadir}/nautilus-python/extensions/nautilus_open_any_terminal.py
 %{_datadir}/caja-python/extensions/nautilus_open_any_terminal.py
 %{_datadir}/glib-2.0/schemas/com.github.stunkymonkey.nautilus-open-any-terminal.gschema.xml
-%{_datadir}/glib-2.0/schemas/gschemas.compiled
 %{_datadir}/locale/*/LC_MESSAGES/nautilus-open-any-terminal.mo
 
 %changelog
