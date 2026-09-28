@@ -60,7 +60,7 @@ installed system-wide.
 # di dalam pohon (mkdir build && cd build && qmake6 ../omawrite.pro).
 mkdir -p build
 pushd build
-%{__qmake6} ../omawrite.pro
+qmake6 ../omawrite.pro
 %make_build
 popd
 
