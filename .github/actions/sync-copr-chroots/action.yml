@@ -1,0 +1,60 @@
+name: Sync COPR project chroots
+description: >
+  Terapkan daftar chroot dari .github/copr-chroots.txt ke project COPR.
+  Dijalankan setiap kali workflow mau submit build, sehingga daftar chroot
+  selalu sama untuk semua workflow dan tidak bergantung pada workflow tertentu.
+
+inputs:
+  project:
+    description: "Nama project COPR"
+    required: true
+  chroots-file:
+    description: "Path ke file daftar chroot"
+    required: false
+    default: ".github/copr-chroots.txt"
+
+runs:
+  using: composite
+  steps:
+    - name: Apply chroot list to COPR project
+      shell: bash
+      env:
+        PROJECT: ${{ inputs.project }}
+        CHROOTS_FILE: ${{ inputs.chroots-file }}
+      run: |
+        set -euo pipefail
+
+        if [ ! -f "${CHROOTS_FILE}" ]; then
+          echo "::error::File daftar chroot tidak ditemukan: ${CHROOTS_FILE}"
+          exit 1
+        fi
+
+        # Satu nama chroot per baris; buang komentar dan baris kosong, lalu
+        # rapikan whitespace supaya format file bebas spasi/koma/nomor.
+        mapfile -t CHROOTS < <(
+          sed -e 's/#.*$//' -e 's/[[:space:]]//g' "${CHROOTS_FILE}" \
+            | grep -v '^$'
+        )
+
+        if [ "${#CHROOTS[@]}" -eq 0 ]; then
+          echo "::error::Tidak ada chroot yang terbaca dari ${CHROOTS_FILE}"
+          exit 1
+        fi
+
+        echo "▶ Chroot aktif (dari ${CHROOTS_FILE}): ${CHROOTS[*]}"
+
+        # PENTING: "copr-cli modify --chroot" Replace SELURUH daftar chroot
+        # project, bukan menambah satu per satu. Semua chroot harus dikirim
+        # dalam satu perintah, kalau tidak chroot yang tidak disebut akan
+        # ikut ter-disable.
+        ARGS=()
+        for c in "${CHROOTS[@]}"; do
+          ARGS+=(--chroot "$c")
+        done
+
+        # Kegagalan sinkronisasi tidak boleh menggagalkan build: chroot yang
+        # sudah aktif sebelumnya masih dipakai, jadi cukup beri peringatan.
+        if ! copr-cli modify "${PROJECT}" "${ARGS[@]}"; then
+          echo "::warning::Gagal menyinkronkan daftar chroot ke project ${PROJECT}."
+          echo "::warning::Build tetap dijalankan memakai chroot yang sudah aktif."
+        fi

@@ -1,0 +1,24 @@
+# COPR chroots untuk project "Mindset-Apps".
+#
+# INI SATU-SATUNYA tempat chroot dikonfigurasi. Semua 19 workflow membaca file
+# ini lewat .github/actions/sync-copr-chroots, dan action dump-copr-log juga
+# memakainya sebagai fallback. Menambah atau mengganti chroot cukup di sini —
+# TIDAK perlu menyentuh workflow satu pun.
+#
+# Cara pakai: satu nama chroot per baris, tanpa spasi, tanpa koma, tanpa nomor.
+# Baris kosong dan baris yang diawali '#' diabaikan.
+#
+# PENTING: "copr-cli modify --chroot" MENGGANTIKAN seluruh daftar chroot project,
+# bukan menambahkannya. Karena itu daftar di bawah wajib ditulis lengkap dalam
+# satu file — jangan memecah chroot ke beberapa tempat.
+#
+# Contoh menambah Fedora 46/47 di masa depan:
+#   fedora-44-x86_64
+#   fedora-45-x86_64
+#   fedora-46-x86_64
+#   fedora-47-x86_64
+#   fedora-rawhide-x86_64
+
+fedora-44-x86_64
+fedora-45-x86_64
+fedora-rawhide-x86_64
