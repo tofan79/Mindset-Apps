@@ -118,6 +118,12 @@ jobs:
           exit $fail
 
       - name: SRPM bisa dibangun?
+        # rpmbuild -bs mewajibkan semua SourceN/PatchN ada di _sourcedir.
+        # Dulu _sourcedir diarahkan ke /dev/null sehingga SEMUA spec gagal
+        # dengan "Bad file: /dev/null/xxx: Not a directory". Sekarang tiap
+        # spec dapat direktori sementara berisi file kosong bernama sama
+        # dengan Source/Patch hasil ekspansi macro (rpmspec -P): yang dicek
+        # cuma struktur spec, bukan isi tarball.
         run: |
           set -uo pipefail
           fail=0
@@ -126,13 +132,20 @@ jobs:
             n=$(basename "$f" .spec)
             cp "$f" ~/rpmbuild/SPECS/
             sed -i 's/%{pkg_version}/1.0/g' ~/rpmbuild/SPECS/"$n".spec
-            if rpmbuild -bs --define "_sourcedir /dev/null" \
+            src=$(mktemp -d)
+            rpmspec -P ~/rpmbuild/SPECS/"$n".spec 2>/dev/null \
+              | awk '/^(Source|Patch)[0-9]*:/ {print $2}' \
+              | while read -r s; do
+                  case "$s" in *'#/'*) s="${s##*#/}" ;; esac
+                  touch "$src/$(basename "$s")"
+                done
+            if rpmbuild -bs --define "_sourcedir $src" \
                  ~/rpmbuild/SPECS/"$n".spec >/tmp/lint.log 2>&1; then
               echo "  ✓ $n"
             else
               echo "::error file=$f::rpmbuild -bs gagal: $(grep -i error /tmp/lint.log | head -1)"
               fail=1
             fi
-            rm -f ~/rpmbuild/SPECS/"$n".spec
+            rm -rf "$src" ~/rpmbuild/SPECS/"$n".spec
           done
           exit $fail
