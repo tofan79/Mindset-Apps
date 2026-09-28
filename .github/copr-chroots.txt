@@ -16,8 +16,7 @@
 #   fedora-44-x86_64
 #   fedora-45-x86_64
 #   fedora-46-x86_64
-#   fedora-47-x86_64
-#   fedora-rawhide-x86_64
+#   etc / dst
 
 fedora-44-x86_64
 fedora-45-x86_64
