@@ -70,8 +70,13 @@ SETUPTOOLS_SCM_PRETEND_VERSION=%{pep440_version} \
 SETUPTOOLS_SCM_PRETEND_VERSION=%{pep440_version} \
   %py3_install
 
-# Skema GSettings TIDAK dikompilasi/dikirim di sini: gschemas.compiled dimiliki
-# glib2 dan dikompilasi ulang otomatis oleh file trigger glib2 di Fedora.
+# Skema GSettings TIDAK dikompilasi di %install, dan gschemas.compiled tidak
+# ikut dikirim di %files. Alasannya: gschemas.compiled adalah file milik glib2
+# yang dibangun ulang untuk SELURUH direktori, jadi mengklaim kepemilikannya
+# di sini akan saling tabrak dengan trigger glib2 saat glib2 di-upgrade.
+# Kompilasi yang benar dilakukan di %post, karena glib-compile-schemas
+# membaca seluruh .gschema.xml di direktori itu. Lihat catatan panjang di
+# %post kenapa harus %post dan tidak bisa andalkan file trigger.
 
 # setup.py InstallCommand mendaftarkan modul ke BOTH
 # share/nautilus-python/extensions dan share/caja-python/extensions
@@ -80,12 +85,35 @@ SETUPTOOLS_SCM_PRETEND_VERSION=%{pep440_version} \
 # dikunci sebagai Requires hanya karena file-nya ikut ter-install.
 
 %post
-# Skema sudah dikompilasi di %install; post hanya me-refresh cache yang
-# relevan. glib-compile-schemas tidak perlu diulang karena .gschema.Compiled
-# sudah ikut terpasang sebagai bagian dari file list RPM.
+# glib-compile-schemas di sini WAJIB, bukan sekadar formalitas.
+#
+# Image RakuOS ini tidak punya file trigger RPM sama sekali: direktori
+# /usr/lib/rpm/file-triggers/ tidak ada, dan tidak ada paket pun yang
+# memiliki file di dalamnya. glib2 sendiri tidak membawa trigger apa pun.
+# Jadi asumsi "dibiarkan oleh file trigger glib2" tidak berlaku di sini.
+#
+# Gejalanya sudah terbukti nyata di sistem ini: berkas
+# /usr/share/glib-2.0/schemas/gschemas.compiled bertanggal 26 Sep,
+# sedangkan nautilus-50.3 terpasang 28 Sep. Karena tidak ada yang membangun
+# ulang database itu, nautilus crash:
+#
+#   GLib-GIO-ERROR: Settings schema 'org.gnome.nautilus.preferences' is not
+#   installed
+#   zsh: IOT instruction (core dumped)  nautilus
+#
+# Skema di bawah akan mengalami hal yang sama persis — terpasang ke direktori
+# tapi tidak pernah terbaca, sehingga preferensi ekstensi (terminal mana yang
+# ditampilkan) selalu kembali ke default tanpa error yang terlihat.
+#
+# glib-compile-schemas dibangun ulang untuk SELURUH direktori, jadi ini juga
+# memperbaiki semua schema lain yang tertinggal, bukan hanya milik paket ini.
+glib-compile-schemas %{_datadir}/glib-2.0/schemas >/dev/null 2>&1 || :
 update-desktop-database -q >/dev/null 2>&1 || :
 
 %postun
+# Sama seperti %post: rebuild ulang supaya skema paket ini hilang dari DB
+# setelah di-uninstall, dan jangan sampai meninggalkan entri yang rusak.
+glib-compile-schemas %{_datadir}/glib-2.0/schemas >/dev/null 2>&1 || :
 update-desktop-database -q >/dev/null 2>&1 || :
 
 %files
