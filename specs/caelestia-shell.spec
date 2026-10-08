@@ -65,16 +65,21 @@ BuildRequires:  iniparser-devel
 Requires:       caelestia-cli
 Requires:       quickshell
 # Alat yang dipanggil langsung dari QML/service: nmcli (NetworkManager),
-# ddcutil (DDC/CI monitor), brightnessctl (backlight), power-profiles-daemon,
-# swappy (anotasi screenshot), slurp (pilih area), wl-copy (clipboard),
-# notify-send (notifikasi fallback), fish (wrap terminal), qt6-qtimageformats
-# (webp dll), sh/bash untuk wrapper.
+# ddcutil (DDC/CI monitor), brightnessctl (backlight), swappy (anotasi
+# screenshot), slurp (pilih area), wl-copy (clipboard), notify-send
+# (notifikasi fallback), fish (wrap terminal), qt6-qtimageformats (webp dll),
+# sh/bash untuk wrapper.
+#
+# power-profiles-daemon sengaja TIDAK dijadikan Requires. Panel profil daya
+# membacanya lewat D-Bus (singleton QML PowerProfiles), jadi tanpa daemon itu
+# cuma widgetnya yang kosong — shell tetap jalan. Paketnya pun tidak ada di
+# semua distro, dan saat tidak tersedia instalasi berhenti di
+# "none of the providers can be installed".
 Requires:       bash
 Requires:       fish
 Requires:       ddcutil
 Requires:       brightnessctl
 Requires:       NetworkManager
-Requires:       power-profiles-daemon
 Requires:       swappy
 Requires:       slurp
 Requires:       wl-clipboard
