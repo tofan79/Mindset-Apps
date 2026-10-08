@@ -64,27 +64,23 @@ BuildRequires:  iniparser-devel
 # dengan "nothing provides caelestia-cli = 2.5.0-1".
 Requires:       caelestia-cli
 Requires:       quickshell
-# Alat yang dipanggil langsung dari QML/service: nmcli (NetworkManager),
+# Font yang dipakai shell (README upstream): Material Symbols untuk ikon,
+# Rubik untuk teks utama, Cascadia Code Nerd untuk terminal. Tanpa ketiganya
+# tampilan langsung berantakan, jadi ini tiga-satunya tambahan yang ditarik
+# otomatis. Nama paketnya mengikuti distro tempat shell ini dipasang.
+Requires:       ttf-material-symbols-variable
+Requires:       ttf-rubik-vf
+Requires:       ttf-cascadia-code-nerd
+
+# Alat yang hanya dipanggil dari QML/service — nmcli (NetworkManager),
 # ddcutil (DDC/CI monitor), brightnessctl (backlight), swappy (anotasi
 # screenshot), slurp (pilih area), wl-copy (clipboard), notify-send
-# (notifikasi fallback), fish (wrap terminal), qt6-qtimageformats (webp dll),
-# sh/bash untuk wrapper.
+# (notifikasi fallback), fish + bash (wrap terminal), qt6-qtimageformats
+# (webp dll) dan power-profiles-daemon (panel profil daya, dibaca lewat
+# D-Bus) — sengaja TIDAK dijadikan Requires. Dipasang manual bila perlu,
+# supaya `rum install caelestia-shell` tidak menarik apa pun selain shell,
+# CLI, quickshell dan font.
 #
-# power-profiles-daemon sengaja TIDAK dijadikan Requires. Panel profil daya
-# membacanya lewat D-Bus (singleton QML PowerProfiles), jadi tanpa daemon itu
-# cuma widgetnya yang kosong — shell tetap jalan. Paketnya pun tidak ada di
-# semua distro, dan saat tidak tersedia instalasi berhenti di
-# "none of the providers can be installed".
-Requires:       bash
-Requires:       fish
-Requires:       ddcutil
-Requires:       brightnessctl
-Requires:       NetworkManager
-Requires:       swappy
-Requires:       slurp
-Requires:       wl-clipboard
-Requires:       libnotify
-Requires:       qt6-qtimageformats
 # Font fallback sengaja TIDAK dijadikan Recommends: biar instalasi tidak
 # diam-diam menarik paket font. Daftarnya ada di README (manual, opsional).
 
