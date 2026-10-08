@@ -334,6 +334,22 @@ cat >> %{_builddir}/kglobalacceld/CMakeLists.txt <<'KWE_KGA'
 set_target_properties(KGlobalAccelD PROPERTIES OUTPUT_NAME kineticwe-globalacceld)
 KWE_KGA
 
+# Packaging-time patch: kscreenlocker >= 6.7.90 (Fedora rawhide) menghapus
+# empat simbol KSldApp yang dipakai src/wayland_server.cpp: sinyal
+# inhibitSuspend/uninhibitSuspend, state AcquiringLock, dan slot
+# lockScreenShown. kscreenlocker baru menahan suspend sendiri lewat
+# PowerManagementInhibition dan berpindah ke Locked di dalam doLock(), jadi
+# kelima call site itu mati di sana. Guard-nya grep ke header terpasang, jadi
+# Fedora 44/45 perilaku lamanya utuh dan edit ini nyala otomatis begitu mereka
+# kebagian kscreenlocker baru juga.
+if ! grep -rq inhibitSuspend /usr/include/KScreenLocker/ 2>/dev/null; then
+    KWE_WAYLAND_SERVER=src/wayland_server.cpp
+    sed -i '/KSldApp::inhibitSuspend, this/,/^    });$/d' "${KWE_WAYLAND_SERVER}"
+    sed -i '/KSldApp::uninhibitSuspend, this/,/^    });$/d' "${KWE_WAYLAND_SERVER}"
+    sed -i '/->lockScreenShown();/d' "${KWE_WAYLAND_SERVER}"
+    sed -i 's/ || ScreenLocker::KSldApp::self()->lockState() == ScreenLocker::KSldApp::AcquiringLock//' "${KWE_WAYLAND_SERVER}"
+fi
+
 %build
 KGA_SRC=%{_builddir}/kglobalacceld
 KGA_BUILD=%{_builddir}/kglobalacceld-build
@@ -543,10 +559,13 @@ echo
 %files -n kineticwe-noctalia
 %license shell/noctalia/LICENSE
 %{_bindir}/noctalia-kwe
-%{_datadir}/noctalia/
-%{_datadir}/applications/dev.noctalia.Noctalia.desktop
+# Upstream mengganti nama path instalasi noctalia (commit 6373eb9c, 3 Okt):
+# share/noctalia -> share/noctalia-kwe, dev.noctalia.Noctalia.desktop ->
+# dev.kineticwe.Noctalia.desktop, noctalia.svg -> noctalia-kwe.svg.
+%{_datadir}/noctalia-kwe/
+%{_datadir}/applications/dev.kineticwe.Noctalia.desktop
 %{_datadir}/applications/dev.kineticwe.Settings.desktop
-%{_datadir}/icons/hicolor/scalable/apps/noctalia.svg
+%{_datadir}/icons/hicolor/scalable/apps/noctalia-kwe.svg
 %{_datadir}/icons/hicolor/512x512/apps/kineticwe-logo.png
 
 %files -n kineticwe-greeter
@@ -562,6 +581,14 @@ echo
 %{_datadir}/polkit-1/actions/org.noctalia.greeter.apply-appearance.policy
 
 %changelog
+* Thu Oct 08 2026 tofan79 <tofan79@users.noreply.github.com> - %{pkg_version}-1
+- kineticwe-noctalia: ikuti path instalasi upstream yang diganti nama
+  (share/noctalia-kwe/, dev.kineticwe.Noctalia.desktop, noctalia-kwe.svg);
+  jalur lama bikin build gagal di tahap files sejak 3 Okt.
+- kscreenlocker 6.7.90+ (rawhide) menghapus inhibitSuspend/uninhibitSuspend,
+  AcquiringLock dan lockScreenShown dari KSldApp; kelima call site di
+  wayland_server.cpp dibuang hanya kalau header terpasang sudah tidak
+  memilikinya (guard grep, jadi 44/45 tidak terpengaruh).
 * Sat Sep 26 2026 tofan79 <tofan79@users.noreply.github.com> - %{pkg_version}-1
 - Restored Recommends: qt5ct. It's not a KDE/Plasma component (it's a
   standalone Qt5 config daemon usable on any DE) and start-kineticwe.sh
