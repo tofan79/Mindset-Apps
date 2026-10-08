@@ -1,3 +1,12 @@
+# LTO dimatikan untuk seluruh paket ini. libcava menyematkan file data
+# (contoh config, shader, tema) lewat third_party/incbin.h yang menghasilkan
+# direktif assembler .incbin berpath relatif; path itu lolos saat compile
+# biasa, tapi lto-wrapper mengulang-assembly di direktori sementara tanpa
+# include-path sumber sehingga gagal "file not found" saat link. Opt-out ini
+# cara resmi redhat-rpm-config, dan flag-nya diekspor otomatis ke CFLAGS
+# oleh mekanisme _auto_set_build_flags.
+%global _lto_cflags %{nil}
+
 # Dua dependensi build TIDAK tersedia di Fedora, jadi dibundel langsung di
 # sini (satu SRPM) alih-alih dijadikan BuildRequires terpisah:
 #
