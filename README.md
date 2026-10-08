@@ -18,6 +18,18 @@ After that, install any app from the table below, e.g.:
 sudo dnf install zoom
 ```
 
+### Caelestia (shell + CLI)
+
+`caelestia-shell` pulls only what it needs to run (quickshell, ddcutil,
+brightnessctl, NetworkManager, power-profiles-daemon, swappy, slurp,
+wl-clipboard, libnotify, fish, qt6-qtimageformats) — installed
+automatically, nothing else. Optional font set is **not** pulled
+automatically; install it yourself if you want the stock look:
+
+```bash
+sudo dnf install material-symbols-fonts google-rubik-fonts nerd-fonts cascadia-code-fonts
+```
+
 ## Available packages
 
 | Package | Upstream source |
@@ -38,6 +50,8 @@ sudo dnf install zoom
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
 | `zoom` | [Zoom](https://zoom.us/download) |
+| `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
+| `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) |
 
 ## How it works
 
