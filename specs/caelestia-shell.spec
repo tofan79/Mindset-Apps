@@ -63,25 +63,23 @@ BuildRequires:  iniparser-devel
 # menghasilkan dependensi yang mustahil terpenuhi — resolver menolak shell
 # dengan "nothing provides caelestia-cli = 2.5.0-1".
 Requires:       caelestia-cli
-# Font yang dipakai shell (README upstream): Material Symbols untuk ikon,
-# Rubik untuk teks utama, Cascadia Code Nerd untuk terminal. Tanpa ketiganya
-# tampilan langsung berantakan, jadi ini tiga-satunya tambahan yang ditarik
-# otomatis. Nama paketnya mengikuti distro tempat shell ini dipasang.
-Requires:       ttf-material-symbols-variable
-Requires:       ttf-rubik-vf
-Requires:       ttf-cascadia-code-nerd
 
 # quickshell (runtime QML tempat shell ini hidup) dipasang manual juga, sama
-# dengan alat yang hanya dipanggil dari QML/service — nmcli (NetworkManager),
-# ddcutil (DDC/CI monitor), brightnessctl (backlight), swappy (anotasi
-# screenshot), slurp (pilih area), wl-copy (clipboard), notify-send
-# (notifikasi fallback), fish + bash (wrap terminal), qt6-qtimageformats
-# (webp dll) dan power-profiles-daemon (panel profil daya, dibaca lewat
-# D-Bus). Semuanya sengaja TIDAK dijadikan Requires, supaya
-# `rum install caelestia-shell` tidak menarik apa pun selain CLI dan font.
+# dengan font yang dipakai shell dan alat yang hanya dipanggil dari
+# QML/service — nmcli (NetworkManager), ddcutil (DDC/CI monitor),
+# brightnessctl (backlight), swappy (anotasi screenshot), slurp (pilih area),
+# wl-copy (clipboard), notify-send (notifikasi fallback), fish + bash (wrap
+# terminal), qt6-qtimageformats (webp dll) dan power-profiles-daemon (panel
+# profil daya, dibaca lewat D-Bus). Semuanya sengaja TIDAK dijadikan
+# Requires, supaya `rum install caelestia-shell` tidak menarik apa pun selain
+# caelestia-cli.
 #
-# Font fallback sengaja TIDAK dijadikan Recommends: biar instalasi tidak
-# diam-diam menarik paket font. Daftarnya ada di README (manual, opsional).
+# Font pun begitu: nama upstream (ttf-material-symbols-variable, ttf-rubik-vf,
+# ttf-cascadia-code-nerd) tidak ada di distro ini — resolver berhenti di
+# "nothing provides ttf-rubik-vf". Yang tersedia dipasang manual
+# (google-rubik-fonts, cascadia-code-nf-fonts); Material Symbols diambil
+# langsung dari google/material-design-icons. Font fallback juga tidak
+# dijadikan Recommends, biar instalasi tidak diam-diam menarik paket font.
 
 %description
 Caelestia is a desktop shell for Wayland compositors, built on Quickshell:
