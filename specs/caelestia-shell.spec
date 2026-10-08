@@ -58,7 +58,11 @@ BuildRequires:  fftw-devel
 BuildRequires:  iniparser-devel
 
 # Entry point "caelestia" dipakai untuk menjalankan/mengendalikan shell.
-Requires:       caelestia-cli = %{version}-%{release}
+# Versinya sengaja tidak dikunci: caelestia-cli dirilis mandiri dari repo
+# terpisah (1.1.3 saat shell 2.5.0), jadi `= %{version}-%{release}` selalu
+# menghasilkan dependensi yang mustahil terpenuhi — resolver menolak shell
+# dengan "nothing provides caelestia-cli = 2.5.0-1".
+Requires:       caelestia-cli
 Requires:       quickshell
 # Alat yang dipanggil langsung dari QML/service: nmcli (NetworkManager),
 # ddcutil (DDC/CI monitor), brightnessctl (backlight), power-profiles-daemon,
