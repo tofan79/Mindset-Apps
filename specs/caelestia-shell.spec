@@ -135,8 +135,14 @@ meson compile -C cava-build
 # untuk end-user. Yang di-sed hanya pc-file di staging.
 CAVA_STAGE=%{_builddir}/cava-stage
 DESTDIR="${CAVA_STAGE}" meson install -C cava-build
-sed -i "s|^prefix=.*|prefix=${CAVA_STAGE}%{_prefix}|" \
-    $(find "${CAVA_STAGE}" -name libcava.pc)
+PC=$(find "${CAVA_STAGE}" -name libcava.pc)
+sed -i "s|^prefix=.*|prefix=${CAVA_STAGE}%{_prefix}|" "$PC"
+# Cflags bawaan cuma memuat ${includedir}/cava, ${includedir}/cava/input dan
+# ${includedir}/cava/output — cukup untuk konsumen yang menulis
+# `#include <cavacore.h>`. Plugin caelestia menulis `#include <cava/cavacore.h>`,
+# jadi butuh ${includedir} induknya; tanpa ini compile mati di cavaprovider.hpp
+# dengan "cava/cavacore.h: No such file or directory".
+sed -i 's|^Cflags: *|Cflags: -I${includedir} |' "$PC"
 
 # --- m3shapes (Source2) ---
 # INSTALL_QMLDIR default upstream "usr/lib/qt6/qml" (relatif, dirancang
