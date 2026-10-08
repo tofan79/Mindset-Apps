@@ -192,6 +192,10 @@ DESTDIR=%{buildroot} cmake --install build
 %{_libdir}/qt6/qml/M3Shapes/
 # libcava yang dibundel (plugin men-link soname-nya di runtime).
 %{_libdir}/libcava.so.*
+# Tautan dev yang ikut terpasang dari `meson install`. Paket ini sudah membawa
+# header dan libcava.pc, jadi tautannya memang bagian dari paket: kalau tidak
+# dicantumkan, rpm berhenti di "Installed (but unpackaged) file(s)".
+%{_libdir}/libcava.so
 %{_libdir}/pkgconfig/libcava.pc
 %{_includedir}/cava/
 # Config quickshell: shell.qml, assets/ (termasuk wrap_term_launch.sh),
