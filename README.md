@@ -17,41 +17,39 @@ After that, install any app from the table below, e.g.:
 ```bash
 sudo dnf install zoom
 ```
-
-### Caelestia (shell + CLI)
-
-`caelestia-shell` pulls only what it needs to run (quickshell, ddcutil,
-brightnessctl, NetworkManager, power-profiles-daemon, swappy, slurp,
-wl-clipboard, libnotify, fish, qt6-qtimageformats) — installed
-automatically, nothing else. Optional font set is **not** pulled
-automatically; install it yourself if you want the stock look:
-
-```bash
-sudo dnf install material-symbols-fonts google-rubik-fonts nerd-fonts cascadia-code-fonts
-```
-
 ## Available packages
+
+All 27 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
-| `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
-| `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
-| `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
-| `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
-| `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) (daily git build) |
-| `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
-| `kineticwe-git` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
-| `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
-| `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
-| `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
-| `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
-| `android-studio` | [Android Studio](https://developer.android.com/studio) |
-| `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
-| `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
-| `zoom` | [Zoom](https://zoom.us/download) |
-| `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
+| `android-studio` | [Android Studio](https://developer.android.com/studio) |
 | `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) |
+| `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
+| `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
+| `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) (daily git build) |
+| `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
+| `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
+| `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
+| `kineticwe-git` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
+| `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
+| `material-symbols-fonts` | [google/material-design-icons](https://github.com/google/material-design-icons) (variable Rounded icon font) |
+| `monologue` | [omacom/monologue](https://github.com/omacom/monologue) |
+| `nautilus-open-any-terminal-git` | [Stunkymonkey/nautilus-open-any-terminal](https://github.com/Stunkymonkey/nautilus-open-any-terminal) (daily git build) |
+| `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
+| `omacut` | [omacom/omacut](https://github.com/omacom/omacut) |
+| `omanta` | [28allday/omanta](https://github.com/28allday/omanta) |
+| `omareel-git` | [omacom/omareel](https://github.com/omacom/omareel) (daily git build) |
+| `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) (daily git build) |
+| `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) |
+| `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
+| `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
+| `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
+| `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
+| `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
+| `ttfx` | [omacom/ttfx](https://github.com/omacom/ttfx) |
+| `zoom` | [Zoom](https://zoom.us/download) |
 
 ## How it works
 
