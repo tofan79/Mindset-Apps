@@ -19,12 +19,14 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 27 packages currently built, in alphabetical order:
+All 30 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
+| `ambxst` | [Axenide/Ambxst](https://github.com/Axenide/Ambxst) (Go daemon + Quickshell shell; runtime quickshell/axctl/wl-clipboard manual) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
+| `axctl` | [Axenide/axctl](https://github.com/Axenide/axctl) (Go compositor daemon/CLI: config, brightness, IPC — dipakai ambxst) |
 | `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) |
 | `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
@@ -45,6 +47,7 @@ All 27 packages currently built, in alphabetical order:
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
+| `phosphor-icons-fonts` | [phosphor-icons/web](https://github.com/phosphor-icons/web) (6 weight ikon, dipakai ambxst) |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
 | `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
