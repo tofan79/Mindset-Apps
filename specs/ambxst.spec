@@ -29,6 +29,13 @@ Source0:        %{name}-%{version}.tar.gz
 # kodenya kompatibel) atau jalankan chroot yang golang-nya cukup.
 BuildRequires:  golang
 
+# Module QML org.kde.syntaxhighlighting (dipakai CodeBlock.qml di sidebar AI)
+# harus ada di runtime, kalau tidak `qs` gagal load shell.qml dengan
+# "module org.kde.syntaxhighlighting is not installed". Berbeda dari
+# quickshell/axctl/wl-clipboard yang sengaja manual (lihat konteks runtime
+# bawah), modul ini WAJIB untuk shell bisa tampil, jadi dijadikan Requires.
+Requires:       kf6-syntax-highlighting
+
 # Tanpa baris ini `find-debuginfo` snap: binary daemon di-strip (-s -w, pola
 # sama backend.nix upstream) tanpa DWARF sama sekali, dan datadir ikut membawa
 # ELF helper lockscreen ambxst-auth (commit upstream) yang menyulap build jadi
@@ -54,6 +61,8 @@ single Go daemon that supervises Quickshell, axctl and wl-paste.
 #     hanya dipanggil saat fiturnya dipakai.
 # Ambxst sendiri butuh compositor Hyprland di level lingkungan (axctl = abstraksi
 # IPC Hyprland), bukan dependensi paket.
+# Pengecualian: kf6-syntax-highlighting adalah Requires di atas karena modul
+# QML-nya wajib untuk shell dapat dimuat (error "module not installed").
 
 %prep
 %setup -q -n Ambxst-%{version}
@@ -101,3 +110,6 @@ cp -a shell.qml modules config assets translations scripts version \
 - Wrapper /usr/bin/ambxst mengekspor AMBXST_SHELL ke datadir; binary asli
   di /usr/libexec/ambxst. Runtime quickshell/axctl/wl-clipboard sengaja
   manual, tidak dijadikan Requires.
+- Tambah Requires: kf6-syntax-highlighting — module QML org.kde.
+  syntaxhighlighting wajib agar qs dapat memuat shell.qml (CodeBlock.qml);
+  tanpa itu shell mogok total (bukan opsi seperti runtime manual lain).
