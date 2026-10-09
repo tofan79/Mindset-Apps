@@ -29,6 +29,13 @@ Source0:        %{name}-%{version}.tar.gz
 # kodenya kompatibel) atau jalankan chroot yang golang-nya cukup.
 BuildRequires:  golang
 
+# Tanpa baris ini `find-debuginfo` snap: binary daemon di-strip (-s -w, pola
+# sama backend.nix upstream) tanpa DWARF sama sekali, dan datadir ikut membawa
+# ELF helper lockscreen ambxst-auth (commit upstream) yang menyulap build jadi
+# "Empty %files file debugsourcefiles.list". Tidak ada debug yang hilang —
+# paket sengaja dibangun stripped.
+%global debug_package %{nil}
+
 %description
 Ambxst is a highly customizable Wayland shell built on Quickshell: a unified
 panel (bar, dock, notch), dashboard, lockscreen, desktop widgets,
