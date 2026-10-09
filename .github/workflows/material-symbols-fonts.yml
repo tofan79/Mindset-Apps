@@ -39,7 +39,7 @@ jobs:
             "https://raw.githubusercontent.com/${{ env.GH_REPO }}/${SHA}/${{ env.FONT_URL_PATH }}" \
             -o font.ttf
           pip install fonttools --quiet
-          VER=$(python3 -c "from fontTools.ttLib import TTFont; print(TTFont('font.ttf').getDebugName(5).removeprefix('Version ').strip())")
+          VER=$(python3 -c "from fontTools.ttLib import TTFont; print(TTFont('font.ttf')['name'].getDebugName(5).removeprefix('Version ').strip())")
           [[ "$VER" =~ ^[0-9]+(\.[0-9]+)+$ ]] || { echo "unexpected font version: $VER"; exit 1; }
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
           echo "version=$VER" >> "$GITHUB_OUTPUT"
