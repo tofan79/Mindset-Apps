@@ -84,6 +84,15 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.4-1
+- End the session through the compositor's own quit first (hyprctl dispatch
+  exit), then `uwsm stop`, then loginctl. From a systemd user service the
+  picker sits outside the session scope, so loginctl was refused and a switch
+  left the user on the old session with "log out yourself".
+- Start the incoming shell's polkit agent (hyprpolkitagent for Caelestia and
+  Ambxst) before the privileged uninstall stage, so `pkexec` has someone to
+  answer it — a reload does not re-run their `exec-once`, so it was dismissed.
+
 * Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.3-1
 - New app icon (folder glyph rendered from SVG), also shipped scalable.
 
