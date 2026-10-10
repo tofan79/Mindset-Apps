@@ -36,8 +36,6 @@ Bold, Fill, Duotone) dari repository phosphor-icons/web.
 # %setup zip tidak diandalkan; ekstrak manual pakai unzip (BuildRequires).
 %setup -q -c -T
 unzip -q %{SOURCE0}
-# Nama direktori hasil unzip dari web-2.1.2.zip = web-2.1.2
-cd web-%{version}
 
 %build
 # Tidak ada yang perlu dibangun: font dikirim apa adanya.
