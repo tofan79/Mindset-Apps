@@ -59,6 +59,8 @@ for s in 16 22 24 32 48 64 128 256 512; do
     install -Dpm0644 "data/icons/hicolor/${s}x${s}/apps/org.rakuos.ShellPicker.png" \
         "%{buildroot}%{_datadir}/icons/hicolor/${s}x${s}/apps/org.rakuos.ShellPicker.png"
 done
+install -Dpm0644 data/org.rakuos.ShellPicker.svg \
+    "%{buildroot}%{_datadir}/icons/hicolor/scalable/apps/org.rakuos.ShellPicker.svg"
 
 # Skel template: switch menyalin isinya ke home user. Layout harus mencerminkan
 # src/compositor supaya jalur relatif skel_for() ketemu setelah dipasang
@@ -78,9 +80,13 @@ desktop-file-validate \
 %{_bindir}/rakuos-shell-picker
 %{_datadir}/applications/org.rakuos.ShellPicker.desktop
 %{_datadir}/icons/hicolor/*/apps/org.rakuos.ShellPicker.png
+%{_datadir}/icons/hicolor/scalable/apps/org.rakuos.ShellPicker.svg
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.3-1
+- New app icon (folder glyph rendered from SVG), also shipped scalable.
+
 * Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.2-1
 - Initial COPR packaging of rakuos-shell-picker.
 - Ship the skel template tree under %{_datadir}/rakuos-shell-picker; the
