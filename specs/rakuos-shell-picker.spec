@@ -1,11 +1,9 @@
-# CATATAN logo: src/ui/logo.rs memuat logo shell dari `assets/` memakai
-# `env!("CARGO_MANIFEST_DIR")` pada RUNTIME, bukan `include_bytes!`. Path itu
-# menunjuk direktori build saat paket dibuat, sehingga di mesin pengguna file
-# tidak ditemukan dan kode jatuh ke fallback huruf (kartu tetap tampil, tapi
-# tanpa logo). Perbaikan sesungguhnya ada di aplikasi (baca dari direktori
-# data sistem, mis. /usr/share/rakuos-shell-picker),
-# bukan di spec ini — lihat pembahasan terpisah. Untuk sementara paket tetap
-# dibangun apa adanya.
+# Dua hal yang dulu dibaca dari path build-time (`env!("CARGO_MANIFEST_DIR")`)
+# sudah diperbaiki di aplikasi, dan spec ini ikut menyesuaikan:
+#  - Logo shell di-embed ke binary lewat include_bytes! (tidak ada file data).
+#  - Skel template dibaca dari %{_datadir}/rakuos-shell-picker (fallback ke
+#    source tree saat dev), jadi paket WAJIB menginstal seluruh skel/ ke sana
+#    dengan layout yang mencerminkan src/compositor — lihat bagian %install.
 
 # rpm di Fedora 44 otomatis membuat subpaket debuginfo/debugsource; dari
 # tarball pihak ketiga tidak ada layout debugsource yang bisa dietakan,
@@ -62,6 +60,15 @@ for s in 16 22 24 32 48 64 128 256 512; do
         "%{buildroot}%{_datadir}/icons/hicolor/${s}x${s}/apps/org.rakuos.ShellPicker.png"
 done
 
+# Skel template: switch menyalin isinya ke home user. Layout harus mencerminkan
+# src/compositor supaya jalur relatif skel_for() ketemu setelah dipasang
+# (src/apply.rs). Tanpa ini, switch berhenti dengan "the skel has no .config/hypr".
+for d in src/compositor/*/shells/*/skel; do
+    rel="${d#src/compositor/}"
+    install -d "%{buildroot}%{_datadir}/rakuos-shell-picker/${rel}"
+    cp -a "$d/." "%{buildroot}%{_datadir}/rakuos-shell-picker/${rel}/"
+done
+
 %check
 desktop-file-validate \
     %{buildroot}%{_datadir}/applications/org.rakuos.ShellPicker.desktop
@@ -71,10 +78,11 @@ desktop-file-validate \
 %{_bindir}/rakuos-shell-picker
 %{_datadir}/applications/org.rakuos.ShellPicker.desktop
 %{_datadir}/icons/hicolor/*/apps/org.rakuos.ShellPicker.png
+%{_datadir}/rakuos-shell-picker/
 
 %changelog
-* Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.1-1
+* Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.2-1
 - Initial COPR packaging of rakuos-shell-picker.
-- Rust + GTK4/libadwaita app; ships binary, .desktop entry, and the
-  hicolor icon set (org.rakuos.ShellPicker). Shell logos are compiled
-  into the binary (include_bytes!), so no runtime data files are needed.
+- Ship the skel template tree under %{_datadir}/rakuos-shell-picker; the
+  switch refuses to run without it ("the skel has no .config/hypr").
+- Logo assets are compiled into the binary (include_bytes!).
