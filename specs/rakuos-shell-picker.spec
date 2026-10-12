@@ -84,6 +84,10 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Sun Oct 11 2026 Mindset Apps <mindset@example.com> - 0.9.5-1
+- Add `--version` / `-V` so the installed binary can be told apart from an
+  image copy.
+
 * Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.4-1
 - End the session through the compositor's own quit first (hyprctl dispatch
   exit), then `uwsm stop`, then loginctl. From a systemd user service the
