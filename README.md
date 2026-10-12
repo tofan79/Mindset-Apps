@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 35 packages currently built, in alphabetical order:
+All 31 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -37,10 +37,6 @@ All 35 packages currently built, in alphabetical order:
 | `kineticwe-git` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
 | `material-symbols-fonts` | [google/material-design-icons](https://github.com/google/material-design-icons) (variable Rounded icon font) |
-| `ml4w-dock-git` | [mylinuxforwork/ml4w-dock](https://github.com/mylinuxforwork/ml4w-dock) (QML + script, rolling git; runtime quickshell-git manual) |
-| `ml4w-dotfiles-settings-git` | [mylinuxforwork/ml4w-dotfiles-settings](https://github.com/mylinuxforwork/ml4w-dotfiles-settings) (settings manager ML4W, Bash + gum + QML, rolling git) |
-| `ml4w-powermenu-git` | [mylinuxforwork/ml4w-powermenu](https://github.com/mylinuxforwork/ml4w-powermenu) (power menu Quickshell, rolling git) |
-| `ml4w-quickshell-overview-git` | [Shanu-Kumawat/quickshell-overview](https://github.com/Shanu-Kumawat/quickshell-overview) (workspace overview Hyprland, rolling git) |
 | `monologue` | [omacom/monologue](https://github.com/omacom/monologue) |
 | `nautilus-open-any-terminal-git` | [Stunkymonkey/nautilus-open-any-terminal](https://github.com/Stunkymonkey/nautilus-open-any-terminal) (daily git build) |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
