@@ -72,8 +72,12 @@ DESTDIR=%{buildroot} cmake --install build
 %{_bindir}/omanta-switch
 %{_bindir}/omanta-dropbox-link
 %{_datadir}/applications/omanta.desktop
+%{_datadir}/applications/omanta-picker.desktop
 %{_datadir}/icons/hicolor/scalable/apps/omanta.svg
 %{_datadir}/omanta/actions/*.toml
+# File chooser portal backend (xdg-desktop-portal FileChooser).
+%{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.omanta.service
+%{_datadir}/xdg-desktop-portal/portals/omanta.portal
 
 %changelog
 * Sun Sep 27 2026 mindset <mindset@copr> - %{pkg_version}-1
