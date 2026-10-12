@@ -84,6 +84,9 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Sun Oct 11 2026 Mindset Apps <mindset@example.com> - 0.9.6-1
+- Launcher and window title now read "RakuOS Shell Picker".
+
 * Sun Oct 11 2026 Mindset Apps <mindset@example.com> - 0.9.5-1
 - Add `--version` / `-V` so the installed binary can be told apart from an
   image copy.
