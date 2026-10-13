@@ -84,6 +84,9 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Tue Oct 13 2026 Mindset Apps <mindset@example.com> - 0.9.7-1
+- Bump to 0.9.7 (ambxst.rs update + zed fix); sync Cargo.lock for --locked build.
+
 * Sun Oct 11 2026 Mindset Apps <mindset@example.com> - 0.9.6-1
 - Launcher and window title now read "RakuOS Shell Picker".
 
