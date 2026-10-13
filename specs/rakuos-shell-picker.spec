@@ -84,30 +84,15 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Tue Oct 13 2026 Mindset Apps <mindset@example.com> - 1.0.0-1
+- First stable release. Verified rakuos-shell-picker deps against the repos:
+  google-rubik-fonts, cascadia-code-nf-fonts, material-symbols-fonts for
+  Caelestia; phosphor-icons-fonts and easyeffects for Ambxst.
+- Caelestia: fonts joined the uninstall plan (kept in sync with install).
+- Ambxst: add phosphor-icons-fonts to the install plan.
+
 * Tue Oct 13 2026 Mindset Apps <mindset@example.com> - 0.9.7-1
 - Bump to 0.9.7 (ambxst.rs update + zed fix); sync Cargo.lock for --locked build.
 
 * Sun Oct 11 2026 Mindset Apps <mindset@example.com> - 0.9.6-1
 - Launcher and window title now read "RakuOS Shell Picker".
-
-* Sun Oct 11 2026 Mindset Apps <mindset@example.com> - 0.9.5-1
-- Add `--version` / `-V` so the installed binary can be told apart from an
-  image copy.
-
-* Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.4-1
-- End the session through the compositor's own quit first (hyprctl dispatch
-  exit), then `uwsm stop`, then loginctl. From a systemd user service the
-  picker sits outside the session scope, so loginctl was refused and a switch
-  left the user on the old session with "log out yourself".
-- Start the incoming shell's polkit agent (hyprpolkitagent for Caelestia and
-  Ambxst) before the privileged uninstall stage, so `pkexec` has someone to
-  answer it — a reload does not re-run their `exec-once`, so it was dismissed.
-
-* Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.3-1
-- New app icon (folder glyph rendered from SVG), also shipped scalable.
-
-* Sat Oct 10 2026 Mindset Apps <mindset@example.com> - 0.9.2-1
-- Initial COPR packaging of rakuos-shell-picker.
-- Ship the skel template tree under %{_datadir}/rakuos-shell-picker; the
-  switch refuses to run without it ("the skel has no .config/hypr").
-- Logo assets are compiled into the binary (include_bytes!).
