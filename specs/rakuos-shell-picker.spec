@@ -84,6 +84,12 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Wed Oct 14 2026 Mindset Apps <mindset@example.com> - 1.0.2-1
+- Unify the default fonts across every shell: Maple Mono NF for mono and Inter
+  for the system, matching the RakuOS defaults. Hyprland groupbar and DMS
+  settings follow suit; Caelestia keeps google-rubik-fonts/cascadia-code-nf-fonts
+  (required, dropping them makes the shell error).
+
 * Wed Oct 14 2026 Mindset Apps <mindset@example.com> - 1.0.1-1
 - Switch the Caelestia/Ambxst polkit agent from hyprpolkitagent to mate-polkit
   (hyprpolkitagent's dialog failed to authenticate pkexec).
