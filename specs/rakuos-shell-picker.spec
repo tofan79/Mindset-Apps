@@ -84,6 +84,12 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Wed Oct 14 2026 Mindset Apps <mindset@example.com> - 1.0.1-1
+- Switch the Caelestia/Ambxst polkit agent from hyprpolkitagent to mate-polkit
+  (hyprpolkitagent's dialog failed to authenticate pkexec).
+- Refresh the app icon set.
+- Fix the stale Caelestia uninstall test and the comment drift it hid.
+
 * Tue Oct 13 2026 Mindset Apps <mindset@example.com> - 1.0.0-1
 - First stable release. Verified rakuos-shell-picker deps against the repos:
   google-rubik-fonts, cascadia-code-nf-fonts, material-symbols-fonts for
@@ -93,6 +99,3 @@ desktop-file-validate \
 
 * Tue Oct 13 2026 Mindset Apps <mindset@example.com> - 0.9.7-1
 - Bump to 0.9.7 (ambxst.rs update + zed fix); sync Cargo.lock for --locked build.
-
-* Sun Oct 11 2026 Mindset Apps <mindset@example.com> - 0.9.6-1
-- Launcher and window title now read "RakuOS Shell Picker".
