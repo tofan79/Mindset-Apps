@@ -84,6 +84,17 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Thu Oct 15 2026 Mindset Apps <mindset@example.com> - 1.1.0-1
+- Niri support: the picker now serves both Hyprland and Niri — DMS, Noctalia
+  and Ambxst ports with their skels; Caelestia stays Hyprland-only.
+- A switch takes the shell's daemon units with it: dms and dsearch are stopped,
+  disabled and masked when DMS is left, and unmasked, enabled and started on
+  the way back, on both compositors.
+- Origin-aware uninstall: only overlay packages are removed; shared runtimes
+  (quickshell-git, matugen) stay for the shells that need them.
+- Ambxst's Niri skel starts the mate-polkit agent (spawn-at-startup), matching
+  Hyprland.
+
 * Wed Oct 14 2026 Mindset Apps <mindset@example.com> - 1.0.2-1
 - Unify the default fonts across every shell: Maple Mono NF for mono and Inter
   for the system, matching the RakuOS defaults. Hyprland groupbar and DMS
