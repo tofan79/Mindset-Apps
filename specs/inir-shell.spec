@@ -125,11 +125,6 @@ EOF
 %{_datadir}/quickshell/inir/
 
 %changelog
-* Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
-- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
-  (${INIR_VENV:-...} di scripts/colors/generate_colors_material.py dan
-  scripts/hyprland/get_keybinds.py) via __requires_exclude; sebelumnya
-  `rum install inir-shell` gagal "nothing provides".
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of iNiR (inir-shell) from upstream tag:
   payload via runtime-payload.py manifest (layout mengikuti PKGBUILD:
@@ -141,3 +136,6 @@ EOF
 - Tanpa Conflicts noctalia: eksklusivitas shell diatur rakuos-shell-picker.
 - BuildRequires systemd-rpm-macros supaya %{_userunitdir} ter-expand di
   chroot COPR (temuan build #11163782: "File must begin with /").
+- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
+  (${INIR_VENV:-...} di get_keybinds.py, generate_colors_material.py)
+  via __requires_exclude supaya `rum install` tidak gagal.

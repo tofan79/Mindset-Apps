@@ -76,11 +76,6 @@ cp -a sdata/uv %{buildroot}%{_datadir}/illogical-impulse/sdata/
 %{_datadir}/illogical-impulse/
 
 %changelog
-* Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
-- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
-  (dots/.config/quickshell/ii/scripts/hyprland/hyprconfigurator.py dan
-  scripts/colors/generate_colors_material.py) via __requires_exclude;
-  sebelumnya `rum install illogical-impulse` gagal "nothing provides".
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of dots-hyprland (illogical-impulse base, RPM 1
   dari pasangan end4-pC): snapshot master + vendor submodule shapes,
@@ -90,3 +85,6 @@ cp -a sdata/uv %{buildroot}%{_datadir}/illogical-impulse/sdata/
   dipasang manual lewat install plan rakuos-shell-picker.
 - venv Python (uv) dibootstrap picker, bukan scriptlet RPM; installer
   interaktif upstream (setup) tidak ikut dipaketkan.
+- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
+  (hyprconfigurator.py, generate_colors_material.py) via
+  __requires_exclude supaya `rum install` tidak gagal "nothing provides".
