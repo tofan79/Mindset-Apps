@@ -1,6 +1,6 @@
 Name:           end4-pc
 Version:        %{pkg_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        end4-pC Quickshell shell config (fork of dots-hyprland ii)
 
 # LICENSE root GPL-3.0; font tulisan tangan di assets/fonts/handwriting

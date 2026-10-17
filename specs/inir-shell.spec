@@ -18,7 +18,7 @@
 
 Name:           inir-shell
 Version:        %{pkg_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        iNiR desktop shell payload, launcher, and user service (Niri/Quickshell)
 BuildArch:      noarch
 

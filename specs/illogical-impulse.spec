@@ -1,6 +1,6 @@
 Name:           illogical-impulse
 Version:        %{pkg_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Quickshell-based Hyprland desktop shell (dots-hyprland snapshot)
 
 # Kode GPL-3.0 (LICENSE); licenses/ berisi teks LGPL-3.0 (bagian yang
