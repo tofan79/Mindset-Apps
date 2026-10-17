@@ -31,60 +31,24 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  rsync
 BuildRequires:  python3
 
-# Requires = depends PKGBUILD upstream dipetakan ke nama Fedora lewat
-# sdata/dist-fedora/install-deps.sh. Yang sengaja TIDAK ikut:
-#  - quickshell  -> quickshell-git dipasang picker/image (lihat atas);
-#  - qt6-qtmultimedia-ffmpeg -> tidak ada di Fedora 44 (backend ffmpeg
-#    sudah menyatu di qt6-qtmultimedia);
-#  - ttf-roboto-flex -> tidak dipaketkan (font fallback UI dipakai);
-#  - ttf-jetbrains-mono-nerd -> jetbrains-mono-fonts-all (varian Nerd
-#    tidak ada di Fedora);
-#  - sisa optdepends Arch (kitty, nautilus, uv, yt-dlp, ...) cukup optdepends,
-#    bukan Requires.
-Requires:       bash
-Requires:       brightnessctl
-Requires:       cliphist
-Requires:       curl
-Requires:       fish
-Requires:       google-noto-emoji-fonts
-Requires:       golang
-Requires:       grim
-Requires:       gum
-Requires:       jetbrains-mono-fonts-all
-Requires:       jq
-Requires:       kdialog
+# Dipakai %%{_userunitdir} di %install/%files. Tanpa paket ini rpmbuild di
+# chroot COPR (fedora-45) tidak mengenal macronya dan gagal dengan
+# "File must begin with /: %%{_userunitdir}/inir.service".
+BuildRequires:  systemd-rpm-macros
+
+# ---- Konteks runtime; sengaja BUKAN Requires (pola ambxst/caelestia) ----
+# quickshell-git, font (material-symbols-fonts, jetbrains-mono-fonts-all),
+# dan alat CLI (grim, slurp, wl-clipboard, playerctl, golang untuk
+# inir-washi, dst — peta lengkapnya di distro/arch/inir-shell/PKGBUILD)
+# dipasang manual lewat install plan rakuos-shell-picker, bukan resolver rpm.
+#
+# Yang tetap Requires hanya modul QML yang WAJIB ada supaya shell bisa
+# dimuat (alasan yang sama dengan ambxst): org.kde.kirigami dipakai panel
+# (waffle bar, sidebar, close-confirm) dan org.kde.syntaxhighlighting
+# dipakai MessageCodeBlock.qml — tanpa paketnya komponen gagal dimuat
+# dengan "module ... is not installed".
 Requires:       kf6-kirigami
 Requires:       kf6-syntax-highlighting
-Requires:       libnotify
-Requires:       material-symbols-fonts
-Requires:       NetworkManager
-Requires:       niri
-Requires:       pipewire
-Requires:       pipewire-alsa
-Requires:       pipewire-pulseaudio
-Requires:       playerctl
-Requires:       polkit
-Requires:       python3
-Requires:       qt6-qt5compat
-Requires:       qt6-qtbase
-Requires:       qt6-qtdeclarative
-Requires:       qt6-qtimageformats
-Requires:       qt6-qtmultimedia
-Requires:       qt6-qtsvg
-Requires:       qt6-qtwayland
-Requires:       rsync
-Requires:       slurp
-Requires:       swayidle
-Requires:       swaylock
-Requires:       wireplumber
-Requires:       wl-clipboard
-Requires:       wlsunset
-Requires:       xdg-desktop-portal
-Requires:       xdg-desktop-portal-gnome
-Requires:       xdg-desktop-portal-gtk
-Requires:       xdg-user-dirs
-Requires:       xdg-utils
-Requires:       xwayland-satellite
 
 %description
 iNiR is a desktop shell for the Niri compositor built on Quickshell: bar,
@@ -156,6 +120,9 @@ EOF
   payload via runtime-payload.py manifest (layout mengikuti PKGBUILD:
   /usr/share/quickshell/inir), /usr/bin/inir, inir.service, desktop
   entries, ikon, dan version.json dengan hint dnf package-managed.
-- Requires dipetakan dari PKGBUILD depends ke nama Fedora; quickshell-git
-  sengaja bukan Requires (dipasang install plan picker, pola ambxst).
+- Requires minimal (pola ambxst): hanya kf6-kirigami + 
+  kf6-syntax-highlighting (modul QML wajib). quickshell-git, font, dan
+  alat CLI dipasang manual lewat install plan rakuos-shell-picker.
 - Tanpa Conflicts noctalia: eksklusivitas shell diatur rakuos-shell-picker.
+- BuildRequires systemd-rpm-macros supaya %{_userunitdir} ter-expand di
+  chroot COPR (temuan build #11163782: "File must begin with /").
