@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 31 packages currently built, in alphabetical order:
+All 34 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -30,9 +30,12 @@ All 31 packages currently built, in alphabetical order:
 | `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) |
 | `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
+| `end4-pc` | [pctrade/end4-pC](https://github.com/pctrade/end4-pC) (config Quickshell fork dots-hyprland untuk Hyprland; base: `illogical-impulse`) |
 | `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) (daily git build) |
 | `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
+| `illogical-impulse` | [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) (snapshot master shell Quickshell "ii" untuk Hyprland; base untuk `end4-pc`) |
+| `inir-shell` | [snowarch/iNiR](https://github.com/snowarch/iNiR) (payload shell Quickshell untuk Niri + launcher dan unit systemd user) |
 | `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
 | `kineticwe-git` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |

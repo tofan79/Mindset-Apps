@@ -1,6 +1,6 @@
 Name:           illogical-impulse
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Quickshell-based Hyprland desktop shell (dots-hyprland snapshot)
 
 # Kode GPL-3.0 (LICENSE); licenses/ berisi teks LGPL-3.0 (bagian yang
@@ -19,6 +19,16 @@ BuildArch:      noarch
 # paketnya komponen gagal dimuat dengan "module ... is not installed".
 Requires:       kf6-kirigami
 Requires:       kf6-syntax-highlighting
+
+# Skrip python payload memakai shebang venv upstream
+# `#!/usr/bin/env -S /bin/sh -c "source ..."`. Varian yang di-escape
+# (`-S\_`) lolos dari brp-mangle-shebangs, lalu generator dependensi rpm
+# membaca seluruh baris shebang sebagai path interpreter dan menulis
+# Requires karangan `/usr/bin/-S_/bin/sh_-c_...` yang tidak disediakan
+# paket mana pun -> `rum install`/dnf gagal "nothing provides".
+# Interpreter sebenarnya sudah dijamin (sh/bash/python3) dan venv dibuat
+# install plan rakuos-shell-picker, jadi dependensi palsu itu disaring.
+%global __requires_exclude ^/usr/bin/-S_
 
 %description
 illogical-impulse (ii) adalah desktop shell berbasis Quickshell untuk
@@ -66,6 +76,11 @@ cp -a sdata/uv %{buildroot}%{_datadir}/illogical-impulse/sdata/
 %{_datadir}/illogical-impulse/
 
 %changelog
+* Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
+- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
+  (dots/.config/quickshell/ii/scripts/hyprland/hyprconfigurator.py dan
+  scripts/colors/generate_colors_material.py) via __requires_exclude;
+  sebelumnya `rum install illogical-impulse` gagal "nothing provides".
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of dots-hyprland (illogical-impulse base, RPM 1
   dari pasangan end4-pC): snapshot master + vendor submodule shapes,

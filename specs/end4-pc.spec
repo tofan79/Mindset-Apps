@@ -1,6 +1,6 @@
 Name:           end4-pc
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        end4-pC Quickshell shell config (fork of dots-hyprland ii)
 
 # LICENSE root GPL-3.0; font tulisan tangan di assets/fonts/handwriting
@@ -17,6 +17,16 @@ BuildArch:      noarch
 # dipasang manual lewat install plan rakuos-shell-picker (pola minimal
 # ambxst, sama seperti inir-shell/illogical-impulse).
 Requires:       illogical-impulse
+
+# Skrip python payload memakai shebang venv upstream
+# `#!/usr/bin/env -S /bin/sh -c "source ..."`. Varian yang di-escape
+# (`-S\_`) lolos dari brp-mangle-shebangs, lalu generator dependensi rpm
+# membaca seluruh baris shebang sebagai path interpreter dan menulis
+# Requires karangan `/usr/bin/-S_/bin/sh_-c_...` yang tidak disediakan
+# paket mana pun -> `rum install`/dnf gagal "nothing provides".
+# Interpreter sebenarnya sudah dijamin (sh/bash/python3) dan venv dibuat
+# install plan rakuos-shell-picker, jadi dependensi palsu itu disaring.
+%global __requires_exclude ^/usr/bin/-S_
 
 %description
 end4-pC adalah fork komunitas dari config Quickshell illogical-impulse
@@ -97,6 +107,10 @@ rm -rf %{buildroot}%{_datadir}/quickshell/end4-pC/screenshots
 %{_datadir}/quickshell/end4-pC/
 
 %changelog
+* Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
+- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
+  (scripts/colors/*.py dan scripts/hyprland/*.py) via __requires_exclude;
+  sebelumnya `rum install end4-pc` gagal "nothing provides".
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of pctrade/end4-pC (RPM 2, lapisan fork di atas
   base illogical-impulse): snapshot main + payload ke
