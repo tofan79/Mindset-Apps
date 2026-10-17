@@ -107,10 +107,6 @@ rm -rf %{buildroot}%{_datadir}/quickshell/end4-pC/screenshots
 %{_datadir}/quickshell/end4-pC/
 
 %changelog
-* Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
-- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
-  (scripts/colors/*.py dan scripts/hyprland/*.py) via __requires_exclude;
-  sebelumnya `rum install end4-pc` gagal "nothing provides".
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of pctrade/end4-pC (RPM 2, lapisan fork di atas
   base illogical-impulse): snapshot main + payload ke
@@ -120,3 +116,6 @@ rm -rf %{buildroot}%{_datadir}/quickshell/end4-pC/screenshots
 - Neutralisasi surface Arch: DotsUpdater di-stub (notifikasi dnf),
   perintah update yay/pacman di UpdatesCount.qml dan Config.qml diganti
   sudo dnf upgrade (dengan guard grep).
+- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
+  (scripts/colors/*.py dan scripts/hyprland/*.py) via __requires_exclude
+  supaya `rum install` tidak gagal "nothing provides".
