@@ -18,7 +18,7 @@
 
 Name:           inir-shell
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        iNiR desktop shell payload, launcher, and user service (Niri/Quickshell)
 BuildArch:      noarch
 
@@ -49,6 +49,16 @@ BuildRequires:  systemd-rpm-macros
 # dengan "module ... is not installed".
 Requires:       kf6-kirigami
 Requires:       kf6-syntax-highlighting
+
+# Skrip python payload memakai shebang venv upstream
+# `#!/usr/bin/env -S /bin/sh -c "source ..."`. Varian yang di-escape
+# (`-S\_`) lolos dari brp-mangle-shebangs, lalu generator dependensi rpm
+# membaca seluruh baris shebang sebagai path interpreter dan menulis
+# Requires karangan `/usr/bin/-S_/bin/sh_-c_...` yang tidak disediakan
+# paket mana pun -> `rum install`/dnf gagal "nothing provides".
+# Interpreter sebenarnya sudah dijamin (sh/bash/python3) dan venv dibuat
+# install plan rakuos-shell-picker, jadi dependensi palsu itu disaring.
+%global __requires_exclude ^/usr/bin/-S_
 
 %description
 iNiR is a desktop shell for the Niri compositor built on Quickshell: bar,
@@ -115,6 +125,11 @@ EOF
 %{_datadir}/quickshell/inir/
 
 %changelog
+* Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
+- Filter requires karangan `/usr/bin/-S_...` dari shebang venv upstream
+  (${INIR_VENV:-...} di scripts/colors/generate_colors_material.py dan
+  scripts/hyprland/get_keybinds.py) via __requires_exclude; sebelumnya
+  `rum install inir-shell` gagal "nothing provides".
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of iNiR (inir-shell) from upstream tag:
   payload via runtime-payload.py manifest (layout mengikuti PKGBUILD:
