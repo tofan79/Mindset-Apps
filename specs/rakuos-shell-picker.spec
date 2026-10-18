@@ -84,6 +84,12 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Sun Oct 18 2026 Mindset Apps <mindset@example.com> - 1.1.2-1
+- Registry fixes found by live switches: DMS now backs up and cleans
+  DankSearch's settings and discards its search index, the vesktop/equibop
+  Discord theme renders left by DMS and Ambxst are discarded, and Caelestia
+  discards the Quickshell QML cache it shares with the runtime.
+
 * Thu Oct 15 2026 Mindset Apps <mindset@example.com> - 1.1.0-1
 - Niri support: the picker now serves both Hyprland and Niri — DMS, Noctalia
   and Ambxst ports with their skels; Caelestia stays Hyprland-only.
