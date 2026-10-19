@@ -21,7 +21,7 @@ Version:        %{pkg_version}
 # 2.33.0-2 sudah ada di COPR; -3 adalah build pertama yang membawa chmod
 # rekursif di %install (script/*.sh|*.fish|*.py jadi 0755). Tanpa ini doctor
 # upstream menyebut 5 script "diperbaiki" padahal /usr immutable menolak chmod.
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        iNiR desktop shell payload, launcher, and user service (Niri/Quickshell)
 BuildArch:      noarch
 
@@ -125,9 +125,30 @@ EOF
 %{_datadir}/applications/inir.desktop
 %{_datadir}/applications/inir-settings.desktop
 %{_datadir}/icons/hicolor/scalable/apps/inir.svg
+# brp-mangle-shebangs (bagian dari __os_install_post Fedora) mencabut bit
+# executable dari skrip yang tidak punya baris shebang. Lima berkas iNiR di
+# bawah memang tanpa shebang, jadi chmod 0755 di %install selalu dibatalkan
+# sebelum paket ditulis — akibatnya doctor iNiR melihatnya sebagai skrip tak
+# executable dan mencoba chmod sebagai user biasa ("Operation not permitted").
+# %attr menulis mode ke header RPM langsung, jadi tidak bisa dibatalkan tahap
+# itu.
+%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/completions/inir.fish
+%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/kvantum/adwsvg.py
+%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/kvantum/adwsvgDark.py
+%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/kvantum/changeAdwColors.py
+%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/systemd/suspend_with_lock.py
 %{_datadir}/quickshell/inir/
 
 %changelog
+* Mon Oct 19 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-4
+- Lima skrip tanpa shebang (completions/inir.fish, kvantum/adwsvg.py,
+  kvantum/adwsvgDark.py, kvantum/changeAdwColors.py,
+  systemd/suspend_with_lock.py) kini ditandai %attr(0755) di %files.
+  brp-mangle-shebangs mencabut bit executable dari setiap skrip tanpa
+  shebang setelah %install, jadi chmod di sana tidak pernah sampai ke
+  paket; doctor iNiR lalu menganggapnya rusak dan gagal chmod sebagai
+  user ("Operation not permitted") setiap pemeriksaan.
+
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of iNiR (inir-shell) from upstream tag:
   payload via runtime-payload.py manifest (layout mengikuti PKGBUILD:
