@@ -84,6 +84,19 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Mon Oct 19 2026 Mindset Apps <mindset@example.com> - 1.2.1-1
+- iNiR's skel now ships an autostart override that disables KDE's Xwayland
+  video bridge: the helper kept a "Wayland to X Recording bridge" window in
+  the compositor's window list for the whole session and could not be closed.
+  The file is listed in both skel_extra_paths and backup_extra_paths, so a
+  switch away takes it with it. Wayland applications still share through the
+  portal.
+
+* Mon Oct 19 2026 Mindset Apps <mindset@example.com> - 1.2.0-1
+- The install/switch dialog shows what a shell looks like before it is
+  installed: six screenshots each for Ambxst, end4-pC, iNiR and Noctalia, four
+  for Caelestia, in a fixed frame with page dots. DMS has none yet and says so.
+
 * Sun Oct 18 2026 Mindset Apps <mindset@example.com> - 1.1.2-1
 - Registry fixes found by live switches: DMS now backs up and cleans
   DankSearch's settings and discards its search index, the vesktop/equibop
