@@ -84,6 +84,14 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Tue Oct 20 2026 Mindset Apps <mindset@example.com> - 1.2.2-1
+- DMS now has a picture in the install/switch dialog: one screenshot of the
+  shell, resized to 720x405 JPEG, so it no longer shows "No preview available
+  yet.".
+- `khal` dropped from DMS's install and uninstall plans. DMS's calendar is
+  DankCalendar, which `dankcalendar-git` brings, so khal only added a second
+  calendar to the same machine.
+
 * Mon Oct 19 2026 Mindset Apps <mindset@example.com> - 1.2.1-1
 - iNiR's skel now ships an autostart override that disables KDE's Xwayland
   video bridge: the helper kept a "Wayland to X Recording bridge" window in
