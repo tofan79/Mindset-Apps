@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 34 packages currently built, in alphabetical order:
+All 36 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -31,6 +31,7 @@ All 34 packages currently built, in alphabetical order:
 | `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
 | `end4-pc` | [pctrade/end4-pC](https://github.com/pctrade/end4-pC) (config Quickshell fork dots-hyprland untuk Hyprland; base: `illogical-impulse`) |
+| `gabarito-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) (daily git build) |
 | `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
@@ -49,6 +50,7 @@ All 34 packages currently built, in alphabetical order:
 | `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) (daily git build) |
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
+| `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
 | `phosphor-icons-fonts` | [phosphor-icons/web](https://github.com/phosphor-icons/web) (6 weight ikon, dipakai ambxst) |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) (Rust + GTK4; pilih desktop shell di atas Hyprland) |
