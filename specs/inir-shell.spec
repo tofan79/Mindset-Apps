@@ -18,7 +18,10 @@
 
 Name:           inir-shell
 Version:        %{pkg_version}
-Release:        1%{?dist}
+# 2.33.0-2 sudah ada di COPR; -3 adalah build pertama yang membawa chmod
+# rekursif di %install (script/*.sh|*.fish|*.py jadi 0755). Tanpa ini doctor
+# upstream menyebut 5 script "diperbaiki" padahal /usr immutable menolak chmod.
+Release:        3%{?dist}
 Summary:        iNiR desktop shell payload, launcher, and user service (Niri/Quickshell)
 BuildArch:      noarch
 
