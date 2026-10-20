@@ -84,6 +84,16 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Tue Oct 20 2026 Mindset Apps <mindset@example.com> - 1.2.4-1
+- end4-pC now sets QT_QPA_PLATFORMTHEME=qt6ct instead of kde. The kde platform
+  theme lives in plasma-integration, whose dependency chain is the whole of
+  plasma-workspace (127 packages, 400 MB); qt6ct already ships on the image and
+  reads the icon theme from qt6ct.conf, where Colloid-Dark is written.
+- Drop the duplicated exec of the venv and appearance scripts from
+  hyprland/execs.lua; custom/execs.lua still runs both.
+- The appearance script repairs the icon theme only when the stored one is
+  empty or does not resolve, so a valid user choice is no longer overwritten.
+
 * Tue Oct 20 2026 Mindset Apps <mindset@example.com> - 1.2.3-1
 - DMS now carries six previews instead of one: the dashboard, the music player
   with its dock, two Settings pages (plugins and theme colors) and a plain
