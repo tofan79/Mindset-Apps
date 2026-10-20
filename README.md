@@ -19,13 +19,14 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 40 packages currently built, in alphabetical order:
+All 41 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
 | `ambxst` | [Axenide/Ambxst](https://github.com/Axenide/Ambxst) (Go daemon + Quickshell shell; runtime quickshell/axctl/wl-clipboard manual) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
+| `artcraft-launcher` | [storytold/craft-launcher](https://github.com/storytold/craft-launcher) (launcher Rust; aplikasi Craft diunduh sendiri saat runtime) |
 | `axctl` | [Axenide/axctl](https://github.com/Axenide/axctl) (Go compositor daemon/CLI: config, brightness, IPC — dipakai ambxst) |
 | `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) |
 | `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
