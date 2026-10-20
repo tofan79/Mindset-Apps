@@ -84,6 +84,11 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Tue Oct 20 2026 Mindset Apps <mindset@example.com> - 1.2.3-1
+- DMS now carries six previews instead of one: the dashboard, the music player
+  with its dock, two Settings pages (plugins and theme colors) and a plain
+  desktop. All 720 px wide JPEGs, 38-63 KB each.
+
 * Tue Oct 20 2026 Mindset Apps <mindset@example.com> - 1.2.2-1
 - DMS now has a picture in the install/switch dialog: one screenshot of the
   shell, resized to 720x405 JPEG, so it no longer shows "No preview available
