@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 36 packages currently built, in alphabetical order:
+All 40 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -41,8 +41,10 @@ All 36 packages currently built, in alphabetical order:
 | `kineticwe-git` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
 | `material-symbols-fonts` | [google/material-design-icons](https://github.com/google/material-design-icons) (variable Rounded icon font) |
+| `mixtapes-git` | [m-obeid/Mixtapes](https://github.com/m-obeid/Mixtapes) (daily git build; upstream belum punya tag/release) |
 | `monologue` | [omacom/monologue](https://github.com/omacom/monologue) |
 | `nautilus-open-any-terminal-git` | [Stunkymonkey/nautilus-open-any-terminal](https://github.com/Stunkymonkey/nautilus-open-any-terminal) (daily git build) |
+| `nuclear` | [nukeop/nuclear](https://github.com/nukeop/nuclear) (repack RPM x86_64 upstream) |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
 | `omacut` | [omacom/omacut](https://github.com/omacom/omacut) |
 | `omanta` | [28allday/omanta](https://github.com/28allday/omanta) |
@@ -50,13 +52,15 @@ All 36 packages currently built, in alphabetical order:
 | `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) (daily git build) |
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
-| `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
+| `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `phosphor-icons-fonts` | [phosphor-icons/web](https://github.com/phosphor-icons/web) (6 weight ikon, dipakai ambxst) |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) (Rust + GTK4; pilih desktop shell di atas Hyprland) |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
+| `sonora` | [sonorahq/sonora](https://github.com/sonorahq/sonora) (repack AppImage x86_64 upstream) |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
 | `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
+| `sysc-greet` | [Nomadcxx/sysc-greet](https://github.com/Nomadcxx/sysc-greet) (greeter TUI untuk greetd, varian cagebreak) |
 | `ttfx` | [omacom/ttfx](https://github.com/omacom/ttfx) |
 | `zoom` | [Zoom](https://zoom.us/download) |
 
