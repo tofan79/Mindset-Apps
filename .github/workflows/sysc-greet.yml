@@ -6,9 +6,10 @@ on:
   push:
     # Push yang menyentuh spec langsung memicu build, jadi perubahan spec
     # (mis. ganti kitty -> ghostty) bisa dicoba tanpa menunggu jadwal.
+    # File workflow sendiri TIDAK termasuk: memperbaiki workflow tidak perlu
+    # membangun ulang paket yang sama.
     paths:
       - 'specs/sysc-greet.spec'
-      - '.github/workflows/sysc-greet.yml'
   workflow_dispatch:
     inputs:
       force:
@@ -139,6 +140,15 @@ jobs:
           printf '%s\n' "$OUT"
           BID=$(printf '%s\n' "$OUT" | grep -oE 'Created builds: [0-9]+' | grep -oE '[0-9]+' | head -1)
           echo "build_id=${BID:-unknown}" >> "$GITHUB_OUTPUT"
+          # COPR kadang membalas halaman 503 saat pemantauan, sehingga copr-cli
+          # keluar non-zero padahal build sudah masuk antrean (terlihat dari
+          # "Created builds: <id>"). Itu gangguan sisi COPR, bukan kegagalan
+          # build — jangan gagalkan run; hasil akhirnya dicek di web COPR.
+          if [ "$RC" -ne 0 ] && [ -n "$BID" ] && printf '%s' "$OUT" | grep -q 'not in JSON format'; then
+            echo "::warning::COPR API sedang gangguan (503); build $BID tetap terkirim, status dicek manual."
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           if [ "$RC" -eq 0 ]; then
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
