@@ -23,6 +23,9 @@ BuildRequires:  rust
 BuildRequires:  cargo
 BuildRequires:  gtk4-devel
 BuildRequires:  libadwaita-devel
+# Halaman login YouTube digambar di WebKitGTK 6.0 (lewat crate javascriptcore6-sys).
+BuildRequires:  webkitgtk6.0-devel
+BuildRequires:  javascriptcoregtk6.0-devel
 BuildRequires:  gstreamer1-devel
 BuildRequires:  gstreamer1-plugins-base-devel
 BuildRequires:  glib2-devel
@@ -36,6 +39,7 @@ BuildRequires:  desktop-file-utils
 
 Requires:       gtk4
 Requires:       libadwaita
+Requires:       webkitgtk6.0
 Requires:       gstreamer1-plugins-base
 Requires:       gstreamer1-plugins-good
 Requires:       gstreamer1-plugins-bad-free
