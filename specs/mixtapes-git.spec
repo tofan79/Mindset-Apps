@@ -76,7 +76,7 @@ sed -i 's/^Exec=muse /Exec=mixtapes /' \
     %{buildroot}%{_datadir}/applications/com.pocoguy.Muse.desktop
 
 %files
-%license COPYING
+%license LICENSE
 %{_bindir}/mixtapes
 %{_datadir}/applications/com.pocoguy.Muse.desktop
 %{_metainfodir}/com.pocoguy.Muse.metainfo.xml
