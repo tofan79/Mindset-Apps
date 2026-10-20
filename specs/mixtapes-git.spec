@@ -26,6 +26,9 @@ BuildRequires:  libadwaita-devel
 BuildRequires:  gstreamer1-devel
 BuildRequires:  gstreamer1-plugins-base-devel
 BuildRequires:  glib2-devel
+# Salah satu crate (lewat ytmusicapi) masih memakai openssl-sys, bukan rustls
+# murni; tanpa header openssl build berhenti di pkg-config.
+BuildRequires:  openssl-devel
 BuildRequires:  pkgconf-pkg-config
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
