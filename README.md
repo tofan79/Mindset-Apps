@@ -34,7 +34,7 @@ All 46 packages currently built, in alphabetical order:
 | `end4-pc` | [pctrade/end4-pC](https://github.com/pctrade/end4-pC) (config Quickshell fork dots-hyprland untuk Hyprland; base: `illogical-impulse`) |
 | `gabarito-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) (daily git build) |
-| `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
+| `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) (build source tag CMake/Qt6 + submodule Quill/quill-icons) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
 | `illogical-impulse` | [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) (snapshot master shell Quickshell "ii" untuk Hyprland; base untuk `end4-pc`) |
 | `impasto-shell` | [andreumassanet/impasto](https://github.com/andreumassanet/impasto) (payload Quickshell untuk Hyprland; runtime quickshell/awww manual) |
