@@ -1,5 +1,9 @@
 name: "hyprfm - COPR Auto Build"
 
+# Build source tag upstream (CMake + Qt6). Submodule Quill dan quill-icons
+# ikut di-clone pada commit yang di-pin tag, lalu dikemas ke dalam source
+# tarball; tidak ada AppImage atau unduhan saat build.
+
 on:
   schedule:
     - cron: '0 0 * * *'   # tiap hari, jam 07.00 WIB (00:00 UTC)
@@ -9,11 +13,11 @@ on:
         description: 'Build paksa walaupun versi sama (mis. setelah ubah spec)'
         type: boolean
         default: false
+
 env:
   APP_NAME:       "hyprfm"
   GITHUB_REPO:    "soyeb-jim285/hyprfm"
   COPR_PROJECT:   "Mindset-Apps"
-  APPIMAGE_PATTERN: "HyprFM-v{VERSION}-x86_64.AppImage"
   SPEC_FILE:      "specs/hyprfm.spec"
 
 jobs:
@@ -25,82 +29,93 @@ jobs:
       - name: Get upstream latest version
         id: upstream
         run: |
-          RELEASE_JSON=$(curl -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
-          VER=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty' | sed 's/^v//')
-          [ -z "$VER" ] && VER=$(git ls-remote --tags "https://github.com/${{ env.GITHUB_REPO }}.git" \
-            | awk -F/ '{print $3}' | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^v//' | sort -V | tail -1)
-          [ -z "$VER" ] && { echo "⚠ No version found — skipping."; echo "skip=true" >> $GITHUB_OUTPUT; exit 0; }
-          APPIMAGE_EXISTS=$(echo "$RELEASE_JSON" | jq -r --arg pat "HyprFM-v${VER}-x86_64.AppImage" \
-            '[.assets[]? | select(.name == $pat)] | length')
-          if [ "$APPIMAGE_EXISTS" = "0" ]; then
-            echo "⚠ Upstream $VER has no AppImage — skipping."
-            echo "skip=true" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          RELEASE_JSON=$(curl -sS --retry 3 \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest" || true)
+          VER=$(printf '%s' "$RELEASE_JSON" \
+            | jq -r '.tag_name // empty' 2>/dev/null | sed 's/^v//' || true)
+          if [ -z "$VER" ]; then
+            VER=$(git ls-remote --tags --refs "https://github.com/${{ env.GITHUB_REPO }}.git" \
+              | awk -F/ '{print $NF}' \
+              | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' \
+              | sed 's/^v//' | sort -V | tail -1)
           fi
-          echo "version=$VER" >> $GITHUB_OUTPUT
+          [[ "$VER" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
+            || { echo "invalid upstream version: $VER"; exit 1; }
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
           echo "▶ Upstream: $VER"
 
       - name: Get current COPR version
         id: copr
         run: |
-          CURRENT=$(curl -s \
+          set -euo pipefail
+          CURRENT=$(curl -fsSL --retry 3 \
             "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
             | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
           CURRENT="${CURRENT%-*}"
-          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
           echo "▶ COPR: $CURRENT"
 
       - name: Smart Skip
         id: check
         run: |
-          if [ "${{ steps.upstream.outputs.skip }}" = "true" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
+          set -euo pipefail
           UP="${{ steps.upstream.outputs.version }}"
           CP="${{ steps.copr.outputs.version }}"
           if [ "${{ inputs.force }}" = "true" ]; then
             echo "🔨 Force build diminta (versi $UP)"
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           elif [ "$UP" = "$CP" ]; then
             echo "✅ Up-to-date ($UP), skip."
-            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "🆕 Update $CP → $UP"
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install dependencies
         if: steps.check.outputs.skip == 'false'
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y rpm build-essential wget libfuse2
+          sudo apt-get install -y rpm build-essential wget curl jq git
           pip install copr-cli --quiet
 
-      - name: Download & extract AppImage
+      - name: Download source with pinned submodules
         if: steps.check.outputs.skip == 'false'
         run: |
+          set -euo pipefail
           VER="${{ steps.upstream.outputs.version }}"
-          wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/HyprFM-v${VER}-x86_64.AppImage" \
-            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/HyprFM-${VER}-x86_64.AppImage" \
-            || wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/${VER}/HyprFM-v${VER}-x86_64.AppImage"
-          FILENAME=$(ls HyprFM*.AppImage)
-          chmod +x "$FILENAME"
-          "./$FILENAME" --appimage-extract
-          tar -czf "hyprfm-${VER}.tar.gz" squashfs-root/
-          echo "TARBALL=hyprfm-${VER}.tar.gz" >> $GITHUB_ENV
+          OUT="${{ env.APP_NAME }}-${VER}"
+          FILENAME="${{ env.APP_NAME }}-${VER}.tar.gz"
+          if ! git clone --quiet --depth 1 --branch "v${VER}" \
+              "https://github.com/${{ env.GITHUB_REPO }}.git" "$OUT"; then
+            git clone --quiet --depth 1 --branch "${VER}" \
+              "https://github.com/${{ env.GITHUB_REPO }}.git" "$OUT"
+          fi
+          git -C "$OUT" submodule update --init --recursive --quiet
+          find "$OUT" -name .git -exec rm -rf {} +
+          tar -czf "$FILENAME" "$OUT"
+          echo "FILENAME=$FILENAME" >> "$GITHUB_ENV"
+          echo "▶ Downloaded $FILENAME (tag v${VER} + submodules)"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
         id: srpm
         run: |
+          set -euo pipefail
           VER="${{ steps.upstream.outputs.version }}"
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
-          cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
-          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/hyprfm.spec
-          cp "$TARBALL" ~/rpmbuild/SOURCES/
-          rpmbuild -bs ~/rpmbuild/SPECS/hyprfm.spec
-          SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
-          echo "path=$SRPM" >> $GITHUB_OUTPUT
+          SPEC_BASENAME=$(basename "${{ env.SPEC_FILE }}")
+          cp "${{ env.SPEC_FILE }}" ~/rpmbuild/SPECS/
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/"$SPEC_BASENAME"
+          cp "$FILENAME" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/"$SPEC_BASENAME"
+          SRPM=$(find ~/rpmbuild/SRPMS -maxdepth 1 -type f -name '*.src.rpm' -print -quit)
+          [[ -n "$SRPM" ]] || { echo "SRPM was not created"; exit 1; }
+          echo "path=$SRPM" >> "$GITHUB_OUTPUT"
+          echo "▶ SRPM: $SRPM"
 
       - name: Setup COPR credentials
         if: steps.check.outputs.skip == 'false'
@@ -116,9 +131,6 @@ jobs:
 
       - name: Sync COPR project chroots
         if: steps.check.outputs.skip == 'false'
-        # Daftar chroot dibaca dari .github/copr-chroots.txt, satu sumber
-        # kebenaran untuk semua workflow. Menambah chroot baru (mis. Fedora
-        # 46/47) cukup edit file itu, tanpa mengubah workflow ini.
         uses: ./.github/actions/sync-copr-chroots
         with:
           project: ${{ env.COPR_PROJECT }}
@@ -127,9 +139,6 @@ jobs:
         id: submit
         if: steps.check.outputs.skip == 'false'
         run: |
-          # Status merah tetap dipertahankan (exit $RC) supaya kegagalan build
-          # tidak tertutupi, tapi build-id dikumpulkan supaya log chroot bisa
-          # diambil di step berikutnya tanpa perlu membuka COPR secara manual.
           set +e
           OUT=$(copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }} 2>&1)
           RC=$?

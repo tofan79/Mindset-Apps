@@ -1,13 +1,22 @@
 Name:           hyprfm
 Version:        %{pkg_version}
-Release:        1%{?dist}
-Summary:        HyprFM — A fast, keyboard-friendly file manager for Hyprland
+Release:        2%{?dist}
+Summary:        Fast keyboard-friendly file manager for Hyprland
 License:        MIT
 URL:            https://github.com/soyeb-jim285/hyprfm
-Source0:        hyprfm-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
-%global debug_package %{nil}
-%global __brp_check_rpaths %{nil}
+# Sumber sekarang build dari tag upstream (CMake/Qt6), bukan repack AppImage.
+# Quill dan quill-icons sudah disalin ke tarball oleh workflow pada commit
+# submodule yang di-pin tag, jadi build tidak mengambil apa pun dari jaringan.
+BuildRequires:  cmake >= 3.20
+BuildRequires:  ninja-build
+BuildRequires:  gcc-c++
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(gio-unix-2.0)
+BuildRequires:  qt6-qtbase-devel
+BuildRequires:  qt6-qtdeclarative-devel
+BuildRequires:  qt6-qtsvg-devel
 
 BuildArch:      x86_64
 AutoReqProv:    no
@@ -16,45 +25,50 @@ Requires:       qt6-qtbase
 Requires:       qt6-qtdeclarative
 Requires:       qt6-qtsvg
 Requires:       qt6-qtwayland
-Requires:       glib2
+Requires:       glib2%{?_isa}
 Requires:       gvfs
 
 %description
 HyprFM is a Qt6/QML file manager designed to feel native on Hyprland.
-Lightweight, themeable, and built around fast keyboard navigation with
-Miller columns, kinetic scrolling, drag & drop, async operations,
-rich previews, and a TOML-based theme system.
+Lightweight and built around fast keyboard navigation with Miller columns,
+kinetic scrolling, drag and drop, async operations, rich previews, and a
+TOML-based theme system.
+
+Built from the upstream source tag; no AppImage or vendor binary is bundled.
 
 %prep
-%setup -q -n squashfs-root
+%autosetup -n %{name}-%{version}
+
+%build
+%cmake -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_TESTS=OFF \
+    -DHYPRFM_DATA_DIR=%{_datadir}/hyprfm
+%cmake_build
 
 %install
-install -d %{buildroot}/opt/hyprfm
-cp -r * %{buildroot}/opt/hyprfm/
+%cmake_install
 
-install -d %{buildroot}%{_bindir}
-ln -s /opt/hyprfm/AppRun %{buildroot}%{_bindir}/hyprfm
-
-install -d %{buildroot}%{_datadir}/applications
-cat > %{buildroot}%{_datadir}/applications/hyprfm.desktop << 'EOF'
-[Desktop Entry]
-Name=HyprFM
-GenericName=File Manager
-Comment=Fast, keyboard-friendly file manager for Hyprland
-Exec=/opt/hyprfm/AppRun %U
-Icon=hyprfm
-Terminal=false
-Type=Application
-Categories=System;FileTools;FileManager;
-MimeType=inode/directory;
-StartupNotify=true
-EOF
+# Salinan LICENSE submodule Quill identik dengan LICENSE utama; simpan satu
+# saja supaya rpmlint tidak melaporkan file duplikat.
+rm -f %{buildroot}%{_datadir}/hyprfm/src/qml/Quill/LICENSE
 
 %files
-/opt/hyprfm/
+%license LICENSE
+%doc README.md
 %{_bindir}/hyprfm
-%{_datadir}/applications/hyprfm.desktop
+%{_datadir}/hyprfm/
+%{_datadir}/applications/io.github.soyeb_jim285.HyprFM.desktop
+%{_datadir}/icons/hicolor/scalable/apps/io.github.soyeb_jim285.HyprFM.svg
+%{_datadir}/metainfo/io.github.soyeb_jim285.HyprFM.metainfo.xml
 
 %changelog
+* Wed Oct 21 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
+- Ganti repack AppImage dengan build source tag upstream: CMake + Qt6,
+  Quill dan quill-icons dari commit submodule yang di-pin tag.
+- Binary di /usr/bin, tema dan modul QML di /usr/share/hyprfm; desktop,
+  ikon, dan metainfo dari dist/ upstream. Runtime manual tetap sama
+  (qt6-qtbase/declarative/svg/wayland, glib2, gvfs).
+
 * Wed Aug 26 2026 mindset <mindset@copr> - %{pkg_version}-1
 - Initial COPR package from upstream AppImage
