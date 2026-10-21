@@ -84,6 +84,15 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Wed Oct 21 2026 Mindset Apps <mindset@example.com> - 1.2.6-1
+- DMS is shown as "Dux Shell" in the UI: the display name and the upstream
+  repository change, while the shell id, the RPM and the units stay `dms`.
+- The Hyprland DMS skel takes the window rules the Niri skel already had
+  (dms-maximized, dms-floating, dms-gnome-weather, dms-window-opaque); the old
+  float-spotify rule is gone.
+- The dev scripts now install and check clang and lld, which .cargo/config.toml
+  needs to link; without them the build stops before the picker is compiled.
+
 * Wed Oct 21 2026 Mindset Apps <mindset@example.com> - 1.2.5-1
 - DMS follows the 2.0 layout: config, state and cache now live in
   ~/.config/dms, ~/.local/state/dms and ~/.cache/dms, with the old paths kept
