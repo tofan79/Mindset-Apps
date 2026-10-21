@@ -84,6 +84,16 @@ desktop-file-validate \
 %{_datadir}/rakuos-shell-picker/
 
 %changelog
+* Wed Oct 21 2026 Mindset Apps <mindset@example.com> - 1.2.5-1
+- DMS follows the 2.0 layout: config, state and cache now live in
+  ~/.config/dms, ~/.local/state/dms and ~/.cache/dms, with the old paths kept
+  as symlinks.
+- The Hyprland DMS skel is split into hyprland.lua plus dms/ modules; durable
+  RakuOS settings move to dms/rakuos.lua so DMS rewrites cannot erase them.
+- DMS gains binds for clipboard, dash, settings, overview, color picker, night
+  light, inhibit, process list, cheat sheet, window rules and display profile;
+  the old config/, layouts/, scripts/ trees and animation presets are gone.
+
 * Tue Oct 20 2026 Mindset Apps <mindset@example.com> - 1.2.4-1
 - end4-pC now sets QT_QPA_PLATFORMTHEME=qt6ct instead of kde. The kde platform
   theme lives in plasma-integration, whose dependency chain is the whole of
