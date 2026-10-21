@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 44 packages currently built, in alphabetical order:
+All 46 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -37,6 +37,7 @@ All 44 packages currently built, in alphabetical order:
 | `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) |
 | `illogical-impulse` | [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) (snapshot master shell Quickshell "ii" untuk Hyprland; base untuk `end4-pc`) |
+| `impasto-shell` | [andreumassanet/impasto](https://github.com/andreumassanet/impasto) (payload Quickshell untuk Hyprland; runtime quickshell/awww manual) |
 | `inir-shell` | [snowarch/iNiR](https://github.com/snowarch/iNiR) (payload shell Quickshell untuk Niri + launcher dan unit systemd user) |
 | `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
 | `kineticwe-git` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (`kineticwe-2.0` branch) |
@@ -58,6 +59,7 @@ All 44 packages currently built, in alphabetical order:
 | `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `phosphor-icons-fonts` | [phosphor-icons/web](https://github.com/phosphor-icons/web) (6 weight ikon, dipakai ambxst) |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) (Rust + GTK4; pilih desktop shell di atas Hyprland) |
+| `sekaipop-shell` | [Blapples/SekaiPop](https://github.com/Blapples/SekaiPop) (payload Quickshell Project Sekai untuk Hyprland; daily git build) |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
 | `sonora` | [sonorahq/sonora](https://github.com/sonorahq/sonora) (repack AppImage x86_64 upstream) |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
@@ -85,12 +87,14 @@ The `software-center` package is special-cased: its source lives in its own
 repository and is rebuilt automatically (daily) whenever a new release tag
 appears there.
 
-For upstream projects without tags, `whisker-shell` and `whisker-cli` use the
-latest commit on `main`. Their RPM version is
-`0.6.<commit-date>.git<short-sha>`; a new commit produces a new version, and a
-commit that already has a successful COPR build is skipped by the same Smart
-Skip logic. `nandoroid-shell` uses the latest release tag, falling back to the
-highest numeric tag when no GitHub release exists.
+For upstream projects without tags, `whisker-shell`, `whisker-cli`, and
+`sekaipop-shell` use the latest commit on `main`. Their RPM version is
+`<base>.<commit-date>.git<short-sha>`; a new commit produces a new version, and
+a commit that already has a successful COPR build is skipped by the same Smart
+Skip logic. `nandoroid-shell` and `impasto-shell` use the latest release tag,
+falling back to the highest numeric tag when no GitHub release exists.
+`impasto-shell` uploads only the shell files to COPR instead of the upstream
+desktop archive.
 
 ## Development
 
