@@ -16,7 +16,7 @@
 
 Name:           whisker-shell
 Version:        %{pkg_version}
-Release:        1.20261018git7bf4078%{?dist}
+Release:        1%{?dist}
 Summary:        Whisker Quickshell desktop shell for Hyprland
 License:        GPL-3.0-only
 URL:            https://github.com/corecathx/whisker
@@ -52,7 +52,7 @@ rm -f %{buildroot}%{_datadir}/whisker/LICENSE
 %{_datadir}/whisker/
 
 %changelog
-* Wed Oct 21 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1.20261018git7bf4078
+* Wed Oct 21 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial packaging of corecathx/whisker (main, no upstream tags).
 - Payload at /usr/share/whisker, matching the AUR package layout.
 - Runtime stays manual in the picker install plan; whisker-cli and

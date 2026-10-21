@@ -1,17 +1,17 @@
 # whisker-cli: CLI companion for Whisker.
 #
-# LISENSI: upstream corecathx/whisker-cli belum punya file LICENSE. Spec ini
-# disiapkan untuk build lokal/uji, tetapi JANGAN dikirim ke COPR atau
-# didistribusikan sampai upstream menambahkan lisensi (gerbang 1.1 plan 2).
+# License follows whisker-shell (same author/project): GPL-3.0-only. Upstream
+# still has no standalone LICENSE file, so the license is declared here and
+# in the package metadata rather than installed as a file.
 #
-# Build masih mengambil hxcpp lewat haxelib (butuh jaringan). Untuk COPR,
-# hxcpp harus di-vendor atau dipaketkan terpisah supaya build reproducible.
+# Build takes hxcpp through haxelib; the COPR workflow enables network for
+# this package because hxcpp is not packaged in Fedora.
 
 %global debug_package %{nil}
 
 Name:           whisker-cli
 Version:        %{pkg_version}
-Release:        1.20261015git54b50c7%{?dist}
+Release:        1%{?dist}
 Summary:        CLI helper for the Whisker Quickshell shell
 License:        GPL-3.0-only
 URL:            https://github.com/corecathx/whisker-cli
@@ -27,9 +27,6 @@ BuildRequires:  zlib-devel
 whisker-cli is the command-line companion for Whisker: it starts and restarts
 the shell, stores preferences, exposes IPC commands, and lists wallpapers.
 
-Upstream does not ship a LICENSE file yet; this package is local-test only
-until that gate is resolved.
-
 %prep
 %autosetup -n %{name}-%{version}
 
@@ -38,8 +35,13 @@ export HAXELIB_PATH=%{_builddir}/haxelib
 mkdir -p "$HAXELIB_PATH"
 haxelib setup "$HAXELIB_PATH" >/dev/null 2>&1 || true
 haxelib install hxcpp --always --quiet
-export WHISKER_VERSION="%{version}"
-export WHISKER_COMMIT="54b50c7"
+
+# Version snapshots look like 0.6.20261015.git54b50c7. Macro.hx wants the
+# upstream base version and the short commit separately, not the RPM version.
+WHISKER_BASE=$(echo "%{version}" | cut -d. -f1-2)
+WHISKER_SHA=$(echo "%{version}" | sed -n 's/.*\.git\([0-9a-f]*\)$/\1/p')
+export WHISKER_VERSION="$WHISKER_BASE"
+export WHISKER_COMMIT="${WHISKER_SHA:-unknown}"
 haxe release.hxml
 
 %install
@@ -49,6 +51,7 @@ install -Dpm0755 target/cpp/whisker %{buildroot}%{_bindir}/whisker
 %{_bindir}/whisker
 
 %changelog
-* Wed Oct 21 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1.20261015git54b50c7
-- Initial local-test packaging of corecathx/whisker-cli.
-- hxcpp fetched at build time; licensing gate still open upstream.
+* Wed Oct 21 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
+- Initial packaging of corecathx/whisker-cli.
+- License declared GPL-3.0-only, matching whisker-shell.
+- hxcpp fetched through haxelib at build time; COPR enables network for it.
