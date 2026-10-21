@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 41 packages currently built, in alphabetical order:
+All 44 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -44,6 +44,7 @@ All 41 packages currently built, in alphabetical order:
 | `material-symbols-fonts` | [google/material-design-icons](https://github.com/google/material-design-icons) (variable Rounded icon font) |
 | `mixtapes-git` | [m-obeid/Mixtapes](https://github.com/m-obeid/Mixtapes) (daily git build; upstream belum punya tag/release) |
 | `monologue` | [omacom/monologue](https://github.com/omacom/monologue) |
+| `nandoroid-shell` | [na-ive/nandoroid-shell](https://github.com/na-ive/nandoroid-shell) (payload Quickshell Material 3 untuk Hyprland; runtime quickshell/matugen manual) |
 | `nautilus-open-any-terminal-git` | [Stunkymonkey/nautilus-open-any-terminal](https://github.com/Stunkymonkey/nautilus-open-any-terminal) (daily git build) |
 | `nuclear` | [nukeop/nuclear](https://github.com/nukeop/nuclear) (repack RPM x86_64 upstream) |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) |
@@ -63,6 +64,8 @@ All 41 packages currently built, in alphabetical order:
 | `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
 | `sysc-greet` | [Nomadcxx/sysc-greet](https://github.com/Nomadcxx/sysc-greet) (greeter TUI untuk greetd, varian cagebreak) |
 | `ttfx` | [omacom/ttfx](https://github.com/omacom/ttfx) |
+| `whisker-cli` | [corecathx/whisker-cli](https://github.com/corecathx/whisker-cli) (CLI pendamping Whisker; daily git build) |
+| `whisker-shell` | [corecathx/whisker](https://github.com/corecathx/whisker) (payload Quickshell Material 3 untuk Hyprland; daily git build) |
 | `zoom` | [Zoom](https://zoom.us/download) |
 
 ## How it works
@@ -81,6 +84,13 @@ Each app has a dedicated workflow that:
 The `software-center` package is special-cased: its source lives in its own
 repository and is rebuilt automatically (daily) whenever a new release tag
 appears there.
+
+For upstream projects without tags, `whisker-shell` and `whisker-cli` use the
+latest commit on `main`. Their RPM version is
+`0.6.<commit-date>.git<short-sha>`; a new commit produces a new version, and a
+commit that already has a successful COPR build is skipped by the same Smart
+Skip logic. `nandoroid-shell` uses the latest release tag, falling back to the
+highest numeric tag when no GitHub release exists.
 
 ## Development
 
