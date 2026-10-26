@@ -7,11 +7,29 @@ URL:            https://github.com/omacom/omareel
 Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
-# CMakeLists.txt baris 2: cmake_minimum_required(VERSION 3.21)
-BuildRequires:  cmake >= 3.21
+# CMakeLists.txt baris 2: cmake_minimum_required(VERSION 3.22)
+BuildRequires:  cmake >= 3.22
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
+
+# Sejak 2026-10-25 (merge "rust-foundation" dkk.) upstream memindahkan logika
+# program ke Rust: crates/omareel_core, omareel_record, dan omareel_qt yang
+# diekspos ke QML lewat CXX-Qt 0.10. C++ yang tersisa hanya UI, plumbing Qt, dan
+# plugin Hyprland.
+#
+# CMakeLists.txt baris 16: find_package(Corrosion REQUIRED). Tanpa paket ini
+# configure berhenti dengan "FindCorrosion.cmake not found" — persis kegagalan
+# build COPR 2026-10-26. corrosion 0.5.2 di Fedora sudah menyediakan
+# corrosion_import_crate(... IMPORTED_CRATES ...) yang dipakai
+# cmake/CxxQt.cmake (vendored dari cxx-qt-cmake 0.10).
+BuildRequires:  corrosion
+# Cargo.toml menetapkan edition 2024 dan rust-version = 1.86; Fedora 44 ke atas
+# jauh di atas itu. Corrosion memanggil cargo untuk membangun workspace crates/
+# (cxx-qt dan cxx-qt-lib diambil dari crates.io, Cargo.lock tidak memakai
+# dependensi git).
+BuildRequires:  rust
+BuildRequires:  cargo
 
 # CMakeLists.txt baris 9:
 #   find_package(Qt6 6.8 REQUIRED COMPONENTS Core Concurrent Gui GuiPrivate
@@ -29,8 +47,10 @@ BuildRequires:  qt6-qtmultimedia-devel
 # COMPONENTS GuiPrivate) gagal dengan "Qt6GuiPrivate" tidak ditemukan.
 BuildRequires:  qt6-qtbase-private-devel
 
-# Test hanya dipakai unit test upstream; tidak perlu untuk RPM dan menambah
-# waktu build. Diturn-offen di %build.
+# Test (QtTest untuk sisi C++ dan cargo test untuk crates Rust) hanya dipakai
+# upstream; tidak perlu untuk RPM dan menambah waktu build karena menyeret
+# qt6-qttest-devel. CTest dimatikan di %build lewat -DBUILD_TESTING=OFF
+# (CMakeLists.txt baris 223), yang juga mematikan target omareel_rust_tests.
 %if 0%{?with_tests}
 BuildRequires:  qt6-qttest-devel
 %endif
@@ -44,7 +64,7 @@ BuildRequires:  qt6-qttest-devel
 # tanpa ini.
 BuildRequires:  layer-shell-qt-devel
 
-# CMakeLists.txt baris 19-21 (pkg_check_modules ... REQUIRED IMPORTED_TARGET):
+# CMakeLists.txt baris 29-33 (pkg_check_modules ... REQUIRED IMPORTED_TARGET):
 #
 # Catatan penting: yang searched oleh pkg_check_modules adalah nama .pc
 # ("libturbojpeg", "wayland-client"), BUKAN nama paket RPM. Nama paketnya
@@ -55,11 +75,10 @@ BuildRequires:  turbojpeg-devel
 BuildRequires:  libevdev-devel
 BuildRequires:  wayland-devel
 
-# CMakeLists.txt baris 36-41: wayland-scanner dijalankan terhadap XML di
-# /usr/share/wayland-protocols/staging/... (ext-image-capture-source-v1 dst).
-# XML itu dimiliki wayland-protocols-devel; tanpa ini build gagal dengan
-# "No rule to make target .../ext-image-capture-source-v1.xml".
-BuildRequires:  wayland-protocols-devel
+# wayland-protocols-devel tidak lagi dibutuhkan: wayland-scanner/XForm di
+# jalur C++ sudah hilang, dan protokol capture sekarang datang dari crate
+# wayland-protocols (fitur "staging") yang isinya dibawa crates.io, bukan XML
+# di /usr/share/wayland-protocols.
 
 # Pustaka runtime yang cocok dengan BuildRequires di atas.
 Requires:       layer-shell-qt
@@ -93,9 +112,10 @@ multimedia stack (thumbnail previews come from libjpeg-turbo via
 libturbojpeg; input events via libevdev).
 
 %{name} is a daily rolling build tracking the tip of upstream's master
-branch. Upstream has tagged v0.1.0, but this spec deliberately follows the
-branch tip so post-0.1.0 fixes land without waiting on a new tag. %{version}
-encodes the commit date and short SHA, e.g. 20260928.gitabcdef1.
+branch. Upstream tags releases (v0.3.0 is the last C++-only one), but this
+spec deliberately follows the branch tip so post-release work lands without
+waiting on a new tag. %{version} encodes the commit date and short SHA, e.g.
+20260928.gitabcdef1.
 
 %prep
 %autosetup -n %{name}-%{version}
@@ -117,18 +137,31 @@ update-desktop-database -q >/dev/null 2>&1 || :
 
 %files
 %license LICENSE
-%license LICENSES/lucide.txt
+# LICENSES/ kini juga memuat lisensi pihak ketiga: lucide, inter (font),
+# cxx-qt-cmake, dan daftar crate Rust. Bawa seluruh direktori, bukan hanya
+# lucide.txt, supaya semua lisensi ikut terpasang.
+%license LICENSES/
 %doc README.md
 %{_bindir}/omareel
-# CMakeLists.txt baris 249 membuat symlink omarecord -> omareel lewat
-# install(CODE ... create_symlink), jadi keduanya ikut terpasang.
+# CMakeLists.txt baris 218-220 membuat symlink omarecord -> omareel lewat
+# add_custom_command(POST_BUILD) + install(CODE ... create_symlink).
 %{_bindir}/omarecord
 %{_datadir}/applications/omareel.desktop
 %{_datadir}/icons/hicolor/scalable/apps/omareel.svg
-# Baris 245-247 mengiterasi ukuran ikon 16..512 ke hicolor/<n>x<n>/apps/.
+# install() mengiterasi ukuran ikon 16, 32, 48, 64, 128, 256 ke
+# hicolor/<n>x<n>/apps/omareel.png (512 tidak lagi dikirim upstream).
 %{_datadir}/icons/hicolor/*/apps/omareel.png
 
 %changelog
+* Mon Oct 26 2026 Mindset Apps <mindset@example.com> - 20261026.git742abda5-1
+- BuildRequires corrosion, rust, and cargo: upstream moved its program logic
+  to Rust crates (CXX-Qt 0.10), so CMakeLists.txt now calls
+  find_package(Corrosion REQUIRED) and failed without it.
+- Require cmake >= 3.22 to match upstream's cmake_minimum_required.
+- Drop wayland-protocols-devel: the C++ wayland-scanner path is gone and the
+  capture protocols now come from the wayland-protocols crate.
+- Ship the whole LICENSES/ directory; upstream added third-party licenses.
+
 * Mon Sep 28 2026 Mindset Apps <mindset@example.com> - 20260928.git0000000-1
 - Initial packaging of omareel-git.
 - BuildRequires layer-shell-qt-devel (hyphenated Fedora name) for

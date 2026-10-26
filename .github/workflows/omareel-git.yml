@@ -30,7 +30,13 @@ jobs:
         run: |
           set -euo pipefail
           API="https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/commits?sha=${{ env.UPSTREAM_BRANCH }}&per_page=1"
-          COMMIT=$(curl -fsSL --retry 3 "$API")
+          # Tanpa token, runner berbagi kuota 60 req/jam per IP dan bisa kena
+          # HTTP 422/403 (curl exit 22) seperti run 24 Okt 2026. Token bawaan
+          # workflow menaikkan kuota ke 5000/jam.
+          COMMIT=$(curl -fsSL --retry 3 --retry-all-errors \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            "$API")
           SHA=$(jq -r '.[0].sha' <<<"$COMMIT")
           [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid SHA from GitHub: $SHA"; exit 1; }
           DATE=$(jq -r '.[0].commit.committer.date' <<<"$COMMIT" | cut -c1-10 | tr -d '-')
@@ -93,9 +99,11 @@ jobs:
           tar -czf "$FILENAME" "${APP_NAME}-${VER}"
           echo "FILENAME=$FILENAME" >> "$GITHUB_ENV"
           echo "▶ $FILENAME ($SHA)"
-          # %files mereferensikan LICENSE, LICENSES/lucide.txt, dan ikon di
-          # pkg/icons/ — pastikan semuanya ada sebelum SRPM dibuat.
-          for f in LICENSE LICENSES/lucide.txt pkg/omareel.desktop pkg/omareel.svg README.md; do
+          # %files mereferensikan LICENSE, LICENSES/, dan ikon di pkg/icons/.
+          # Cargo.lock wajib ada: cmake/CxxQt.cmake memanggil
+          # corrosion_import_crate(... LOCKED), yang gagal tanpa lockfile.
+          for f in LICENSE LICENSES/lucide.txt Cargo.lock Cargo.toml \
+                   pkg/omareel.desktop pkg/omareel.svg README.md; do
             [ -s "${APP_NAME}-${VER}/$f" ] || { echo "missing required file: $f"; exit 1; }
           done
 
