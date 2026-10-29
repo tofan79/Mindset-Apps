@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 46 packages currently built, in alphabetical order:
+All 47 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -66,6 +66,7 @@ All 46 packages currently built, in alphabetical order:
 | `swash` | [ItsLemmy/swash](https://github.com/ItsLemmy/swash) |
 | `sysc-greet` | [Nomadcxx/sysc-greet](https://github.com/Nomadcxx/sysc-greet) (greeter TUI untuk greetd, varian cagebreak) |
 | `ttfx` | [omacom/ttfx](https://github.com/omacom/ttfx) |
+| `umbriel-git` | [noctalia-dev/umbriel](https://github.com/noctalia-dev/umbriel) (Wayland compositor wlroots; daily git build, paket `umbriel` + session `umbriel.desktop`) |
 | `whisker-cli` | [corecathx/whisker-cli](https://github.com/corecathx/whisker-cli) (CLI pendamping Whisker; daily git build) |
 | `whisker-shell` | [corecathx/whisker](https://github.com/corecathx/whisker) (payload Quickshell Material 3 untuk Hyprland; daily git build) |
 | `zoom` | [Zoom](https://zoom.us/download) |
