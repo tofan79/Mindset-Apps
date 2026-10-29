@@ -78,7 +78,7 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           FILENAME="${{ env.APP_NAME }}-${VER}.tar.gz"
           curl -fsSL --retry 3 \
-            "https://github.com/${{ env.GH_PROJECT }}/archive/refs/tags/v${VER}.tar.gz" \
+            "https://github.com/${{ env.GH_PROJECT }}/releases/download/v${VER}/dfiles-${VER}.tar.gz" \
             -o upstream.tar.gz
           mkdir -p extract
           tar -xzf upstream.tar.gz -C extract
