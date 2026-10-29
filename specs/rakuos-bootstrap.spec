@@ -16,6 +16,7 @@ Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cargo
 BuildRequires:  rust
+BuildRequires:  systemd-rpm-macros
 BuildRequires:  gcc
 BuildRequires:  pkgconf-pkg-config
 
@@ -39,7 +40,7 @@ cp -a data/catalog.toml %{buildroot}%{_datadir}/rakuos/bootstrap/catalog.toml
 cp -a data/skel %{buildroot}%{_datadir}/rakuos/bootstrap/
 cp -a data/sessions %{buildroot}%{_datadir}/rakuos/bootstrap/
 install -Dpm0644 data/rakuos-bootstrap.service \
-    %{buildroot}%{_unitdir}/rakuos-bootstrap.service
+    %{buildroot}/usr/lib/systemd/system/rakuos-bootstrap.service
 
 %post
 %systemd_post rakuos-bootstrap.service
@@ -57,7 +58,7 @@ install -Dpm0644 data/rakuos-bootstrap.service \
 %{_datadir}/rakuos/bootstrap/catalog.toml
 %{_datadir}/rakuos/bootstrap/skel/
 %{_datadir}/rakuos/bootstrap/sessions/
-%{_unitdir}/rakuos-bootstrap.service
+/usr/lib/systemd/system/rakuos-bootstrap.service
 
 %changelog
 * Sat Oct 31 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
