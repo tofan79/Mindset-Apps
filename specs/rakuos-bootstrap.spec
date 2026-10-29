@@ -57,7 +57,6 @@ install -Dpm0644 data/rakuos-bootstrap.service \
 %dir %{_datadir}/rakuos/bootstrap
 %{_datadir}/rakuos/bootstrap/catalog.toml
 %{_datadir}/rakuos/bootstrap/skel/
-%{_datadir}/rakuos/bootstrap/sessions/
 /usr/lib/systemd/system/rakuos-bootstrap.service
 
 %changelog
