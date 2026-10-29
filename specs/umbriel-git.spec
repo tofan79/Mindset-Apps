@@ -65,7 +65,6 @@ halus. Paket ini dibangun harian dari branch main upstream.
     -Dtests=disabled \
     -Dtracy=disabled \
     -Djemalloc=disabled \
-    -Dlcms2=auto \
     -Dlocaled=enabled
 %meson_build
 
