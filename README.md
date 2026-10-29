@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 47 packages currently built, in alphabetical order:
+All 48 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -58,6 +58,7 @@ All 47 packages currently built, in alphabetical order:
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
 | `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `phosphor-icons-fonts` | [phosphor-icons/web](https://github.com/phosphor-icons/web) (6 weight ikon, dipakai ambxst) |
+| `rakuos-bootstrap` | [tofan79/rakuos-bootstrap](https://github.com/tofan79/rakuos-bootstrap) (wizard pasca-install RakuOS minimal, release tag) |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) (Rust + GTK4; pilih desktop shell di atas Hyprland) |
 | `sekaipop-shell` | [Blapples/SekaiPop](https://github.com/Blapples/SekaiPop) (payload Quickshell Project Sekai untuk Hyprland; daily git build) |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
