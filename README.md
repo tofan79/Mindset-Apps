@@ -44,7 +44,7 @@ and RPM Fusion codec repository configured in COPR.
 | `impasto-shell` | [andreumassanet/impasto](https://github.com/andreumassanet/impasto) (payload Quickshell untuk Hyprland; runtime quickshell/awww manual) |
 | `inir-shell` | [snowarch/iNiR](https://github.com/snowarch/iNiR) (payload shell Quickshell untuk Niri + launcher dan unit systemd user) |
 | `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
-| `kineticwe` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (snapshot `kineticwe-2.0` branch, KWE 2.0) |
+| `kineticwe` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (daily commit snapshots from `kineticwe-2.0`; date + short SHA version with smart skip) |
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
 | `material-symbols-fonts` | [google/material-design-icons](https://github.com/google/material-design-icons) (variable Rounded icon font) |
 | `mixtapes-git` | [m-obeid/Mixtapes](https://github.com/m-obeid/Mixtapes) (daily git build; upstream belum punya tag/release) |
