@@ -22,6 +22,7 @@ jobs:
         run: |
           dnf install -y rpm-build dnf-plugins-core python3-jinja2 \
             >/dev/null
+          dnf copr enable -y mindset/Mindset-Apps
           rpm --version
 
       - name: Parse semua spec

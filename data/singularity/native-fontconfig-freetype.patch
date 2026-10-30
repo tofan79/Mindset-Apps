@@ -1,0 +1,10 @@
+diff --git a/subprojects/libsingularity/src/pdf/pdf_native.c b/subprojects/libsingularity/src/pdf/pdf_native.c
+--- a/subprojects/libsingularity/src/pdf/pdf_native.c
++++ b/subprojects/libsingularity/src/pdf/pdf_native.c
+@@ -1,6 +1,7 @@
+ #include <glib.h>
+ #include <string.h>
+ #include <fontconfig/fontconfig.h>
++#include <fontconfig/fcfreetype.h>
+ #include <hb.h>
+ #include <hb-ot.h>

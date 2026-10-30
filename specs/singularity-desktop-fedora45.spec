@@ -26,6 +26,7 @@ Source13:       check-keyring-regression.sh
 Patch0:         native-gtk-drag-icon.patch
 Patch1:         native-gtk-accessible-text.patch
 Patch2:         native-runtime-compat.patch
+Patch3:         native-fontconfig-freetype.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -1090,6 +1091,7 @@ Headers and development metadata for singularity-keyframe.
 %patch -P 0 -p1
 %patch -P 1 -p1
 %patch -P 2 -p1
+%patch -P 3 -p1
 tar --zstd -xf %{SOURCE5} -C subprojects/vetro
 tar --zstd -xf %{SOURCE9}
 
