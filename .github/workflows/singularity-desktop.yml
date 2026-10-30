@@ -94,7 +94,7 @@ jobs:
           cp specs/singularity-desktop-fedora45.spec ~/rpmbuild/SPECS/singularity-desktop.spec
           sed -i "s/^Version:.*/Version:        ${VERSION}/" ~/rpmbuild/SPECS/singularity-desktop.spec
           rpmbuild -bs --define "_topdir $HOME/rpmbuild" ~/rpmbuild/SPECS/singularity-desktop.spec
-      - name: Submit SRPM to COPR
+      - name: Configure COPR client
         if: steps.check.outputs.skip == 'false'
         run: |
           set -euo pipefail
@@ -107,4 +107,31 @@ jobs:
           token = ${{ secrets.COPR_TOKEN }}
           copr_url = https://copr.fedorainfracloud.org
           EOF
+      - name: Build vala-cups prerequisite when missing
+        if: steps.check.outputs.skip == 'false'
+        env:
+          TAG: ${{ steps.upstream.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          API=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/${UPSTREAM}/releases/tags/${TAG}")
+          ASSET=$(jq -r '.assets[] | select(.name | test("^vala-cups-.*\\.src\\.rpm$")) | .browser_download_url' <<<"$API" | head -1)
+          test -n "$ASSET"
+          curl -fsSL --retry 3 "$ASSET" -o /tmp/vala-cups.src.rpm
+          VERSION=$(rpm -qp --qf '%{VERSION}' /tmp/vala-cups.src.rpm)
+          CURRENT=$(curl -fsSL --retry 3 \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=vala-cups" \
+            | jq -r '[.items[] | select(.state == "succeeded")][0].source_package.version // "none"')
+          CURRENT="${CURRENT%-*}"
+          if [[ "$CURRENT" != "$VERSION" ]]; then
+            copr-cli build "$COPR_PROJECT" /tmp/vala-cups.src.rpm
+          else
+            echo "vala-cups $VERSION already succeeded in COPR"
+          fi
+      - name: Submit desktop SRPM to COPR
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
           copr-cli build "$COPR_PROJECT" "$(find ~/rpmbuild/SRPMS -name '*.src.rpm' -print -quit)"

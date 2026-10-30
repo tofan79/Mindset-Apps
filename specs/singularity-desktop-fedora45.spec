@@ -33,6 +33,7 @@ BuildRequires:  golang >= 1.24
 BuildRequires:  meson >= 1.3
 BuildRequires:  ninja-build
 BuildRequires:  vala
+BuildRequires:  vala-cups
 BuildRequires:  gettext
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  pkgconf-pkg-config
