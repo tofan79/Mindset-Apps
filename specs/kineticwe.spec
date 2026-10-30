@@ -629,7 +629,7 @@ echo
   kglobalaccel calls) are optional best-effort integrations that
   degrade gracefully with no service present — consistent with the
   2.0 plan's "accepted drops" and not a hard dependency, so left as-is.
-- Rename package kineticwe -> kineticwe-git to make clear this COPR build
+- Package name kineticwe, built from kineticwe-2.0 branch
   tracks upstream kineticwe-2.0 git HEAD daily, not a tagged release.
   Updated the self-referencing kineticwe-greeter Requires to match
   (now Requires: %{name} instead of a hardcoded old package name).

@@ -2,7 +2,7 @@
 #
 # Upstream belum menerbitkan tag maupun release (masih alpha, versi Cargo.toml
 # 0.1.0), jadi paket ini dibangun harian dari commit terbaru branch main —
-# pola yang sama dengan gloview-git dan kineticwe-git. Versi paket memakai
+# pola yang sama dengan gloview-git dan kineticwe. Versi paket memakai
 # bentuk <versi-cargo>.<YYYYMMDD>.git<sha> supaya COPR bisa membedakan build
 # antar commit tanpa menunggu upstream menaikkan versi.
 
