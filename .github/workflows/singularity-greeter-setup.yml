@@ -27,14 +27,19 @@ jobs:
       - uses: actions/checkout@v7
       - name: Resolve upstream packaging snapshot
         id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          RELEASE=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
-            "https://api.github.com/repos/${UPSTREAM}/releases/latest")
+          RELEASES=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/${UPSTREAM}/releases?per_page=100")
+          RELEASE=$(jq -c '[.[] | select(any(.assets[]?; .name | test("^singularity-desktop-.*\\.src\\.rpm$")))] | sort_by(.published_at) | last' <<<"$RELEASES")
           TAG=$(jq -r '.tag_name // empty' <<<"$RELEASE")
           ASSET_NAME=$(jq -r '.assets[] | select(.name | test("^singularity-desktop-.*\\.src\\.rpm$")) | .name' <<<"$RELEASE" | head -1)
           BASE_VERSION=$(sed -E 's/^singularity-desktop-(.*)-[0-9]+\.fc[0-9]+\.src\.rpm$/\1/' <<<"$ASSET_NAME")
           SHA=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer $GH_TOKEN" \
             "https://api.github.com/repos/${UPSTREAM}/commits/${TAG}" | jq -r '.sha')
           [[ -n "$TAG" && -n "$ASSET_NAME" && "$BASE_VERSION" != "$ASSET_NAME" && "$SHA" =~ ^[0-9a-f]{40}$ ]]
           DAY=$(date -u -d "$(jq -r '.published_at' <<<"$RELEASE")" +%Y%m%d)
