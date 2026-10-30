@@ -86,9 +86,14 @@ EOF
 
 # Guard grep: kalau upstream mengganti string ini, build gagal supaya
 # patch-nya ditinjau ulang (pola guard yang sama dengan kineticwe).
-grep -q '"yay -Syu --combinedupgrade=false"' modules/ii/bar/UpdatesCount.qml \
-    || { echo "UpdatesCount.qml: string yay berubah, tinjau ulang patch"; exit 1; }
-sed -i 's|"yay -Syu --combinedupgrade=false"|"sudo dnf upgrade"|' modules/ii/bar/UpdatesCount.qml
+# Sejak upstream memakai satu baris fish bercabang (yay -> paru -> pacman),
+# guard mencocokkan `pacman -Syu` saja lalu seluruh baris itu diganti.
+grep -q 'pacman -Syu' modules/ii/bar/UpdatesCount.qml \
+    || { echo "UpdatesCount.qml: string pacman berubah, tinjau ulang patch"; exit 1; }
+sed -i -E 's|^([[:space:]]*)"[^"]*pacman -Syu[^"]*"[[:space:]]*$|\1"sudo dnf upgrade"|' \
+    modules/ii/bar/UpdatesCount.qml
+grep -q '"sudo dnf upgrade"' modules/ii/bar/UpdatesCount.qml \
+    || { echo "UpdatesCount.qml: penggantian ke dnf gagal, tinjau ulang patch"; exit 1; }
 
 grep -q "pkexec pacman -Syu" modules/common/Config.qml \
     || { echo "Config.qml: string pkexec pacman berubah, tinjau ulang patch"; exit 1; }
@@ -107,6 +112,14 @@ rm -rf %{buildroot}%{_datadir}/quickshell/end4-pC/screenshots
 %{_datadir}/quickshell/end4-pC/
 
 %changelog
+* Fri Oct 30 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
+- Ikuti perubahan upstream: perintah update di
+  modules/ii/bar/UpdatesCount.qml kini satu baris fish bercabang
+  (`if type -q yay; ... else; sudo pacman -Syu; end`). Guard %prep
+  sekarang mencocokkan `pacman -Syu`, seluruh baris diganti
+  `sudo dnf upgrade`, plus cek pasca-replace supaya build tetap gagal
+  keras kalau patch tidak terpasang. Sebelumnya build mati di %prep
+  ("string yay berubah") pada snapshot a33a31f9.
 * Sat Oct 17 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR packaging of pctrade/end4-pC (RPM 2, lapisan fork di atas
   base illogical-impulse): snapshot main + payload ke
