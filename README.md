@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 49 packages currently built, in alphabetical order:
+All 48 packages currently built, in alphabetical order:
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -31,7 +31,6 @@ All 49 packages currently built, in alphabetical order:
 | `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) |
 | `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (bundles libcava + m3shapes) |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) + [Colloid icons](https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants) |
-| `dux-files` | [duxlabs-dev/dux-files](https://github.com/duxlabs-dev/dux-files) (file manager Go + Quickshell Wayland, release tag) |
 | `end4-pc` | [pctrade/end4-pC](https://github.com/pctrade/end4-pC) (config Quickshell fork dots-hyprland untuk Hyprland; base: `illogical-impulse`) |
 | `gabarito-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) (daily git build) |
