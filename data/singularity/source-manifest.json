@@ -1,0 +1,498 @@
+{
+  "source_archive": "singularity-desktop-0.1.0.tar.zst",
+  "sha256": "c06c3aa69c538d68c3925b99b2c138386254841d46251e8a8a729d17103eceb0",
+  "repositories": [
+    {
+      "path": ".",
+      "revision": "020e4b7e206665633bc7264fe665a9a70e3501ac",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/labwc",
+      "revision": "2da90c41a34b734805cd360f7e4996ad30ec4087",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/libfprint",
+      "revision": "d25fa50748d6edf5be0f472f157a3b3020cb4113",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/libgusb",
+      "revision": "ed31c8134d80d006bd45450e84180be2a7c0742e",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/libinput",
+      "revision": "d20219b4a7350434fc058dcf00dec3f8cf13db47",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/libsingularity",
+      "revision": "23fb17092e8c8be27bfee5b546f42ee51f808604",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-accounts",
+      "revision": "b5001ebbc0900f1e49db266d3d5ad2ea4ef34f65",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-atelier",
+      "revision": "3ff8b07243eadead8f79c5265548e8b49213ced1",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-authenticator",
+      "revision": "ff2e729ed65ac1ca5c45e41e1dfb4a6a83b8660c",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-backups",
+      "revision": "fd8f24b7c5e5d2c9b0a824a56396542aa8db40e2",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-browser",
+      "revision": "2677252228f055554a4329d625ae8dfe60047cab",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-calculator",
+      "revision": "6e8cd47505ed35e7ef64323c41fbbcfe54a04182",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-calendar",
+      "revision": "f61b34dcfd1e78e3d837f9a8d54ba7429b4f1eb2",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-camera",
+      "revision": "8df49e25f706928f86b7d57ca7f2205f4cfdc604",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-characters",
+      "revision": "61b013331ab78a574f57ab13307ebe675f5c6c14",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-clock",
+      "revision": "087dc31c47c69dae9d26ed5b64e713edd6f6f03f",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-colorpicker",
+      "revision": "3e5dadcfb395490c1105a95f0cae1090ea79207e",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-connections",
+      "revision": "2322ff3e63d97075eabe8c93171f91d6535127a5",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-contacts",
+      "revision": "6e11148d4e000b9f440f9c256b89a46c74ee8cbd",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-database",
+      "revision": "ce7603ec7740294fc70e3c1af3f82f2bc0638f4a",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-demo",
+      "revision": "f7961449a9b91115b0c131225216e14193679319",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-disks",
+      "revision": "c3de3efb930b7d230ab2bd5d5945cb2553df6253",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-draw",
+      "revision": "db14659a7651575b298f58631b3b770138d72e6f",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-drivewriter",
+      "revision": "f1c987ff49c70faf15eb2d77b79d1f04d21761cf",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-edit",
+      "revision": "7c0807abea0abcd15dcbd6aa11a92a1d180ef763",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-fediverse",
+      "revision": "5168d5b430453359ae9f62a8b5924a8011207759",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-files",
+      "revision": "95c70f53dc90f910117f23e33ce21d0fa1683e3a",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-fonts",
+      "revision": "7dd7fec966c4f577215ad52cbd7fc82961cafaa7",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-formula",
+      "revision": "b1141ced47d3299b8d8f21b6fa4bcae9b4154274",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-gestures",
+      "revision": "c524945f57c3a973c3971891dd392ce285c4fd59",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-git",
+      "revision": "c92ee9263d6c8c10a5c5fc437cfc0edf665038ef",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-greeter",
+      "revision": "ddb9ac60630436fdc7abb2b1cc8e533d97af3966",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-help",
+      "revision": "7beb19c7164f148726243ff6e16d71d02c30a464",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-installer",
+      "revision": "143839365e2f9723dd80df17acb5ca8571be335f",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-keyframe",
+      "revision": "ac51f0d18284a871cf44bd5010bb31949fff423b",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-keyring",
+      "revision": "8001926d36b943780bebfba5f4686b0cdfafad15",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-leafs",
+      "revision": "da0081199738efef08e9d365c4aa0397386ff6d8",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-lettere",
+      "revision": "3422da02a826e90a1e77cdd07f7880f8503394f8",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-loginui",
+      "revision": "a2bd53f35baf007bb01e9098f9f45c6924298687",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-logs",
+      "revision": "e1afde9197ce826abd27d2f9bf333e3bc6d52485",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-machines",
+      "revision": "299f6c62cda243be362dc47bd1d02a61b213e06c",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-maps",
+      "revision": "d8fc9fce29166bc76c055e345c92ffe097df6ff2",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-media-plugins",
+      "revision": "911bbe0b1f8f9a4ca70c3ba69e1c0f6e5589df81",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-monitor",
+      "revision": "77bdd60ab9286bfabffb04dc361ad56d70136ff9",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-montage",
+      "revision": "fc01203869bf951048711fd3f3e134c6b581e264",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-music",
+      "revision": "76402c4c7baf5df3bc9a1cdc8095f3b292deb3d3",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-nearby",
+      "revision": "b744e0ae59ef4e18b57621c797300ce0c10d2be9",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-nearby-app",
+      "revision": "379d291fd3e732647f65a6d7250af4827c725f24",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-news",
+      "revision": "56081e2710db3e7de05cc05da17eb8f3ce963065",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-notes",
+      "revision": "e4a490d6c33baf69fba983e22f7e0ed9383af051",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-passwords",
+      "revision": "dd44eb8acf40d1a69ca887fb0276219bc09561ea",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-photos",
+      "revision": "e7fa969eb578c9c0ad46c56fa10db4852a22a94b",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-plugins",
+      "revision": "7bc0e598b4a6349debe77aba5a8166267bb9a3f3",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-podcasts",
+      "revision": "c7f509fb97c786ea6c25ed4d1eda3a1751098345",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-polkit-agent",
+      "revision": "fa8379d8263b9198ab1e7441a7de63457133d771",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-printers",
+      "revision": "8bd051429569fd77bd40f6c678184bc6e00cd147",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-publish",
+      "revision": "5c409f81fefbab18fd967368986821d10e696008",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-qrcodes",
+      "revision": "9b82d5fd7362ea3533457fc0a5a3b308d942a411",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-radio",
+      "revision": "535af7c695043f9f6b98f7b2f88aa3c73834c0c6",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-reader",
+      "revision": "5c477a62683dc09b7997dc72b4fea558da82642c",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-scanner",
+      "revision": "eab55b9a5e93652df6a2243703465f9069319f69",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-session",
+      "revision": "37f6e0e235a46e2d2488e23f38a7d07d125f535b",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-sharing",
+      "revision": "698982db2511392ee2dd9799df1967436ab7ed5e",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-shell",
+      "revision": "aef0f372529fb69cbf38f64a427aabdfc0b4a555",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-slides",
+      "revision": "8ceed412f23888b94e1849a68923883ffcc81daf",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-spreadsheet",
+      "revision": "12cf2bbf281686db739ee767c4cae313323e2276",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-store",
+      "revision": "7ba1fdd89d7047ed1db820a693587190a6b37034",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-tasks",
+      "revision": "1986ad77fe0afbdeee11cffe87b7d1147cb509c2",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-themes",
+      "revision": "641f7ffab7c41983f1a1f9ac7bca08d773900fa0",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-tour",
+      "revision": "5dfe27ae76907590fce25eab3c8a381e3c7b9797",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-translate",
+      "revision": "e1332e5d5069ce504a28aae63fa9b7084bbc4fe5",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-usage",
+      "revision": "cc3a788348543b973556a37f8fd178f191f303c3",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-vector",
+      "revision": "28968587c85e1c27df2e86f85a8f87a0e4c25f99",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-videos",
+      "revision": "ae7ebf404b31edec66ac76369c1f59ac8b4974bf",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-voice",
+      "revision": "4f3b63c26e4f7977c2fe5072aeded088838d5944",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-wallpapers",
+      "revision": "422f24176489f97192c0552230020390a4e33a32",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-wave",
+      "revision": "7a9c7ea449c02308aee1d146a7ed4ecf6134435e",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-weather",
+      "revision": "2043c0ab3670624569b37d93e1a90328ba3573a1",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/singularity-widgets",
+      "revision": "bd4d4d708950637b3116c70dcd9e5f8ef7d3cc81",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/singularity-write",
+      "revision": "d92761704063567e937e1e4ae1a5a0477e9ece84",
+      "local_changes": true
+    },
+    {
+      "path": "subprojects/vetro",
+      "revision": "bb1013b407b2ef32dbe475a670f30a27510a9b6a",
+      "local_changes": false
+    },
+    {
+      "path": "subprojects/xdg-desktop-portal-singularity",
+      "revision": "f0ce8587a4df4a400d82939019a5d38b51c3f00d",
+      "local_changes": false
+    }
+  ],
+  "expected_installed_components": [
+    "libsingularity",
+    "singularity-accounts",
+    "singularity-atelier",
+    "singularity-authenticator",
+    "singularity-backups",
+    "singularity-browser",
+    "singularity-calculator",
+    "singularity-calendar",
+    "singularity-camera",
+    "singularity-characters",
+    "singularity-clock",
+    "singularity-colorpicker",
+    "singularity-connections",
+    "singularity-contacts",
+    "singularity-database",
+    "singularity-demo",
+    "singularity-disks",
+    "singularity-draw",
+    "singularity-drivewriter",
+    "singularity-edit",
+    "singularity-fediverse",
+    "singularity-files",
+    "singularity-fonts",
+    "singularity-formula",
+    "singularity-gestures",
+    "singularity-git",
+    "singularity-greeter",
+    "singularity-help",
+    "singularity-keyframe",
+    "singularity-keyring",
+    "singularity-leafs",
+    "singularity-lettere",
+    "singularity-loginui",
+    "singularity-logs",
+    "singularity-machines",
+    "singularity-maps",
+    "singularity-media-plugins",
+    "singularity-monitor",
+    "singularity-montage",
+    "singularity-music",
+    "singularity-nearby",
+    "singularity-nearby-app",
+    "singularity-news",
+    "singularity-notes",
+    "singularity-passwords",
+    "singularity-photos",
+    "singularity-plugins",
+    "singularity-podcasts",
+    "singularity-polkit-agent",
+    "singularity-printers",
+    "singularity-publish",
+    "singularity-qrcodes",
+    "singularity-radio",
+    "singularity-reader",
+    "singularity-scanner",
+    "singularity-session",
+    "singularity-sharing",
+    "singularity-shell",
+    "singularity-slides",
+    "singularity-splash",
+    "singularity-spreadsheet",
+    "singularity-store",
+    "singularity-tasks",
+    "singularity-themes",
+    "singularity-tour",
+    "singularity-translate",
+    "singularity-usage",
+    "singularity-vector",
+    "singularity-videos",
+    "singularity-voice",
+    "singularity-wallpapers",
+    "singularity-wave",
+    "singularity-weather",
+    "singularity-widgets",
+    "singularity-write",
+    "xdg-desktop-portal-singularity"
+  ],
+  "native_rpm_status": "NOT VERIFIED",
+  "vm_install_status": "PROVEN: disk boot, /dev/vda3 Btrfs root, installed Nobara 44, active GDM and SSH",
+  "host_reserve_gib": 8,
+  "snapshot_note": "Build outputs are excluded only at repository roots; source directories named stage are included."
+}

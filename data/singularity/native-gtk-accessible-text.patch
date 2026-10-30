@@ -1,0 +1,111 @@
+--- a/subprojects/singularity-write/src/ui/doc_view.vala
++++ b/subprojects/singularity-write/src/ui/doc_view.vala
+@@ -1885,7 +1885,7 @@
+             return global_offset(ed.focus);
+         }
+ 
+-        public bool get_selection(out Gtk.AccessibleTextRange[] ranges) {
++        public bool get_selection([CCode (array_length_pos = 0.5, array_length_type = "gsize")] out Gtk.AccessibleTextRange[] ranges) {
+             ranges = {};
+             if (ed == null || !ed.has_selection) return false;
+             Pos a, b;
+@@ -1898,7 +1898,98 @@
+             return true;
+         }
+ 
+-        public bool get_accessible_text_attributes(uint offset, out Gtk.AccessibleTextRange[] ranges, out string[] attribute_names, out string[] attribute_values) {
++        public void get_default_attributes([CCode (array_length = false, array_null_terminated = true)] out string[] attribute_names, [CCode (array_length = false, array_null_terminated = true)] out string[] attribute_values) {
++            attribute_names = {};
++            attribute_values = {};
++        }
++
++        public bool get_extents(uint start, uint end, Graphene.Rect extents) {
++            if (lay == null || end < start) return false;
++            if (start == end) {
++                var pos = position_for_offset(start);
++                int page = 0;
++                double x = 0, y = 0, h = 0;
++                if (pos == null || !caret_rect(pos, out page, out x, out y, out h) || page >= page_x.length) return false;
++                double wx, wy;
++                page_to_widget(page, x, y, out wx, out wy);
++                extents.init((float) wx, (float) wy, 1, (float) (h * scale));
++                return true;
++            }
++            bool found = false;
++            double left = 0, top = 0, right = 0, bottom = 0;
++            uint base_offset = 0;
++            foreach (var p in Story.paragraphs(doc.body)) {
++                uint length = (uint) p.plain_text().char_count();
++                var lines = lay.para_lines[p];
++                if (lines != null && start <= base_offset + length && end >= base_offset) {
++                    foreach (var lb in lines) {
++                        uint a = base_offset + (uint) lb.pl.text.byte_to_model(lb.info.start_byte);
++                        uint b = base_offset + (uint) lb.pl.text.byte_to_model(lb.info.end_byte);
++                        if ((start >= b && b > a) || end <= a || lb.page >= page_x.length) continue;
++                        int s = (int) (uint.max(start, a) - base_offset);
++                        int e = (int) (uint.min(end, b) - base_offset);
++                        double x0 = lb.caret_x(lb.pl.text.to_byte(s));
++                        double x1 = lb.caret_x(lb.pl.text.to_byte(e));
++                        double wx, wy;
++                        page_to_widget(lb.page, double.min(x0, x1), lb.top, out wx, out wy);
++                        double r = wx + double.max(1, (x1 - x0).abs() * scale);
++                        double bottom_y = wy + lb.height * scale;
++                        left = found ? double.min(left, wx) : wx;
++                        top = found ? double.min(top, wy) : wy;
++                        right = found ? double.max(right, r) : r;
++                        bottom = found ? double.max(bottom, bottom_y) : bottom_y;
++                        found = true;
++                    }
++                }
++                base_offset += length + 1;
++            }
++            if (!found) return false;
++            extents.init((float) left, (float) top, (float) (right - left), (float) (bottom - top));
++            return true;
++        }
++
++        public bool get_offset(Graphene.Point point, out uint offset) {
++            offset = 0;
++            int page;
++            double x, y;
++            to_page(point.x, point.y, out page, out x, out y);
++            if (page < 0) return false;
++            var pos = hit(page, x, y);
++            if (pos == null || !Story.paragraphs(doc.body).contains(pos.para)) return false;
++            offset = global_offset(pos);
++            return true;
++        }
++
++        private Pos? position_for_offset(uint offset) {
++            if (doc == null) return null;
++            Pos? last = null;
++            foreach (var p in Story.paragraphs(doc.body)) {
++                uint length = (uint) p.plain_text().char_count();
++                if (offset <= length) return new Pos(p, (int) offset);
++                offset -= length + 1;
++                last = new Pos(p, p.length);
++            }
++            return offset == 0 ? last : null;
++        }
++
++        public bool set_caret_position(uint offset) {
++            if (ed == null) return false;
++            var pos = position_for_offset(offset);
++            if (pos == null) return false;
++            ed.set_caret(pos);
++            return true;
++        }
++
++        public bool set_selection(size_t i, Gtk.AccessibleTextRange range) {
++            if (ed == null || i != 0 || range.start > uint.MAX || range.length > uint.MAX - range.start) return false;
++            var a = position_for_offset((uint) range.start);
++            var b = position_for_offset((uint) (range.start + range.length));
++            if (a == null || b == null) return false;
++            ed.select(a, b);
++            return true;
++        }
++
++        public bool get_accessible_text_attributes(uint offset, [CCode (array_length_pos = 1.5, array_length_type = "gsize")] out Gtk.AccessibleTextRange[] ranges, [CCode (array_length = false, array_null_terminated = true)] out string[] attribute_names, [CCode (array_length = false, array_null_terminated = true)] out string[] attribute_values) {
+             ranges = {};
+             attribute_names = {};
+             attribute_values = {};

@@ -1,0 +1,385 @@
+--- a/subprojects/singularity-keyring/src/collection.vala
++++ b/subprojects/singularity-keyring/src/collection.vala
+@@ -3,6 +3,9 @@
+ using GLib;
+ 
+ namespace Singularity.Keyring {
++
++    [DBus (name = "org.freedesktop.Secret.Error")]
++    public errordomain KeyringError { IS_LOCKED }
+ 
+     public delegate SecretSession? SessionLookup (string path);
+ 
+@@ -232,10 +235,10 @@
+                                   Secret secret,
+                                   bool replace,
+                                   out GLib.ObjectPath item_path,
+-                                  out GLib.ObjectPath prompt) throws GLib.Error {
++                                  out GLib.ObjectPath prompt) throws GLib.Error, KeyringError {
+             prompt = (GLib.ObjectPath) "/";
+             if (_locked || _data == null)
+-                throw new GLib.DBusError.FAILED ("collection is locked");
++                throw new KeyringError.IS_LOCKED ("collection is locked");
+ 
+             string new_label = "";
+             string new_type  = "org.freedesktop.Secret.Generic";
+--- a/subprojects/singularity-keyring/src/service.vala
++++ b/subprojects/singularity-keyring/src/service.vala
+@@ -17,6 +17,7 @@
+         private HashTable<string, SecretSession>    _sessions;
+         private HashTable<string, uint>             _session_reg_ids;
+         private HashTable<string, string>           _aliases;
++        private HashTable<string, uint>             _alias_reg_ids;
+ 
+         // Tracks active prompt object so we don't unregister too early.
+         private HashTable<string, SecretPrompt>     _prompts;
+@@ -39,6 +40,7 @@
+             _sessions           = new HashTable<string, SecretSession>    (str_hash, str_equal);
+             _session_reg_ids    = new HashTable<string, uint>             (str_hash, str_equal);
+             _aliases            = new HashTable<string, string>           (str_hash, str_equal);
++            _alias_reg_ids      = new HashTable<string, uint>             (str_hash, str_equal);
+             _prompts            = new HashTable<string, SecretPrompt>     (str_hash, str_equal);
+             _prompt_reg_ids     = new HashTable<string, uint>             (str_hash, str_equal);
+         }
+@@ -55,7 +57,7 @@
+             if (_collections["login"] == null) {
+                 _register_collection_locked ("login");
+             }
+-            _aliases["default"] = "/org/freedesktop/secrets/collection/login";
++            set_alias ("default", (GLib.ObjectPath) "/org/freedesktop/secrets/collection/login");
+         }
+ 
+         private SecretCollection _register_collection_locked (string name) throws Error {
+@@ -77,7 +79,7 @@
+                 _aliases.foreach ((alias, target) => {
+                     if (target == path) aliases += alias;
+                 });
+-                foreach (var alias in aliases) _aliases.remove (alias);
++                foreach (var alias in aliases) _remove_alias (alias);
+                 collection_deleted ((GLib.ObjectPath) path);
+             });
+ 
+@@ -85,6 +87,12 @@
+             _collections[name] = coll;
+             _collection_reg_ids[name] = reg_id;
+             return coll;
++        }
++
++        private string _resolve_alias (string path) {
++            string prefix = "/org/freedesktop/secrets/aliases/";
++            if (!path.has_prefix (prefix)) return path;
++            return _aliases[path.substring (prefix.length)] ?? path;
+         }
+ 
+         private static string _path_to_session_id (string path) {
+@@ -217,7 +225,7 @@
+             if (!coll.unlock_collection ())
+                 throw new GLib.DBusError.FAILED ("Could not initialise collection");
+ 
+-            if (alias.length > 0) _aliases[alias] = coll.get_path ();
++            if (alias.length > 0) set_alias (alias, (GLib.ObjectPath) coll.get_path ());
+             collection_path = (GLib.ObjectPath) coll.get_path ();
+             collection_created (collection_path);
+         }
+@@ -252,7 +260,7 @@
+             _collections.foreach ((name, coll) => {
+                 bool referenced = false;
+                 foreach (var p in objects) {
+-                    string ps = (string) p;
++                    string ps = _resolve_alias ((string) p);
+                     if (ps == coll.get_path () || ps.has_prefix (coll.get_path () + "/")) {
+                         referenced = true;
+                         break;
+@@ -264,7 +272,7 @@
+             // Already unlocked subset.
+             GLib.ObjectPath[] already = {};
+             foreach (var p in objects) {
+-                string ps = (string) p;
++                string ps = _resolve_alias ((string) p);
+                 bool covered = false;
+                 _collections.foreach ((name, coll) => {
+                     if (coll.is_locked ()) return;
+@@ -277,11 +285,12 @@
+             // If the master itself is already unlocked we can finish all
+             // collections inline without prompting.
+             if (_store.master.unlocked) {
++                already = {};
+                 for (uint i = 0; i < locked_colls.length; i++) {
+                     locked_colls[i].unlock_collection ();
+                 }
+                 foreach (var p in objects) {
+-                    string ps = (string) p;
++                    string ps = _resolve_alias ((string) p);
+                     _collections.foreach ((name, coll) => {
+                         if (coll.is_locked ()) return;
+                         if (ps == coll.get_path () || ps.has_prefix (coll.get_path () + "/"))
+@@ -318,7 +327,7 @@
+                     }
+                     if (!ok) {
+                         dismissed = true;
+-                        result    = new GLib.Variant ("ao", new GLib.ObjectPath[0]);
++                        result    = new GLib.Variant.array (new GLib.VariantType ("o"), {});
+                         return;
+                     }
+                     GLib.ObjectPath[] now_unlocked = {};
+@@ -326,7 +335,7 @@
+                         if (coll.is_locked ()) coll.unlock_collection ();
+                     });
+                     foreach (var op in captured) {
+-                        string ops = (string) op;
++                        string ops = _resolve_alias ((string) op);
+                         _collections.foreach ((name, coll) => {
+                             if (coll.is_locked ()) return;
+                             if (ops == coll.get_path () || ops.has_prefix (coll.get_path () + "/"))
+@@ -364,7 +373,7 @@
+             _collections.foreach ((name, coll) => {
+                 bool referenced = (objects.length == 0);
+                 foreach (var p in objects) {
+-                    string ps = (string) p;
++                    string ps = _resolve_alias ((string) p);
+                     if (ps == coll.get_path () || ps.has_prefix (coll.get_path () + "/")) {
+                         referenced = true;
+                         break;
+@@ -412,15 +421,27 @@
+             return (target != null) ? (GLib.ObjectPath) target : (GLib.ObjectPath) "/";
+         }
+ 
++        private void _remove_alias (string name) {
++            uint reg_id = _alias_reg_ids[name];
++            if (reg_id != 0) _conn.unregister_object (reg_id);
++            _alias_reg_ids.remove (name);
++            _aliases.remove (name);
++        }
++
+         public void set_alias (string name, GLib.ObjectPath collection_path) throws GLib.Error {
+             string cp = (string) collection_path;
+-            if (cp == "/") { _aliases.remove (name); return; }
+-            bool found = false;
++            if (cp == "/") { _remove_alias (name); return; }
++            string alias_path = "/org/freedesktop/secrets/aliases/" + name;
++            if (!GLib.Variant.is_object_path (alias_path))
++                throw new GLib.DBusError.INVALID_ARGS ("Invalid collection alias");
++            SecretCollection? target = null;
+             _collections.foreach ((cname, coll) => {
+-                if (coll.get_path () == cp) found = true;
+-            });
+-            if (!found)
++                if (coll.get_path () == cp) target = coll;
++            });
++            if (target == null)
+                 throw new GLib.DBusError.FAILED ("No collection at path '%s'".printf (cp));
++            _remove_alias (name);
++            _alias_reg_ids[name] = _conn.register_object (alias_path, target);
+             _aliases[name] = cp;
+         }
+     }
+--- a/subprojects/singularity-keyring/src/unlock_dialog.vala
++++ b/subprojects/singularity-keyring/src/unlock_dialog.vala
+@@ -117,9 +117,9 @@
+                 win.close ();
+                 cbref (true, p1);
+             }
+-            ok_btn.clicked.connect (try_submit);
+-            entry1.activate.connect (try_submit);
+-            if (entry2 != null) entry2.activate.connect (try_submit);
++            ok_btn.clicked.connect (() => try_submit ());
++            entry1.activate.connect (() => try_submit ());
++            if (entry2 != null) entry2.activate.connect (() => try_submit ());
+ 
+             win.close_request.connect (() => {
+                 if (!finished) {
+--- a/subprojects/singularity-keyring/src/main.vala
++++ b/subprojects/singularity-keyring/src/main.vala
+@@ -15,7 +15,8 @@
+                 flags:          ApplicationFlags.IS_SERVICE);
+     }
+ 
+-    protected override void activate () {
++    protected override void startup () {
++        base.startup ();
+         hold ();  // stay alive without windows
+     }
+ 
+--- a/subprojects/singularity-reader/tests/export_test.vala
++++ b/subprojects/singularity-reader/tests/export_test.vala
+@@ -14,11 +14,11 @@
+     string path = Path.build_filename (dir, "sample.pdf");
+     var surface = new Cairo.PdfSurface (path, 595, 842);
+     var cr = new Cairo.Context (surface);
+-    cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.BOLD);
++    cr.select_font_face ("DejaVu Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.BOLD);
+     cr.set_font_size (24);
+     cr.move_to (60, 80);
+     cr.show_text ("Annual Summary");
+-    cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
++    cr.select_font_face ("DejaVu Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
+     cr.set_font_size (11);
+     string[] para = { "Our company reached many goals this year and the results", "exceeded the expectations of the whole board of directors." };
+     double y = 120;
+@@ -27,10 +27,10 @@
+         cr.show_text (line);
+         y += 14;
+     }
+-    cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.BOLD);
++    cr.select_font_face ("DejaVu Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.BOLD);
+     cr.move_to (60, y + 10);
+     cr.show_text ("Important note");
+-    cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
++    cr.select_font_face ("DejaVu Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
+     string[,] table = {
+         { "Item", "Quantity", "Price" },
+         { "Apples", "12", "1,234.50" },
+--- a/subprojects/singularity-publish/src/layout/text_engine.vala
++++ b/subprojects/singularity-publish/src/layout/text_engine.vala
+@@ -1380,6 +1380,7 @@
+             Pango.Layout layout;
+             unowned Pango.LayoutLine line;
+             while (true) {
++                while (win < total && ((uint8) b.text[win] & 0xc0) == 0x80) win++;
+                 bool last_possible = win >= total;
+                 layout = make_layout (b, from, win, width, last_possible, band.a - col.x, col.w);
+                 line = layout.get_line_readonly (0);
+--- a/subprojects/singularity-publish/tests/merge_test.vala
++++ b/subprojects/singularity-publish/tests/merge_test.vala
+@@ -97,13 +97,13 @@
+     assert (Merge.used_fields (p).contains ("Name") && Merge.used_fields (p).contains ("Photo"));
+     var cache = new LayoutCache (p);
+     var f = (TextFrame) p.pages[0].items[0];
+-    assert (cache.story (f.story).frames[0].lines[0].build.text == "Dear Ada from London");
++    assert (cache.story (f.story).frames[0].lines[0].build.text.replace ("\u00AD", "") == "Dear Ada from London");
+     p.merge.preview = 2;
+     cache.invalidate ();
+-    assert (cache.story (f.story).frames[0].lines[0].build.text == "Dear Linus from Helsinki");
++    assert (cache.story (f.story).frames[0].lines[0].build.text.replace ("\u00AD", "") == "Dear Linus from Helsinki");
+     p.merge.preview = -1;
+     cache.invalidate ();
+-    assert (cache.story (f.story).frames[0].lines[0].build.text == "Dear «Name» from «City»");
++    assert (cache.story (f.story).frames[0].lines[0].build.text.replace ("\u00AD", "") == "Dear «Name» from «City»");
+ }
+ 
+ void test_expand_letters () {
+--- a/subprojects/singularity-publish/tests/indesign_test.vala
++++ b/subprojects/singularity-publish/tests/indesign_test.vala
+@@ -622,7 +622,7 @@
+     var cache = new LayoutCache (p);
+     var fr = cache.story (t.story).frames[0];
+     assert (fr.notes.size == 1 && fr.notes[0].number == 1);
+-    var line = fr.lines[0].build.text;
++    var line = fr.lines[0].build.text.replace ("\u00AD", "");
+     assert (line.contains ("one1") && line.contains ("two2") && line.contains ("footnote1"));
+     para.runs.insert (0, Footnotes.make_endnote (p, "Earlier."));
+     assert (Footnotes.update_endnotes (p, "Notes") == 3);
+@@ -637,7 +637,7 @@
+ 
+ string first_text (LayoutCache c, int story) {
+     var sb = new StringBuilder ();
+-    foreach (var fr in c.story (story).frames) foreach (var l in fr.lines) if (l.para_first) sb.append (l.build.text + "|");
++    foreach (var fr in c.story (story).frames) foreach (var l in fr.lines) if (l.para_first) sb.append (l.build.text.replace ("\u00AD", "") + "|");
+     return sb.str;
+ }
+ 
+@@ -1161,25 +1161,25 @@
+     para.runs.add (new Run (" today."));
+     st.paras.add (para);
+     var cache = new LayoutCache (p);
+-    string all = cache.story (t.story).frames[0].lines[0].build.text;
++    string all = cache.story (t.story).frames[0].lines[0].build.text.replace ("\u00AD", "");
+     assert (all.contains ("0123 456") && all.contains ("example.org"));
+     p.conditions[1].visible = false;
+     p.condition_sets.add (Conditions.capture (p, "Print Edition"));
+     cache.invalidate ();
+     var line = cache.story (t.story).frames[0].lines[0];
+-    assert (line.build.text == "Call 0123 456 today.");
++    assert (line.build.text.replace ("\u00AD", "") == "Call 0123 456 today.");
+     assert (line.build.disp_of (13) == line.build.disp_of (24));
+     p.conditions[0].visible = false;
+     p.conditions[1].visible = true;
+     cache.invalidate ();
+-    assert (cache.story (t.story).frames[0].lines[0].build.text == "Call example.org today.");
++    assert (cache.story (t.story).frames[0].lines[0].build.text.replace ("\u00AD", "") == "Call example.org today.");
+     Conditions.apply_set (p, p.condition_sets[0]);
+     assert (p.conditions[0].visible && !p.conditions[1].visible && p.active_condition_set == "Print Edition");
+     var q = round_trip (p);
+     assert (q.conditions.size == 2 && !q.conditions[1].visible && q.condition_sets.size == 1 && q.condition_sets[0].states["Web"] == false);
+     assert (q.story (t.story).paras[0].runs[2].condition == "Web");
+     var qc = new LayoutCache (q);
+-    assert (qc.story (t.story).frames[0].lines[0].build.text == "Call 0123 456 today.");
++    assert (qc.story (t.story).frames[0].lines[0].build.text.replace ("\u00AD", "") == "Call 0123 456 today.");
+ }
+ 
+ void test_separation_preview () {
+@@ -1701,8 +1701,8 @@
+         var cache = new LayoutCache (p);
+         var line = cache.story (t.story).frames[0].lines[0];
+         int xa, xb;
+-        line.line ().index_to_x (8, false, out xa);
+-        line.line ().index_to_x (13, false, out xb);
++        line.line ().index_to_x (line.build.disp_of (8), false, out xa);
++        line.line ().index_to_x (line.build.disp_of (13), false, out xb);
+         double x1 = 50 + line.x + line.x_off + xa / (double) Pango.SCALE, x2 = 50 + line.x + line.x_off + xb / (double) Pango.SCALE;
+         double base_y = 50 + line.baseline;
+         Singularity.Pdf.Annotations.markup (d, 0, "Highlight", { Singularity.Pdf.Rect.of (x1 + 0.5, ph - base_y - 2, x2 - 0.5, ph - base_y + 8) }, { 1, 1, 0 }, 0.4, "Proofreader", "Check the day");
+--- a/subprojects/singularity-publish/src/model/extras.vala
++++ b/subprojects/singularity-publish/src/model/extras.vala
+@@ -326,13 +326,13 @@
+ 
+         public static Gee.ArrayList<string> search_dirs () {
+             var l = new Gee.ArrayList<string> ();
++            string? extra = Environment.get_variable ("PUBLISH_THESAURUS_PATH");
++            if (extra != null) foreach (string d in extra.split (":")) if (d != "") l.add (d);
+             l.add (Path.build_filename (Environment.get_user_data_dir (), "mythes"));
+             foreach (string d in Environment.get_system_data_dirs ()) {
+                 l.add (Path.build_filename (d, "mythes"));
+                 l.add (Path.build_filename (d, "thesaurus"));
+             }
+-            string? extra = Environment.get_variable ("PUBLISH_THESAURUS_PATH");
+-            if (extra != null) foreach (string d in extra.split (":")) if (d != "") l.add (d);
+             return l;
+         }
+ 
+--- a/subprojects/singularity-keyframe/src/io/encoder.vala
++++ b/subprojects/singularity-keyframe/src/io/encoder.vala
+@@ -123,7 +123,8 @@
+         }
+ 
+         private void add_pro (OutputFormat f, string gst_element, string ffmpeg_codec) {
+-            if (has_element (gst_element) && has_element ("qtmux")) {
++            // qtmux cannot mux the DNxHD caps advertised by libav.
++            if (ffmpeg_codec != "dnxhd" && has_element (gst_element) && has_element ("qtmux")) {
+                 f.backend = "gstreamer";
+             } else if (ffmpeg_path () != null) {
+                 f.backend = "ffmpeg";
+--- a/subprojects/singularity-publish/tests/layout_test.vala
++++ b/subprojects/singularity-publish/tests/layout_test.vala
+@@ -652,6 +652,23 @@
+     }
+ }
+ 
++void test_unicode_window () {
++    var p = base_pub ();
++    var f = frame (p, 0, 0, 0, 72, 5000);
++    f.inset_left = 0;
++    f.inset_right = 0;
++    var s = p.story (f.story);
++    var text = new StringBuilder ();
++    for (int i = 0; i < 256; i++) text.append ("\u6f22");
++    s.paras.clear ();
++    var para = new Paragraph.with_text (text.str);
++    para.fmt.composer = 1;
++    s.paras.add (para);
++    var res = new LayoutCache (p).story (s.id);
++    assert (!res.overset && res.frames[0].lines.size > 1);
++    foreach (var line in res.frames[0].lines) assert (line.layout.get_text ().validate ());
++}
++
+ int main (string[] args) {
+     Intl.setlocale (LocaleCategory.ALL, "C.UTF-8");
+     Test.init (ref args);
+@@ -666,6 +683,7 @@
+     Test.add_func ("/layout/justify", test_justify);
+     Test.add_func ("/layout/paragraph-composer", test_paragraph_composer);
+     Test.add_func ("/layout/justification-limits", test_justification_limits);
++    Test.add_func ("/layout/unicode-window", test_unicode_window);
+     Test.add_func ("/layout/hyphenation-settings", test_hyphenation_settings);
+     Test.add_func ("/layout/text-variables", test_text_variables);
+     Test.add_func ("/layout/frame-grid", test_frame_grid);

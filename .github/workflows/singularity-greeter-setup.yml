@@ -1,0 +1,97 @@
+name: singularity-greeter-setup - COPR Auto Build
+
+on:
+  schedule:
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Build ulang walaupun versi sama'
+        type: boolean
+        default: false
+  push:
+    paths:
+      - 'specs/singularity-greeter-setup.spec'
+      - 'data/singularity/greeter/**'
+      - '.github/workflows/singularity-greeter-setup.yml'
+
+env:
+  PACKAGE: singularity-greeter-setup
+  UPSTREAM: singularityos-lab/packaging
+  COPR_PROJECT: Mindset-Apps
+
+jobs:
+  build-source-rpm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Resolve upstream packaging snapshot
+        id: upstream
+        run: |
+          set -euo pipefail
+          RELEASE=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/${UPSTREAM}/releases/latest")
+          TAG=$(jq -r '.tag_name // empty' <<<"$RELEASE")
+          ASSET_NAME=$(jq -r '.assets[] | select(.name | test("^singularity-desktop-.*\\.src\\.rpm$")) | .name' <<<"$RELEASE" | head -1)
+          BASE_VERSION=$(sed -E 's/^singularity-desktop-(.*)-[0-9]+\.fc[0-9]+\.src\.rpm$/\1/' <<<"$ASSET_NAME")
+          SHA=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/${UPSTREAM}/commits/${TAG}" | jq -r '.sha')
+          [[ -n "$TAG" && -n "$ASSET_NAME" && "$BASE_VERSION" != "$ASSET_NAME" && "$SHA" =~ ^[0-9a-f]{40}$ ]]
+          DAY=$(date -u -d "$(jq -r '.published_at' <<<"$RELEASE")" +%Y%m%d)
+          echo "version=${BASE_VERSION}.${DAY}.git${SHA:0:8}" >> "$GITHUB_OUTPUT"
+      - name: Check latest successful COPR build
+        id: copr
+        run: |
+          set -euo pipefail
+          CURRENT=$(curl -fsSL --retry 3 \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.PACKAGE }}" \
+            | jq -r '[.items[] | select(.state == "succeeded")][0].source_package.version // "none"')
+          echo "version=${CURRENT%-*}" >> "$GITHUB_OUTPUT"
+      - name: Smart skip
+        id: check
+        env:
+          UPSTREAM_VERSION: ${{ steps.upstream.outputs.version }}
+          COPR_VERSION: ${{ steps.copr.outputs.version }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          if [[ "$FORCE" == true || "$UPSTREAM_VERSION" != "$COPR_VERSION" ]]; then
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          else
+            echo "Up to date: $UPSTREAM_VERSION"
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.upstream.outputs.version }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y rpm
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp specs/singularity-greeter-setup.spec ~/rpmbuild/SPECS/
+          sed -i "s/^Version:.*/Version:        ${VERSION}/" ~/rpmbuild/SPECS/singularity-greeter-setup.spec
+          cp data/singularity/greeter/singularity-greeter-session ~/rpmbuild/SOURCES/
+          cp data/singularity/greeter/config.toml ~/rpmbuild/SOURCES/
+          cp data/singularity/greeter/labwc-locked/rc.xml ~/rpmbuild/SOURCES/labwc-locked-rc.xml
+          cp data/singularity/greeter/labwc-locked/menu.xml ~/rpmbuild/SOURCES/labwc-locked-menu.xml
+          cp data/singularity/greeter/singularity-greeter.sysusers ~/rpmbuild/SOURCES/
+          cp data/singularity/greeter/singularity-greeter.tmpfiles ~/rpmbuild/SOURCES/
+          cp data/singularity/greeter/LICENSE ~/rpmbuild/SOURCES/
+          rpmbuild -bs --define "_topdir $HOME/rpmbuild" ~/rpmbuild/SPECS/singularity-greeter-setup.spec
+      - name: Submit to COPR
+        if: steps.check.outputs.skip == 'false'
+        env:
+          COPR_PROJECT: ${{ env.COPR_PROJECT }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --user copr-cli
+          mkdir -p ~/.config
+          cat > ~/.config/copr <<EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login = ${{ secrets.COPR_LOGIN }}
+          token = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+          copr-cli build "$COPR_PROJECT" "$(find ~/rpmbuild/SRPMS -name '*.src.rpm' -print -quit)"

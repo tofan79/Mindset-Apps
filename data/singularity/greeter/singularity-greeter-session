@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+export HOME=/var/lib/greeter
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+mkdir -p "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME"
+
+if [ -r /etc/locale.conf ]; then
+    . /etc/locale.conf
+    [ -z "${LANG:-}" ] || export LANG
+fi
+
+exec dbus-run-session -- /usr/libexec/singularity/labwc \
+    -C /usr/share/singularity/greeter/labwc-locked \
+    -s /usr/bin/singularity-greeter

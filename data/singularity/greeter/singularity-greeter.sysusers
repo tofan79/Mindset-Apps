@@ -1,0 +1,4 @@
+u greeter - "Singularity Greeter" /var/lib/greeter /usr/sbin/nologin
+m greeter video
+m greeter render
+m greeter input

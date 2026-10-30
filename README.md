@@ -19,7 +19,11 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-All 48 packages currently built, in alphabetical order:
+50 packages total: 48 built and 2 pending their first successful COPR build.
+
+Packages are listed alphabetically. Singularity packages marked **pending** are
+not installable yet; the desktop package also needs its runtime dependencies
+and RPM Fusion codec repository configured in COPR.
 
 | Package | Upstream source |
 |---------|-----------------|
@@ -61,6 +65,8 @@ All 48 packages currently built, in alphabetical order:
 | `rakuos-bootstrap` | [tofan79/rakuos-bootstrap](https://github.com/tofan79/rakuos-bootstrap) (wizard pasca-install RakuOS minimal, release tag) |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) (Rust + GTK4; pilih desktop shell di atas Hyprland) |
 | `sekaipop-shell` | [Blapples/SekaiPop](https://github.com/Blapples/SekaiPop) (payload Quickshell Project Sekai untuk Hyprland; daily git build) |
+| `singularity-desktop` *(pending)* | [singularityos-lab/packaging](https://github.com/singularityos-lab/packaging) (desktop, apps, compositor components and greeter client; Fedora 45 build) |
+| `singularity-greeter-setup` *(pending)* | [singularityos-lab/packaging](https://github.com/singularityos-lab/packaging) (greetd wrapper and locked labwc config; does not enable greetd) |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) |
 | `sonora` | [sonorahq/sonora](https://github.com/sonorahq/sonora) (repack AppImage x86_64 upstream) |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |

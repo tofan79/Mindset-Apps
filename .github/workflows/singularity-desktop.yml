@@ -1,0 +1,104 @@
+name: singularity-desktop - COPR Auto Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Build ulang walaupun versi sama'
+        type: boolean
+        default: false
+  push:
+    paths:
+      - 'specs/singularity-desktop-fedora45.spec'
+      - '.github/workflows/singularity-desktop.yml'
+
+env:
+  PACKAGE: singularity-desktop
+  UPSTREAM: singularityos-lab/packaging
+  COPR_PROJECT: Mindset-Apps
+
+jobs:
+  source-rpm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Find newest upstream packaging release
+        id: upstream
+        run: |
+          set -euo pipefail
+          RELEASE=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/${UPSTREAM}/releases/latest")
+          TAG=$(jq -r '.tag_name // empty' <<<"$RELEASE")
+          ASSET_NAME=$(jq -r '.assets[] | select(.name | test("^singularity-desktop-.*\\.src\\.rpm$")) | .name' <<<"$RELEASE" | head -1)
+          BASE_VERSION=$(sed -E 's/^singularity-desktop-(.*)-[0-9]+\.fc[0-9]+\.src\.rpm$/\1/' <<<"$ASSET_NAME")
+          SHA=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/${UPSTREAM}/commits/${TAG}" | jq -r '.sha')
+          [[ -n "$TAG" && -n "$ASSET_NAME" && "$BASE_VERSION" != "$ASSET_NAME" && "$SHA" =~ ^[0-9a-f]{40}$ ]]
+          DAY=$(date -u -d "$(jq -r '.published_at' <<<"$RELEASE")" +%Y%m%d)
+          VERSION="${BASE_VERSION}.${DAY}.git${SHA:0:8}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Check latest successful COPR build
+        id: copr
+        run: |
+          set -euo pipefail
+          CURRENT=$(curl -fsSL --retry 3 \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.PACKAGE }}" \
+            | jq -r '[.items[] | select(.state == "succeeded")][0].source_package.version // "none"')
+          echo "version=${CURRENT%-*}" >> "$GITHUB_OUTPUT"
+      - name: Smart skip
+        id: check
+        env:
+          UPSTREAM_VERSION: ${{ steps.upstream.outputs.version }}
+          COPR_VERSION: ${{ steps.copr.outputs.version }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          if [[ "$FORCE" == true || "$UPSTREAM_VERSION" != "$COPR_VERSION" ]]; then
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          else
+            echo "Up to date: $UPSTREAM_VERSION"
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Download baseline SRPM and prepare updated SRPM
+        if: steps.check.outputs.skip == 'false'
+        env:
+          TAG: ${{ steps.upstream.outputs.tag }}
+          VERSION: ${{ steps.upstream.outputs.version }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y rpm cpio zstd
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS} unpack unpack-tree
+          API=$(curl -fsSL --retry 3 "https://api.github.com/repos/${UPSTREAM}/releases/tags/${TAG}")
+          ASSET=$(jq -r '.assets[] | select(.name | test("^singularity-desktop-.*\\.src\\.rpm$")) | .browser_download_url' <<<"$API" | head -1)
+          test -n "$ASSET"
+          curl -fsSL --retry 3 "$ASSET" -o unpack/singularity-desktop.src.rpm
+          SRPM=unpack/singularity-desktop.src.rpm
+          SRPM=$(find unpack -name 'singularity-desktop-*.src.rpm' -print -quit)
+          [ -n "$SRPM" ] || SRPM=unpack/singularity-desktop.src.rpm
+          test -n "$SRPM"
+          (cd unpack && rpm2cpio "$GITHUB_WORKSPACE/$SRPM" | (cd ../unpack-tree && cpio -idm --quiet))
+          find unpack-tree -type f -path '*/SOURCES/*' -exec cp -t ~/rpmbuild/SOURCES/ {} +
+          cp data/singularity/native-build.sh data/singularity/native-install.sh \
+            data/singularity/native-check.sh data/singularity/rpm-files.py \
+            data/singularity/source-manifest.json data/singularity/*.patch \
+            ~/rpmbuild/SOURCES/
+          cp specs/singularity-desktop-fedora45.spec ~/rpmbuild/SPECS/singularity-desktop.spec
+          sed -i "s/^Version:.*/Version:        ${VERSION}/" ~/rpmbuild/SPECS/singularity-desktop.spec
+          rpmbuild -bs --define "_topdir $HOME/rpmbuild" ~/rpmbuild/SPECS/singularity-desktop.spec
+      - name: Submit SRPM to COPR
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          python3 -m pip install --user copr-cli
+          mkdir -p ~/.config
+          cat > ~/.config/copr <<EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login = ${{ secrets.COPR_LOGIN }}
+          token = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+          copr-cli build "$COPR_PROJECT" "$(find ~/rpmbuild/SRPMS -name '*.src.rpm' -print -quit)"
