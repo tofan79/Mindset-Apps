@@ -35,12 +35,17 @@ install -Dpm0644 %{SOURCE2} %{buildroot}%{_datadir}/singularity/greeter/labwc-lo
 install -Dpm0644 %{SOURCE3} %{buildroot}%{_datadir}/singularity/greeter/labwc-locked/menu.xml
 install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysusersdir}/singularity-greeter.conf
 install -Dpm0644 %{SOURCE5} %{buildroot}%{_tmpfilesdir}/singularity-greeter.conf
+install -Dpm0644 %{SOURCE6} %{buildroot}%{_licensedir}/%{name}/LICENSE
 
 %files
-%license %{SOURCE6}
+%license %{_licensedir}/%{name}/LICENSE
 %{_libexecdir}/singularity-greeter/session
 %{_datadir}/greetd/singularity-greeter.toml
 %{_datadir}/singularity/greeter/labwc-locked/rc.xml
 %{_datadir}/singularity/greeter/labwc-locked/menu.xml
 %{_sysusersdir}/singularity-greeter.conf
 %{_tmpfilesdir}/singularity-greeter.conf
+
+%changelog
+* Fri Oct 30 2026 Tofan79 <nanasmuda.404@outlook.co.id> - %{version}-1
+- Initial Mindset-Apps package for the Singularity greetd session glue.

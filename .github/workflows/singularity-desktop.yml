@@ -75,8 +75,8 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -q
-          sudo apt-get install -y rpm cpio zstd
-          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS} unpack unpack-tree
+          sudo apt-get install -y rpm zstd
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS} unpack
           API=$(curl -fsSL --retry 3 -H 'Accept: application/vnd.github+json' -H "Authorization: Bearer $GH_TOKEN" \
             "https://api.github.com/repos/${UPSTREAM}/releases/tags/${TAG}")
           ASSET=$(jq -r '.assets[] | select(.name | test("^singularity-desktop-.*\\.src\\.rpm$")) | .browser_download_url' <<<"$API" | head -1)
@@ -86,8 +86,7 @@ jobs:
           SRPM=$(find unpack -name 'singularity-desktop-*.src.rpm' -print -quit)
           [ -n "$SRPM" ] || SRPM=unpack/singularity-desktop.src.rpm
           test -n "$SRPM"
-          (cd unpack && rpm2cpio "$GITHUB_WORKSPACE/$SRPM" | (cd ../unpack-tree && cpio -idm --quiet))
-          find unpack-tree -type f -path '*/SOURCES/*' -exec cp -t ~/rpmbuild/SOURCES/ {} +
+          rpm -i --nodeps --define "_topdir $HOME/rpmbuild" "$GITHUB_WORKSPACE/$SRPM"
           cp data/singularity/native-build.sh data/singularity/native-install.sh \
             data/singularity/native-check.sh data/singularity/rpm-files.py \
             data/singularity/source-manifest.json data/singularity/*.patch \
