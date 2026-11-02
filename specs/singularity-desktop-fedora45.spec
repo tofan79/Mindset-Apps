@@ -28,6 +28,7 @@ Patch1:         native-gtk-accessible-text.patch
 Patch2:         native-runtime-compat.patch
 Patch3:         native-fontconfig-freetype.patch
 Patch4:         native-vetro-property-types.patch
+Patch5:         native-nettle-digest-api.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -1094,6 +1095,7 @@ Headers and development metadata for singularity-keyframe.
 %patch -P 2 -p1
 %patch -P 3 -p1
 %patch -P 4 -p1
+%patch -P 5 -p1
 tar --zstd -xf %{SOURCE5} -C subprojects/vetro
 tar --zstd -xf %{SOURCE9}
 

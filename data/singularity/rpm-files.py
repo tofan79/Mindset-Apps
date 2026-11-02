@@ -46,6 +46,9 @@ extra = {
     '/usr/lib/systemd/system/fprintd.service.d/': 'singularity-fprint',
     '/usr/share/wayland-sessions/singularity.desktop': 'singularity-session',
     '/usr/share/dbus-1/services/dev.sinty.keyring.service': 'singularity-keyring',
+    '/usr/lib64/libsingularity-gesture.so': 'libsingularity',
+    '/usr/lib64/libsingularity-system.so': 'libsingularity',
+    '/usr/lib64/libsingularity.so': 'libsingularity',
 }
 files = [p for p in stage.rglob('*') if p.is_file() or p.is_symlink()]
 for path in files:
