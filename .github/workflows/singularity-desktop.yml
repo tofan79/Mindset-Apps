@@ -12,6 +12,10 @@ on:
   push:
     paths:
       - 'specs/singularity-desktop-fedora45.spec'
+      - 'data/singularity/*.patch'
+      - 'data/singularity/*.sh'
+      - 'data/singularity/*.py'
+      - 'data/singularity/*.json'
       - '.github/workflows/singularity-desktop.yml'
 
 env:

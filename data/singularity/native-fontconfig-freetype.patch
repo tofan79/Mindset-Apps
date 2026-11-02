@@ -8,3 +8,4 @@ diff --git a/subprojects/libsingularity/src/pdf/pdf_native.c b/subprojects/libsi
 +#include <fontconfig/fcfreetype.h>
  #include <hb.h>
  #include <hb-ot.h>
+ #include <hb-subset.h>
