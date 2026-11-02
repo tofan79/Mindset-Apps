@@ -1,13 +1,13 @@
-diff --git a/subprojects/singularity-database/src/model/crypt_vfs.c b/subprojects/singularity-database/src/model/crypt_vfs.c
 --- a/subprojects/singularity-database/src/model/crypt_vfs.c
 +++ b/subprojects/singularity-database/src/model/crypt_vfs.c
-@@ -5,5 +5,6 @@
+@@ -5,6 +5,7 @@
  #include <nettle/aes.h>
  #include <nettle/ctr.h>
  #include <nettle/hmac.h>
 +#include <nettle/version.h>
  #include <nettle/pbkdf2.h>
  #include <nettle/memops.h>
+ 
 @@ -120,7 +121,11 @@
      hmac_sha256_update (&h, 4, num);
      hmac_sha256_update (&h, SDB_IV_LEN, iv);
