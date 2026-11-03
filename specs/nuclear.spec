@@ -8,7 +8,7 @@
 
 Name:           nuclear
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Music player for your desktop built with Tauri and WebKit
 
 License:        AGPL-3.0-only

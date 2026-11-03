@@ -1,6 +1,6 @@
 Name:           localsend
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        LocalSend — Share files to nearby devices, no internet needed
 License:        Apache-2.0
 URL:            https://localsend.org

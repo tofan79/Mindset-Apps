@@ -1,6 +1,6 @@
 Name:           zoom
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Zoom Workplace — video conferencing, team chat and collaboration
 # Proprietary Zoom software; LicenseRef-* is the SPDX form for non-listed licenses.
 License:        LicenseRef-Zoom-Proprietary

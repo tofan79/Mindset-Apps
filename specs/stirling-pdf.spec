@@ -1,6 +1,6 @@
 Name:           stirling-pdf
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Stirling PDF — Locally hosted web app for PDF operations
 # Upstream LICENSE is MIT except app/proprietary, app/saas, engine/ etc., which
 # carry their own licenses. Verify what the RPM actually ships before release.

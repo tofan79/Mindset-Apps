@@ -1,6 +1,6 @@
 Name:           android-studio
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Android Studio — The official Android IDE
 License:        Apache-2.0
 URL:            https://developer.android.com/studio

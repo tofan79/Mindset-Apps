@@ -1,6 +1,6 @@
 Name:           ab-download-manager
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        AB Download Manager — Fast & powerful download manager
 License:        Apache-2.0
 URL:            https://abdownloadmanager.com

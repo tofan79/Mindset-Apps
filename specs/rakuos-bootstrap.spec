@@ -8,7 +8,7 @@
 
 Name:           rakuos-bootstrap
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Wizard pasca-install untuk RakuOS minimal
 License:        MIT
 URL:            https://github.com/tofan79/rakuos-bootstrap

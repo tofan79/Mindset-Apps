@@ -1,6 +1,6 @@
 Name:           intellij-idea
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        IntelliJ IDEA — Leading Java and Kotlin IDE (unified)
 # Core is Apache-2.0; the unified distribution also contains JetBrains
 # proprietary Ultimate components (subscription-gated).

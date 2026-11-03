@@ -12,7 +12,7 @@
 
 Name:           whisker-cli
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        CLI helper for the Whisker Quickshell shell
 License:        GPL-3.0-only
 URL:            https://github.com/corecathx/whisker-cli

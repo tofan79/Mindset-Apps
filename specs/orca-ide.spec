@@ -1,6 +1,6 @@
 Name:           orca-ide
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Orca IDE — Multimodal AI-native code editor
 # Upstream repo (stablyai/orca) is MIT. The Electron runtime bundled in the
 # official RPM carries its own notices under /opt/Orca.
