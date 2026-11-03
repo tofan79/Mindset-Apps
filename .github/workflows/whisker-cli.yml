@@ -103,6 +103,11 @@ jobs:
           tar -xzf "$FILENAME" -C extract
           mapfile -t TOP < <(find extract -mindepth 1 -maxdepth 1 -type d)
           [ "${#TOP[@]}" -eq 1 ] || { echo "expected 1 top dir, got ${#TOP[@]}"; exit 1; }
+          # Upstream whisker-cli ships no LICENSE; reuse the GPL-3.0 text from
+          # corecathx/whisker so the RPM carries a license file.
+          [ -f "${TOP[0]}/LICENSE" ] || curl -fsSL --retry 3 \
+            "https://raw.githubusercontent.com/corecathx/whisker/main/LICENSE" \
+            -o "${TOP[0]}/LICENSE"
           mv "${TOP[0]}" "${{ env.APP_NAME }}-${VER}"
           tar -czf "$FILENAME" "${{ env.APP_NAME }}-${VER}"
           echo "FILENAME=$FILENAME" >> "$GITHUB_ENV"

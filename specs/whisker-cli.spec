@@ -1,8 +1,9 @@
 # whisker-cli: CLI companion for Whisker.
 #
 # License follows whisker-shell (same author/project): GPL-3.0-only. Upstream
-# still has no standalone LICENSE file, so the license is declared here and
-# in the package metadata rather than installed as a file.
+# still has no standalone LICENSE file, so the workflow copies the GPL-3.0 text
+# from corecathx/whisker into the tarball and it is installed via %license.
+# TODO: ask upstream to add a LICENSE file to whisker-cli.
 #
 # Build takes hxcpp through haxelib; the COPR workflow enables network for
 # this package because hxcpp is not packaged in Fedora.
@@ -48,6 +49,7 @@ haxe release.hxml
 install -Dpm0755 target/cpp/whisker %{buildroot}%{_bindir}/whisker
 
 %files
+%license LICENSE
 %{_bindir}/whisker
 
 %changelog

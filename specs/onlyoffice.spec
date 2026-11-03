@@ -63,7 +63,7 @@ rm -rf %{buildroot}/usr/lib/.build-id
 /usr/share/applications/onlyoffice-desktopeditors.desktop
 /usr/share/doc/onlyoffice-desktopeditors
 /usr/share/icons/hicolor/*/apps/onlyoffice-desktopeditors.png
-/usr/share/licenses/onlyoffice-desktopeditors
+%license /usr/share/licenses/onlyoffice-desktopeditors
 
 %changelog
 * Sat Aug 08 2026 mindset <mindset@copr> - %{pkg_version}-1

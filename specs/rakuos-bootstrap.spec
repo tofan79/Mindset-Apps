@@ -52,6 +52,7 @@ install -Dpm0644 data/rakuos-bootstrap.service \
 %systemd_postun_with_restart rakuos-bootstrap.service
 
 %files
+%license LICENSE
 %{_bindir}/rakuos-bootstrap
 %dir %{_datadir}/rakuos
 %dir %{_datadir}/rakuos/bootstrap

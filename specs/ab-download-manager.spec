@@ -5,6 +5,7 @@ Summary:        AB Download Manager — Fast & powerful download manager
 License:        Apache-2.0
 URL:            https://abdownloadmanager.com
 Source0:        ABDownloadManager_%{pkg_version}_linux_x64.tar.gz
+Source1:        LICENSE
 
 # Pre-built binary, skip RPATH and debuginfo checks
 %global debug_package %{nil}
@@ -27,6 +28,7 @@ browser integration.
 %setup -q -c -n ABDownloadManager
 
 %install
+install -Dpm0644 %{SOURCE1} %{buildroot}%{_licensedir}/%{name}/LICENSE
 install -d %{buildroot}/opt/ab-download-manager
 cp -r * %{buildroot}/opt/ab-download-manager/
 
@@ -48,6 +50,7 @@ StartupNotify=true
 EOF
 
 %files
+%license %{_licensedir}/%{name}/LICENSE
 /opt/ab-download-manager/
 %{_bindir}/abdownloadmanager
 %{_datadir}/applications/ab-download-manager.desktop

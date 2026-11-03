@@ -2,9 +2,10 @@ Name:           localsend
 Version:        %{pkg_version}
 Release:        1%{?dist}
 Summary:        LocalSend — Share files to nearby devices, no internet needed
-License:        MIT
+License:        Apache-2.0
 URL:            https://localsend.org
 Source0:        LocalSend-%{version}-linux-x86-64.tar.gz
+Source1:        LICENSE
 
 # Pre-built binary, skip RPATH and debuginfo checks
 %global debug_package %{nil}
@@ -25,6 +26,7 @@ No internet required, no external servers.
 %setup -q -c -n localsend
 
 %install
+install -Dpm0644 %{SOURCE1} %{buildroot}%{_licensedir}/%{name}/LICENSE
 install -d %{buildroot}/opt/localsend
 cp -r * %{buildroot}/opt/localsend/
 
@@ -46,6 +48,7 @@ StartupNotify=true
 EOF
 
 %files
+%license %{_licensedir}/%{name}/LICENSE
 /opt/localsend/
 %{_bindir}/localsend
 %{_datadir}/applications/localsend.desktop

@@ -2,7 +2,9 @@ Name:           intellij-idea
 Version:        %{pkg_version}
 Release:        1%{?dist}
 Summary:        IntelliJ IDEA — Leading Java and Kotlin IDE (unified)
-License:        Apache-2.0
+# Core is Apache-2.0; the unified distribution also contains JetBrains
+# proprietary Ultimate components (subscription-gated).
+License:        Apache-2.0 AND LicenseRef-JetBrains-Proprietary
 URL:            https://www.jetbrains.com/idea/
 Source0:        idea-%{pkg_version}.tar.gz
 

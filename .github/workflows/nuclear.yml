@@ -93,6 +93,9 @@ jobs:
             -o nuclear.rpm
           mkdir -p pkg
           (cd pkg && rpm2cpio ../nuclear.rpm | cpio -idm --quiet)
+          curl -fsSL --retry 3 \
+            "https://raw.githubusercontent.com/${{ env.GITHUB_REPO }}/${TAG//@/%40}/LICENSE" \
+            -o pkg/LICENSE
           mv pkg "nuclear-${VER}"
           tar -czf "nuclear-${VER}.tar.gz" "nuclear-${VER}"
           echo "TARBALL=nuclear-${VER}.tar.gz" >> $GITHUB_ENV

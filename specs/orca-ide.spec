@@ -2,9 +2,12 @@ Name:           orca-ide
 Version:        %{pkg_version}
 Release:        1%{?dist}
 Summary:        Orca IDE — Multimodal AI-native code editor
-License:        Proprietary
+# Upstream repo (stablyai/orca) is MIT. The Electron runtime bundled in the
+# official RPM carries its own notices under /opt/Orca.
+License:        MIT
 URL:            https://github.com/stablyai/orca
 Source0:        orca-ide-%{version}.x86_64.rpm
+Source1:        LICENSE
 
 %global debug_package %{nil}
 %global __brp_check_rpaths %{nil}
@@ -40,6 +43,7 @@ This package is a repack of the official Orca RPM.
 %build
 
 %install
+install -Dpm0644 %{SOURCE1} %{buildroot}%{_licensedir}/%{name}/LICENSE
 mkdir -p %{buildroot}
 rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot} > /dev/null 2>&1
 rm -rf %{buildroot}/usr/lib/.build-id
@@ -66,6 +70,7 @@ EOF
 [ -f /opt/Orca/chrome-sandbox ] && chmod 4755 /opt/Orca/chrome-sandbox || :
 
 %files
+%license %{_licensedir}/%{name}/LICENSE
 %defattr(-,root,root,-)
 /opt/Orca/
 %{_bindir}/orca-ide

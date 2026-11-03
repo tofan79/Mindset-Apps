@@ -47,6 +47,7 @@ install -Dpm0644 usr/share/icons/hicolor/512x512/apps/nuclear-music-player.png \
     %{buildroot}%{_datadir}/icons/hicolor/512x512/apps/nuclear-music-player.png
 
 %files
+%license LICENSE
 %{_bindir}/nuclear-music-player
 %{_datadir}/applications/Nuclear.desktop
 %{_datadir}/icons/hicolor/512x512/apps/nuclear-music-player.png

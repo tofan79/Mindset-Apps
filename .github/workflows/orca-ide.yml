@@ -74,6 +74,7 @@ jobs:
           VER="${{ steps.upstream.outputs.version }}"
           RPM_FILENAME="${RPM_PREFIX}-${VER}.x86_64.rpm"
           wget -q "https://github.com/${{ env.GITHUB_REPO }}/releases/download/v${VER}/${RPM_FILENAME}" -O "$RPM_FILENAME"
+          curl -fsSL --retry 3 "https://raw.githubusercontent.com/${{ env.GITHUB_REPO }}/v${VER}/LICENSE" -o LICENSE
           echo "RPM_FILENAME=$RPM_FILENAME" >> "$GITHUB_ENV"
 
       - name: Build SRPM
@@ -85,6 +86,7 @@ jobs:
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/orca-ide.spec
           cp "$RPM_FILENAME" ~/rpmbuild/SOURCES/
+          cp LICENSE ~/rpmbuild/SOURCES/
           rpmbuild -bs ~/rpmbuild/SPECS/orca-ide.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT

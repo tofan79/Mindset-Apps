@@ -2,9 +2,12 @@ Name:           stirling-pdf
 Version:        %{pkg_version}
 Release:        1%{?dist}
 Summary:        Stirling PDF — Locally hosted web app for PDF operations
+# Upstream LICENSE is MIT except app/proprietary, app/saas, engine/ etc., which
+# carry their own licenses. Verify what the RPM actually ships before release.
 License:        MIT
 URL:            https://docs.stirlingpdf.com
 Source0:        Stirling-PDF-linux-x86_64.rpm
+Source1:        LICENSE
 
 # Binary repackage from upstream RPM, skip debuginfo and RPATH checks
 %global debug_package %{nil}
@@ -27,6 +30,7 @@ external services. Runs entirely on your machine via a bundled local backend.
 rpm2cpio %{SOURCE0} | cpio -idmv
 
 %install
+install -Dpm0644 %{SOURCE1} %{buildroot}%{_licensedir}/%{name}/LICENSE
 install -d %{buildroot}/usr/bin
 install -d %{buildroot}/usr/lib/"Stirling PDF"/libs
 install -d %{buildroot}/usr/lib/"Stirling PDF"/runtime
@@ -45,6 +49,7 @@ for size in 16 32 64 128 192 512; do
 done
 
 %files
+%license %{_licensedir}/%{name}/LICENSE
 /usr/bin/Stirling-PDF
 /usr/lib/Stirling\ PDF/
 %{_datadir}/applications/Stirling\ PDF.desktop
