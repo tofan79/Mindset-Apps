@@ -85,7 +85,7 @@ Singleton {
 EOF
 
 # Guard grep: kalau upstream mengganti string ini, build gagal supaya
-# patch-nya ditinjau ulang (pola guard yang sama dengan kineticwe).
+# patch-nya ditinjau ulang (pola guard yang sama dengan komponen lain).
 # Sejak upstream memakai satu baris fish bercabang (yay -> paru -> pacman),
 # guard mencocokkan `pacman -Syu` saja lalu seluruh baris itu diganti.
 grep -q 'pacman -Syu' modules/ii/bar/UpdatesCount.qml \

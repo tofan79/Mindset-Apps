@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-48 packages total, all with successful COPR builds.
+47 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -42,7 +42,6 @@ Packages are listed alphabetically.
 | `impasto-shell` | [andreumassanet/impasto](https://github.com/andreumassanet/impasto) (payload Quickshell untuk Hyprland; runtime quickshell/awww manual) |
 | `inir-shell` | [snowarch/iNiR](https://github.com/snowarch/iNiR) (payload shell Quickshell untuk Niri + launcher dan unit systemd user) |
 | `intellij-idea` | [JetBrains](https://www.jetbrains.com/idea/) (API) |
-| `kineticwe` | [theblackdon/kineticwe](https://gitlab.com/theblackdon/kineticwe) (daily commit snapshots from `kineticwe-2.0`; date + short SHA version with smart skip) |
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) |
 | `material-symbols-fonts` | [google/material-design-icons](https://github.com/google/material-design-icons) (variable Rounded icon font) |
 | `mixtapes-git` | [m-obeid/Mixtapes](https://github.com/m-obeid/Mixtapes) (daily git build; upstream belum punya tag/release) |
@@ -107,7 +106,7 @@ desktop archive.
 - **Run a build manually:** open
   [Actions](https://github.com/tofan79/Mindset-Apps/actions), select the
   workflow, and press *Run workflow*.
-- **Skipped runs** complete in under a minute; most real builds take 5–10 minutes, while KineticWE can take longer because it builds several subpackages.
+- **Skipped runs** complete in under a minute; most real builds take 5–10 minutes, 
 
 ## License
 
