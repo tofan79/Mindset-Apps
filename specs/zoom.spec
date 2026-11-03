@@ -58,6 +58,7 @@ rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot} > /dev/null 2>&1
 rm -rf %{buildroot}/usr/lib/.build-id
 
 %files
+%license /usr/share/doc/zoom/
 %defattr(-,root,root,-)
 /opt/zoom/
 /usr/bin/zoom

@@ -51,6 +51,7 @@ install -d %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 cp bin/studio.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/android-studio.svg 2>/dev/null || true
 
 %files
+%license /opt/android-studio/license/
 /opt/android-studio/
 %{_bindir}/android-studio
 %{_datadir}/applications/android-studio.desktop

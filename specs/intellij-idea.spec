@@ -54,6 +54,7 @@ install -d %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 cp bin/idea.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/intellij-idea.svg 2>/dev/null || true
 
 %files
+%license /opt/intellij-idea/license/
 /opt/intellij-idea/
 %{_bindir}/idea
 %{_datadir}/applications/intellij-idea.desktop
