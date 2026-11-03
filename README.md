@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-47 packages total, all with successful COPR builds.
+48 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -28,6 +28,7 @@ Packages are listed alphabetically.
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
 | `ambxst` | [Axenide/Ambxst](https://github.com/Axenide/Ambxst) (Go daemon + Quickshell shell; runtime quickshell/axctl/wl-clipboard manual) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
+| `arroxy` | [antonio-orionus/Arroxy](https://github.com/antonio-orionus/Arroxy) |
 | `artcraft-launcher` | [storytold/craft-launcher](https://github.com/storytold/craft-launcher) (launcher Rust; aplikasi Craft diunduh sendiri saat runtime) |
 | `axctl` | [Axenide/axctl](https://github.com/Axenide/axctl) (Go compositor daemon/CLI: config, brightness, IPC — dipakai ambxst) |
 | `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) |
