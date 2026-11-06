@@ -110,6 +110,11 @@ falling back to the highest numeric tag when no GitHub release exists.
 `impasto-shell` uploads only the shell files to COPR instead of the upstream
 desktop archive.
 
+Packages with a `-git` suffix in their name are rolling: they re-evaluate on
+every run (smart-skip by commit SHA), and there is no release-to-release
+migration step for them. Release-tracking and repack packages never move
+automatically unless a new tag or release asset appears upstream.
+
 ## Development
 
 - **Add a package:** create `specs/<name>.spec` and
