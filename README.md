@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-52 packages total, all with successful COPR builds.
+53 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -54,7 +54,7 @@ Packages are listed alphabetically.
 | `nuclear` | [nukeop/nuclear](https://github.com/nukeop/nuclear) | Music player for your desktop built with Tauri and WebKit | repack RPM x86_64 upstream |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) | Fast embeddable browser automation engine with native rendering | — |
 | `omacut` | [omacom/omacut](https://github.com/omacom/omacut) | Dead-simple video length trimmer built with Qt Quick and ffmpeg | — |
-| `omanta` | [28allday/omanta](https://github.com/28allday/omanta) | Native file manager for Omarchy (Qt Quick + GIO) | — |
+| `omafont` | [28allday/omafont-app](https://github.com/28allday/omafont-app) | Font manager for Omarchy: browse, preview, install and remove fonts | build from source (qmake6) || `omanta` | [28allday/omanta](https://github.com/28allday/omanta) | Native file manager for Omarchy (Qt Quick + GIO) | — |
 | `omareel-git` | [omacom/omareel](https://github.com/omacom/omareel) | Minimal, keyboard-driven video cutter for Wayland compositors | daily git build |
 | `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) | Keyboard-first presentation editor and presenter | daily git build |
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) | Dead-simple Markdown writing app built with Qt Quick | — |
