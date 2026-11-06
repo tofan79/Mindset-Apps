@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-48 packages total, all with successful COPR builds.
+51 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -28,6 +28,7 @@ Packages are listed alphabetically.
 | `ab-download-manager` | [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager) |
 | `ambxst` | [Axenide/Ambxst](https://github.com/Axenide/Ambxst) (Go daemon + Quickshell shell; runtime quickshell/axctl/wl-clipboard manual) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
+| `ario` | [peymanAzad/ario](https://github.com/peymanAzad/ario) (repack RPM x86_64 upstream; TUI + daemon, butuh `aria2`) |
 | `arroxy` | [antonio-orionus/Arroxy](https://github.com/antonio-orionus/Arroxy) |
 | `artcraft-launcher` | [storytold/craft-launcher](https://github.com/storytold/craft-launcher) (launcher Rust; aplikasi Craft diunduh sendiri saat runtime) |
 | `axctl` | [Axenide/axctl](https://github.com/Axenide/axctl) (Go compositor daemon/CLI: config, brightness, IPC — dipakai ambxst) |
@@ -57,6 +58,7 @@ Packages are listed alphabetically.
 | `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) (daily git build) |
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) |
+| `openidea` | [l0ng-ai/openidea](https://github.com/l0ng-ai/openidea) (repack RPM x86_64 upstream; IDE Tauri/WebKit) |
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) |
 | `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) (font variabel, font "important" iNiR) |
 | `phosphor-icons-fonts` | [phosphor-icons/web](https://github.com/phosphor-icons/web) (6 weight ikon, dipakai ambxst) |
@@ -72,6 +74,7 @@ Packages are listed alphabetically.
 | `umbriel-git` | [noctalia-dev/umbriel](https://github.com/noctalia-dev/umbriel) (Wayland compositor wlroots; daily git build, paket `umbriel` + session `umbriel.desktop`) |
 | `whisker-cli` | [corecathx/whisker-cli](https://github.com/corecathx/whisker-cli) (CLI pendamping Whisker; daily git build) |
 | `whisker-shell` | [corecathx/whisker](https://github.com/corecathx/whisker) (payload Quickshell Material 3 untuk Hyprland; daily git build) |
+| `zapfast` | [crmne/zapfast](https://github.com/crmne/zapfast) (repack RPM x86_64 upstream; klien WhatsApp native Rust + egui) |
 | `zoom` | [Zoom](https://zoom.us/download) |
 
 ## How it works
@@ -90,6 +93,13 @@ Each app has a dedicated workflow that:
 The `software-center` package is special-cased: its source lives in its own
 repository and is rebuilt automatically (daily) whenever a new release tag
 appears there.
+
+`nuclear`, `sonora`, `zapfast`, `ario`, and `openidea` do not compile anything
+in COPR. Upstream already publishes an x86_64 artifact (an RPM, or an AppImage
+for `sonora`), so the workflow downloads it, unpacks the payload, and repacks
+the same files into an RPM. Builds finish in seconds and cannot break on a
+dependency change, at the cost of shipping upstream's binary rather than one
+compiled on Fedora.
 
 For upstream projects without tags, `whisker-shell`, `whisker-cli`, and
 `sekaipop-shell` use the latest commit on `main`. Their RPM version is
