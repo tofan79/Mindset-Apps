@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-51 packages total, all with successful COPR builds.
+52 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -29,6 +29,7 @@ Packages are listed alphabetically.
 | `ambxst` | [Axenide/Ambxst](https://github.com/Axenide/Ambxst) (Go daemon + Quickshell shell; runtime quickshell/axctl/wl-clipboard manual) |
 | `android-studio` | [Android Studio](https://developer.android.com/studio) |
 | `ario` | [peymanAzad/ario](https://github.com/peymanAzad/ario) (repack RPM x86_64 upstream; TUI + daemon, butuh `aria2`) |
+| `aura` | [antwny/aura](https://github.com/antwny/aura) (repack tarball x86_64 upstream; live wallpaper Rust + mpvpaper, GNOME/KDE/COSMIC) |
 | `arroxy` | [antonio-orionus/Arroxy](https://github.com/antonio-orionus/Arroxy) |
 | `artcraft-launcher` | [storytold/craft-launcher](https://github.com/storytold/craft-launcher) (launcher Rust; aplikasi Craft diunduh sendiri saat runtime) |
 | `axctl` | [Axenide/axctl](https://github.com/Axenide/axctl) (Go compositor daemon/CLI: config, brightness, IPC — dipakai ambxst) |
@@ -94,12 +95,12 @@ The `software-center` package is special-cased: its source lives in its own
 repository and is rebuilt automatically (daily) whenever a new release tag
 appears there.
 
-`nuclear`, `sonora`, `zapfast`, `ario`, and `openidea` do not compile anything
-in COPR. Upstream already publishes an x86_64 artifact (an RPM, or an AppImage
-for `sonora`), so the workflow downloads it, unpacks the payload, and repacks
-the same files into an RPM. Builds finish in seconds and cannot break on a
-dependency change, at the cost of shipping upstream's binary rather than one
-compiled on Fedora.
+`nuclear`, `sonora`, `zapfast`, `ario`, `openidea`, and `aura` do not compile
+anything in COPR. Upstream already publishes an x86_64 artifact (an RPM,
+an AppImage for `sonora`, or a tarball for `aura`), so the workflow downloads
+it, unpacks the payload, and repacks the same files into an RPM. Builds finish
+in seconds and cannot break on a dependency change, at the cost of shipping
+upstream's binary rather than one compiled on Fedora.
 
 For upstream projects without tags, `whisker-shell`, `whisker-cli`, and
 `sekaipop-shell` use the latest commit on `main`. Their RPM version is
