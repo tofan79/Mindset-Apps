@@ -1,8 +1,9 @@
-name: "omafont - COPR Auto Build"
+name: "phantomat-git - COPR Auto Build"
 
-# Qt6 font manager. Upstream menerbitkan tag rilis (Arch package *.pkg.tar.zst)
-# tanpa tarball x86_64, jadi source diunduh lewat arsip tag GitHub lalu
-# di-build dari sumber dengan qmake6, pola BuildRequires qt6-*.
+# Upstream belum punya tag/release, jadi workflow ini mengikuti master: setiap
+# commit baru menghasilkan versi <tanggal>.<git><sha>. Build-nya butuh
+# hyprland-devel yang tidak ada di repo Fedora — itu datang dari repo eksternal
+# copr://lionheartp/Hyprland yang sudah dipasang di project COPR Mindset-Apps.
 
 on:
   schedule:
@@ -15,10 +16,11 @@ on:
         default: false
 
 env:
-  APP_NAME:       "omafont"
-  GITHUB_REPO:    "28allday/omafont-app"
+  APP_NAME:       "phantomat-git"
+  GH_PROJECT:     "djeddi-yacine/phantomat"
+  BRANCH:         "main"
   COPR_PROJECT:   "Mindset-Apps"
-  SPEC_FILE:      "specs/omafont.spec"
+  SPEC_FILE:      "specs/phantomat-git.spec"
 
 jobs:
   check-and-build:
@@ -26,20 +28,25 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Get upstream latest tag
+      - name: Get upstream latest commit
         id: upstream
         run: |
           set -euo pipefail
-          TAG=$(curl -fsSL --retry 3 \
+          API="https://api.github.com/repos/${{ env.GH_PROJECT }}/commits?sha=${{ env.BRANCH }}&per_page=1"
+          # Token bawaan workflow menaikkan kuota API dari 60 ke 5000 req/jam,
+          # supaya tidak kena HTTP 403/422 saat runner berbagi IP.
+          COMMIT=$(curl -fsSL --retry 3 --retry-all-errors \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ github.token }}" \
-            "https://api.github.com/repos/${{ env.GITHUB_REPO }}/tags?per_page=30" \
-            | jq -r '[.[].name] | map(select(test("^v?[0-9]+\\.[0-9]+"))) | sort_by(.) | last // empty')
-          [ -n "$TAG" ] || { echo "no tag found"; exit 1; }
-          VER="${TAG#v}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+            "$API")
+          SHA=$(jq -r '.[0].sha' <<<"$COMMIT")
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid SHA from GitHub: $SHA"; exit 1; }
+          DATE=$(jq -r '.[0].commit.committer.date' <<<"$COMMIT" | cut -c1-10 | tr -d '-')
+          SHORT="${SHA:0:8}"
+          VER="${DATE}.git${SHORT}"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
           echo "version=$VER" >> "$GITHUB_OUTPUT"
-          echo "▶ Upstream: $TAG"
+          echo "▶ Upstream: $VER ($SHORT)"
 
       - name: Get current COPR version
         id: copr
@@ -59,18 +66,21 @@ jobs:
           UP="${{ steps.upstream.outputs.version }}"
           CP="${{ steps.copr.outputs.version }}"
           if [ "${{ inputs.force }}" = "true" ]; then
-            echo "🔨 Force build diminta (versi $UP)"; echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "🔨 Force build diminta (versi $UP)"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           elif [ "$UP" = "$CP" ]; then
-            echo "✅ Up-to-date ($UP), skip."; echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🆕 Update $CP → $UP"; echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install dependencies
         if: steps.check.outputs.skip == 'false'
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y rpm cpio curl jq git
+          sudo apt-get install -y rpm build-essential wget jq
           pip install copr-cli --quiet
 
       - name: Download source tarball
@@ -78,16 +88,25 @@ jobs:
         run: |
           set -euo pipefail
           VER="${{ steps.upstream.outputs.version }}"
-          TAG="${{ steps.upstream.outputs.tag }}"
+          SHA="${{ steps.upstream.outputs.sha }}"
+          FILENAME="${APP_NAME}-${VER}.tar.gz"
           curl -fsSL --retry 3 \
-            "https://github.com/${{ env.GITHUB_REPO }}/archive/refs/tags/${TAG}.tar.gz" \
-            -o upstream.tar.gz
-          mkdir -p pkg
-          tar -xzf upstream.tar.gz -C pkg --strip-components=1
-          [ -s "pkg/omafont.pro" ] || { echo "missing omafont.pro"; exit 1; }
-          mv pkg "omafont-${VER}"
-          tar -czf "omafont-${VER}.tar.gz" "omafont-${VER}"
-          echo "TARBALL=omafont-${VER}.tar.gz" >> "$GITHUB_ENV"
+            "https://github.com/${{ env.GH_PROJECT }}/archive/${SHA}.tar.gz" \
+            -o "$FILENAME"
+          mkdir -p extract
+          tar -xzf "$FILENAME" -C extract
+          mapfile -t TOP < <(find extract -mindepth 1 -maxdepth 1 -type d)
+          [ "${#TOP[@]}" -eq 1 ] || { echo "expected 1 top dir, got ${#TOP[@]}"; exit 1; }
+          mv "${TOP[0]}" "${APP_NAME}-${VER}"
+          tar -czf "$FILENAME" "${APP_NAME}-${VER}"
+          echo "FILENAME=$FILENAME" >> "$GITHUB_ENV"
+          echo "▶ $FILENAME ($SHA)"
+          # Berkas yang dirujuk spec dan Makefile. Kalau upstream memindahkannya,
+          # build berhenti di sini, bukan di tengah build COPR.
+          for f in Makefile LICENSE README.md scripts/generate-plugin-version.sh \
+                   examples/spatialoverview.lua; do
+            [ -s "${APP_NAME}-${VER}/$f" ] || { echo "missing required file: $f"; exit 1; }
+          done
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -98,7 +117,7 @@ jobs:
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
-          cp "$TARBALL" ~/rpmbuild/SOURCES/
+          cp "$FILENAME" ~/rpmbuild/SOURCES/
           rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> "$GITHUB_OUTPUT"
@@ -131,7 +150,12 @@ jobs:
           printf '%s\n' "$OUT"
           BID=$(printf '%s\n' "$OUT" | grep -oE 'Created builds: [0-9]+' | grep -oE '[0-9]+' | head -1)
           echo "build_id=${BID:-unknown}" >> "$GITHUB_OUTPUT"
-          if [ "$RC" -eq 0 ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::error::Build COPR ${BID:-unknown} gagal, log chroot akan ditampilkan di bawah"; fi
+          if [ "$RC" -eq 0 ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Build COPR ${BID:-unknown} gagal, log chroot akan ditampilkan di bawah"
+          fi
           exit $RC
 
       - name: Dump COPR chroot log
