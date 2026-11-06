@@ -75,6 +75,45 @@ BuildRequires:  turbojpeg-devel
 BuildRequires:  libevdev-devel
 BuildRequires:  wayland-devel
 
+# CMakeLists.txt baris 34: pkg_check_modules(XKBCOMMON REQUIRED IMPORTED_TARGET
+# xkbcommon). libevdev hanya memberi keycode mentah; nama tombolnya diambil
+# dari xkbcommon memakai layout pengguna. Selama ini .pc ini ikut terpasang
+# sebagai dependensi transitif qt6-qtbase-devel, jadi build lama tetap jalan
+# walau tidak disebut. Sekarang disebut eksplisit supaya build tidak
+# bergantung pada rantai dependensi paket lain yang bisa berubah.
+BuildRequires:  libxkbcommon-devel
+
+# CMakeLists.txt baris 37 (REQUIRED IMPORTED_TARGET):
+#   pkg_check_modules(GPU_CAPTURE REQUIRED IMPORTED_TARGET
+#                     gbm libdrm libva libavcodec libavformat libavfilter
+#                     libavutil)
+#
+# Sejak 2026-11-05 upstream memindahkan screen capture ke
+# crates/omareel_record/csrc/gpu_capture.c: buffer GBM, encode VA-API, dan
+# FFmpeg. build.rs crate itu memanggil pkg-config untuk ketujuh .pc tersebut,
+# jadi ketujuhnya harus ada saat tahap cmake (CMakeLists.txt) DAN saat cargo
+# mengompilasi gpu_capture.c. Tanpa ini configure berhenti dengan
+# "The following required packages were not found: gbm libdrm libva
+# libavcodec libavformat libavfilter libavutil" — kegagalan COPR 2026-11-05
+# dan 2026-11-06.
+#
+# Nama .pc → nama paket Fedora: gbm → mesa-libgbm-devel, libdrm → libdrm-devel,
+# libva → libva-devel. Ketujuh .pc FFmpeg disediakan ffmpeg-free-devel
+# (paket meta yang menarik libavcodec-free-devel, libavformat-free-devel,
+# libavfilter-free-devel, dan libavutil-free-devel).
+#
+# ffmpeg-free-devel, bukan ffmpeg-devel: build GPL penuh hanya ada di repo
+# pihak ketiga (RPM Fusion/rakuos) yang tidak dipakai chroot COPR, jadi
+# menyebutnya akan gagal dengan "No match for argument: ffmpeg-devel".
+# ffmpeg-free adalah build LGPL tanpa codec non-free; header/API-nya sama,
+# dan karena omareel sendiri MIT, menautkan LGPL tidak mengubah lisensi paket.
+# Konsekuensinya encoder non-free (mis. H.264 lewat x264) tidak tersedia —
+# untuk merekam layar, encoder VA-API (h264_vaapi/hevc_vaapi) tetap ada.
+BuildRequires:  mesa-libgbm-devel
+BuildRequires:  libdrm-devel
+BuildRequires:  libva-devel
+BuildRequires:  ffmpeg-free-devel
+
 # wayland-protocols-devel tidak lagi dibutuhkan: wayland-scanner/XForm di
 # jalur C++ sudah hilang, dan protokol capture sekarang datang dari crate
 # wayland-protocols (fitur "staging") yang isinya dibawa crates.io, bukan XML
@@ -93,6 +132,12 @@ Requires:       qt6-qtbase-gui
 Requires:       qt6-qtdeclarative
 Requires:       qt6-qtmultimedia
 Requires:       qt6-qtsvg
+
+# gbm, libdrm, libva, dan FFmpeg sengaja TIDAK ditulis manual di sini: rpmbuild
+# sudah menghasilkan Requires dari soname (libgbm.so.1, libdrm.so.2,
+# libva.so.2, libavcodec.so.*, dst). Itu lebih tepat daripada mengunci nama
+# paket, karena pengguna yang punya ffmpeg penuh dari RPM Fusion tetap bisa
+# memakai paket ini tanpa dipaksa memasang ffmpeg-free.
 
 # Plugin Hyprland (capture-exclusion) tidak dikunci sebagai BuildRequires
 # hyprland-devel: CMakeLists.txt memakai pkg_check_modules(HYPRLAND QUIET
@@ -153,6 +198,16 @@ update-desktop-database -q >/dev/null 2>&1 || :
 %{_datadir}/icons/hicolor/*/apps/omareel.png
 
 %changelog
+* Fri Nov 06 2026 Mindset Apps <mindset@example.com> - 20261106.git0000000-1
+- BuildRequires mesa-libgbm-devel, libdrm-devel, libva-devel, and
+  ffmpeg-free-devel: upstream moved screen capture to
+  crates/omareel_record/csrc/gpu_capture.c, and CMakeLists.txt now calls
+  pkg_check_modules(GPU_CAPTURE REQUIRED ...) for gbm, libdrm, libva, and the
+  FFmpeg libraries. COPR builds since 2026-11-05 failed at configure with
+  "The following required packages were not found".
+- BuildRequires libxkbcommon-devel explicitly instead of relying on
+  qt6-qtbase-devel pulling it in transitively.
+
 * Mon Oct 26 2026 Mindset Apps <mindset@example.com> - 20261026.git742abda5-1
 - BuildRequires corrosion, rust, and cargo: upstream moved its program logic
   to Rust crates (CXX-Qt 0.10), so CMakeLists.txt now calls
