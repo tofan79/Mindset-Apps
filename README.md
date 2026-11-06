@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-52 packages total, all with successful COPR builds.
+53 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -63,6 +63,7 @@ Packages are listed alphabetically.
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) | Orca IDE — Multimodal AI-native code editor | — |
 | `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) | Oxanium variable display font (Google Fonts) | font variabel, font "important" iNiR |
 | `phosphor-icons-fonts` | [phosphor-icons/web](https://github.com/phosphor-icons/web) | Phosphor icon family fonts | 6 weight ikon, dipakai ambxst |
+| `phantomat-git` | [djeddi-yacine/phantomat](https://github.com/djeddi-yacine/phantomat) (port Hyprland 0.57, fork djeddi) | Zoomable infinite-canvas overview plugin for Hyprland (daily git build) | — |
 | `rakuos-bootstrap` | [tofan79/rakuos-bootstrap](https://github.com/tofan79/rakuos-bootstrap) | Wizard pasca-install untuk RakuOS minimal | wizard pasca-install RakuOS minimal, release tag |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) | Pick the desktop shell (Noctalia/DMS/Caelestia/Ambxst) on Hyprland | Rust + GTK4; pilih desktop shell di atas Hyprland |
 | `sekaipop-shell` | [Blapples/SekaiPop](https://github.com/Blapples/SekaiPop) | SekaiPop Quickshell desktop shell for Hyprland | payload Quickshell Project Sekai untuk Hyprland; daily git build |
