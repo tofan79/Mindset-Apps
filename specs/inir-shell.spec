@@ -21,7 +21,7 @@ Version:        %{pkg_version}
 # 2.33.0-2 sudah ada di COPR; -3 adalah build pertama yang membawa chmod
 # rekursif di %install (script/*.sh|*.fish|*.py jadi 0755). Tanpa ini doctor
 # upstream menyebut 5 script "diperbaiki" padahal /usr immutable menolak chmod.
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        iNiR desktop shell payload, launcher, and user service (Niri/Quickshell)
 BuildArch:      noarch
 
@@ -133,11 +133,9 @@ EOF
 # executable dan mencoba chmod sebagai user biasa ("Operation not permitted").
 # %attr menulis mode ke header RPM langsung, jadi tidak bisa dibatalkan tahap
 # itu.
-%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/completions/inir.fish
-%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/kvantum/adwsvg.py
-%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/kvantum/adwsvgDark.py
-%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/kvantum/changeAdwColors.py
-%attr(0755,root,root) %{_datadir}/quickshell/inir/scripts/systemd/suspend_with_lock.py
+# Lima skrip ini tidak lagi disertakan oleh runtime-payload upstream 3.0.1,
+# jadi baris %attr dihapus supaya rpm tidak gagal pada file yang tidak ada.
+# chmod generik (find ... scripts) di atas tetap berlaku jika file muncul kembali.
 %{_datadir}/quickshell/inir/
 
 %changelog
