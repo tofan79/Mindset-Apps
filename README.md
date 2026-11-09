@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-57 packages total, all with successful COPR builds.
+59 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -36,8 +36,10 @@ Packages are listed alphabetically.
 | `caelestia-cli` | [caelestia-dots/cli](https://github.com/caelestia-dots/cli) | Command line tool for the Caelestia desktop shell | — |
 | `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) | Caelestia desktop shell for Wayland compositors (Quickshell) | bundles libcava + m3shapes |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) | Colloid GTK and icon themes | https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants |
+| `disktree` | [tobi/disktree](https://github.com/tobi/disktree) | Interactive disk-usage treemap for Wayland/Hyprland | Rust + GPUI; build via `cargo xtask` |
 | `end4-pc` | [pctrade/end4-pC](https://github.com/pctrade/end4-pC) | end4-pC Quickshell shell config (fork of dots-hyprland ii) | config Quickshell fork dots-hyprland untuk Hyprland; base: `illogical-impulse` |
 | `gabarito-fonts` | [google/fonts](https://github.com/google/fonts) | Gabarito variable display font (Google Fonts) | font variabel, font "important" iNiR |
+| `gliff` | [omacom/gliff](https://github.com/omacom/gliff) | Remote desktop for Hyprland over SSH with GPU H.264 | Hyprland on both ends; MIT + BSD-2-Clause |
 | `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) | macOS Mission Control-style overview plugin for Hyprland (daily git build) | daily git build |
 | `hydra-download-manager` | [ja7ad/hydra](https://github.com/ja7ad/hydra) | Hydra Download Manager — fast multi-connection download accelerator (GUI + CLI + browser integration) | package renamed from `hydra` to avoid conflict with THC-Hydra; fetches official plugins bundle from release |
 | `hype` | [omacom/hype](https://github.com/omacom/hype) | Hype — simple Markdown presentations with visual slide editor | Qt6 + qmake6; runtime ffmpeg/source-highlight |
