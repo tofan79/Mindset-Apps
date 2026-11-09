@@ -15,6 +15,7 @@ BuildRequires:  rust
 BuildRequires:  cargo
 BuildRequires:  nasm
 BuildRequires:  pkgconfig
+BuildRequires:  dbus-devel
 BuildRequires:  gtk4-devel
 BuildRequires:  libadwaita-devel
 BuildRequires:  libdrm-devel
