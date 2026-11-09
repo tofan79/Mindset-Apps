@@ -33,7 +33,13 @@ what fills your disk. Runs as a Wayland desktop app.
 make build
 
 %install
-make install PREFIX=%{buildroot}%{_prefix}
+install -Dm755 target/portable/disktree %{buildroot}%{_bindir}/disktree
+install -Dm644 assets/disktree.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/disktree.svg
+mkdir -p %{buildroot}%{_datadir}/applications
+VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+sed -e 's|@BINDIR@|%{_bindir}|' -e "s|@VERSION@|$VERSION|" \
+  packaging/disktree.desktop.in > %{buildroot}%{_datadir}/applications/disktree.desktop
+install -Dpm0644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 
 %post
 update-desktop-database -q %{_datadir}/applications >/dev/null 2>&1 || :
