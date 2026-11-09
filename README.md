@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-55 packages total, all with successful COPR builds.
+57 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -61,6 +61,7 @@ Packages are listed alphabetically.
 | `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) | Keyboard-first presentation editor and presenter | daily git build |
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) | Dead-simple Markdown writing app built with Qt Quick | — |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | ONLYOFFICE Desktop Editors | — |
+| `omasnap` | [omacom/omasnap](https://github.com/omacom/omasnap) | Native Wayland screenshot and annotation editor for Hyprland | — (Wayland + Hyprland) |
 | `openidea` | [l0ng-ai/openidea](https://github.com/l0ng-ai/openidea) | Open-source IDE inspired by IntelliJ IDEA | repack RPM x86_64 upstream; IDE Tauri/WebKit |
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) | Orca IDE — Multimodal AI-native code editor | — |
 | `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) | Oxanium variable display font (Google Fonts) | font variabel, font "important" iNiR |
@@ -69,6 +70,7 @@ Packages are listed alphabetically.
 | `rakuos-bootstrap` | [tofan79/rakuos-bootstrap](https://github.com/tofan79/rakuos-bootstrap) | Wizard pasca-install untuk RakuOS minimal | wizard pasca-install RakuOS minimal, release tag |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) | Pick the desktop shell (Noctalia/DMS/Caelestia/Ambxst) on Hyprland | Rust + GTK4; pilih desktop shell di atas Hyprland |
 | `sekaipop-shell` | [Blapples/SekaiPop](https://github.com/Blapples/SekaiPop) | SekaiPop Quickshell desktop shell for Hyprland | payload Quickshell Project Sekai untuk Hyprland; daily git build |
+| `signed` | [omacom/signed](https://github.com/omacom/signed) | Sign PDFs and fill them in with text and dates | — |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) | Software Center — install and manage apps, Flatpaks, and system updates | — |
 | `sonora` | [sonorahq/sonora](https://github.com/sonorahq/sonora) | Native music streaming client built with Rust and GPUI | repack AppImage x86_64 upstream |
 | `stirling-pdf` | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) | Stirling PDF — Locally hosted web app for PDF operations | — |
