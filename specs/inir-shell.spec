@@ -21,7 +21,7 @@ Version:        %{pkg_version}
 # 2.33.0-2 sudah ada di COPR; -3 adalah build pertama yang membawa chmod
 # rekursif di %install (script/*.sh|*.fish|*.py jadi 0755). Tanpa ini doctor
 # upstream menyebut 5 script "diperbaiki" padahal /usr immutable menolak chmod.
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        iNiR desktop shell payload, launcher, and user service (Niri/Quickshell)
 BuildArch:      noarch
 
@@ -32,6 +32,7 @@ Source0:        %{name}-%{version}.tar.gz
 # runtime-payload.py menyalurkan payload lewat rsync (include/exclude dari
 # sdata/runtime-payload-dirs.txt + runtime-root-files.txt).
 BuildRequires:  rsync
+BuildRequires:  jq
 BuildRequires:  python3
 
 # Dipakai %%{_userunitdir} di %install/%files. Tanpa paket ini rpmbuild di
@@ -80,7 +81,7 @@ picker, bukan oleh resolver rpm.
 
 %install
 %{__install} -d %{buildroot}%{_datadir}/quickshell
-python3 sdata/lib/runtime-payload.py copy --root . --target %{buildroot}%{_datadir}/quickshell/inir
+source sdata/lib/runtime-payload.sh && runtime_payload copy --root . --target %{buildroot}%{_datadir}/quickshell/inir
 
 chmod 0755 %{buildroot}%{_datadir}/quickshell/inir/setup
 find %{buildroot}%{_datadir}/quickshell/inir/scripts -type f \

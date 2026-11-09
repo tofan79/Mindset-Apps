@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-53 packages total, all with successful COPR builds.
+54 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 
@@ -39,6 +39,7 @@ Packages are listed alphabetically.
 | `end4-pc` | [pctrade/end4-pC](https://github.com/pctrade/end4-pC) | end4-pC Quickshell shell config (fork of dots-hyprland ii) | config Quickshell fork dots-hyprland untuk Hyprland; base: `illogical-impulse` |
 | `gabarito-fonts` | [google/fonts](https://github.com/google/fonts) | Gabarito variable display font (Google Fonts) | font variabel, font "important" iNiR |
 | `gloview-git` | [fedsfarm/gloview](https://github.com/fedsfarm/gloview) | macOS Mission Control-style overview plugin for Hyprland (daily git build) | daily git build |
+| `hydra-download-manager` | [ja7ad/hydra](https://github.com/ja7ad/hydra) | Hydra Download Manager — fast multi-connection download accelerator (GUI + CLI + browser integration) | package renamed from `hydra` to avoid conflict with THC-Hydra; fetches official plugins bundle from release |
 | `hyprfm` | [soyeb-jim285/hyprfm](https://github.com/soyeb-jim285/hyprfm) | Fast keyboard-friendly file manager for Hyprland | build source tag CMake/Qt6 + submodule Quill/quill-icons |
 | `hyprland-preview-share-picker` | [WhySoBad/hyprland-preview-share-picker](https://github.com/WhySoBad/hyprland-preview-share-picker) | Alternative share picker for Hyprland with window and monitor previews | — |
 | `illogical-impulse` | [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) | Quickshell-based Hyprland desktop shell (dots-hyprland snapshot) | snapshot master shell Quickshell "ii" untuk Hyprland; base untuk `end4-pc` |
