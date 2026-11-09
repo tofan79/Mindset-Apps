@@ -21,7 +21,7 @@ Version:        %{pkg_version}
 # 2.33.0-2 sudah ada di COPR; -3 adalah build pertama yang membawa chmod
 # rekursif di %install (script/*.sh|*.fish|*.py jadi 0755). Tanpa ini doctor
 # upstream menyebut 5 script "diperbaiki" padahal /usr immutable menolak chmod.
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        iNiR desktop shell payload, launcher, and user service (Niri/Quickshell)
 BuildArch:      noarch
 
@@ -91,7 +91,7 @@ find %{buildroot}%{_datadir}/quickshell/inir/scripts -type f \
 %{__install} -Dpm 0644 assets/systemd/inir.service %{buildroot}%{_userunitdir}/inir.service
 %{__install} -Dpm 0644 assets/applications/inir.desktop %{buildroot}%{_datadir}/applications/inir.desktop
 %{__install} -Dpm 0644 assets/applications/inir-settings.desktop %{buildroot}%{_datadir}/applications/inir-settings.desktop
-%{__install} -Dpm 0644 assets/icons/desktop-symbolic.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/inir.svg
+%{__install} -Dpm 0644 assets/icons/inir.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/inir.svg
 
 # version.json dibaca `inir version/update/doctor`. Adaptasi dari PKGBUILD
 # package(): packageManager dnf, tanpa libalpm hook (tidak ada padanan Fedora).
