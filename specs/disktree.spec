@@ -17,6 +17,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  vulkan-headers
 BuildRequires:  libxkbcommon-devel
+BuildRequires:  libxkbcommon-x11-devel
 BuildRequires:  libxcb-devel
 BuildRequires:  gtk4-devel
 
