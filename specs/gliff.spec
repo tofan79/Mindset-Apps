@@ -9,6 +9,8 @@ License:        MIT AND BSD-2-Clause
 URL:            https://github.com/omacom/gliff
 Source0:        %{name}-%{version}.tar.gz
 
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  rust
 BuildRequires:  cargo
 BuildRequires:  nasm
