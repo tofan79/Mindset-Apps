@@ -1,7 +1,10 @@
 Name:           hype
 Version:        %{pkg_version}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Simple Markdown presentations with a visual slide editor
+
+# Hindari kegagalan debugsourcefiles.list kosong di COPR.
+%global debug_package %{nil}
 
 License:        MIT
 URL:            https://github.com/omacom/hype
