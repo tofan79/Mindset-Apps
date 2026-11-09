@@ -1,6 +1,6 @@
 Name:           hype
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Simple Markdown presentations with a visual slide editor
 
 License:        MIT
@@ -29,7 +29,7 @@ integration.
 mkdir -p build
 cd build
 qmake6 ../hype.pro
-make -j%{?_smp_mflags}
+make %{?_smp_mflags}
 
 %install
 install -Dpm0755 build/hype %{buildroot}%{_bindir}/hype
