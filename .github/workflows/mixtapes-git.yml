@@ -34,9 +34,11 @@ jobs:
           SHORT="${SHA:0:8}"
           # Upstream belum punya tag/release, jadi versi Cargo.toml dipakai
           # sebagai awalan dan tanggal+sha menjaga urutan antar build.
-          CARGO=$(curl -fsSL --retry 3 \
-            "https://raw.githubusercontent.com/${{ env.GH_PROJECT }}/${SHA}/Cargo.toml" \
-            | grep -m1 '^version = ' | cut -d'"' -f2)
+          # Simpan ke file dulu: `curl | grep -m1` membuat grep menutup pipe
+          # lebih awal sehingga curl gagal dengan exit 23 (Failed writing body).
+          curl -fsSL --retry 3 -o /tmp/upstream-Cargo.toml \
+            "https://raw.githubusercontent.com/${{ env.GH_PROJECT }}/${SHA}/Cargo.toml"
+          CARGO=$(grep -m1 '^version = ' /tmp/upstream-Cargo.toml | cut -d'"' -f2)
           [[ -n "$CARGO" ]] || { echo "version not found in Cargo.toml"; exit 1; }
           VER="${CARGO}.${DATE}.git${SHORT}"
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"

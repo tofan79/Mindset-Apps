@@ -41,6 +41,7 @@ BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  qt6-qtsvg-devel
 BuildRequires:  qt6-qtmultimedia-devel
+BuildRequires:  qt6-qtshadertools-devel
 
 # "GuiPrivate" tidak diekspos paket qt6-qtbase-devel biasa — header privatnya
 # ada di paket tersendiri. Tanpa BuildRequires ini, find_package(Qt6 ...
