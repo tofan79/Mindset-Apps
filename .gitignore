@@ -1,5 +1,13 @@
 # amp-desktop sengaja tidak pernah masuk repo ini: distribusi ulang paketnya
 # melanggar ketentuan layanan upstream. File-nya boleh ada di mesin lokal untuk
 # eksperimen, tapi tidak boleh ikut ter-commit, apalagi ter-push.
+# amp-desktop: payload proprietary juga — helper build lokal, bukan untuk repo.
+local/amp-desktop/
 specs/amp-desktop.spec
 .github/workflows/amp-desktop.yml
+
+# superwhisper: aturan yang sama — payload proprietary, build lokal saja.
+# Jangan commit, jangan push, jangan COPR.
+specs/superwhisper.spec
+.github/workflows/superwhisper.yml
+local/superwhisper/
