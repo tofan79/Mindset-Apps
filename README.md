@@ -19,7 +19,8 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-59 packages total, all with successful COPR builds.
+60 packages total (59 with successful COPR builds; `folio-omacom` awaits its
+first build).
 
 Packages are listed alphabetically.
 
@@ -37,6 +38,7 @@ Packages are listed alphabetically.
 | `caelestia-shell` | [caelestia-dots/shell](https://github.com/caelestia-dots/shell) | Caelestia desktop shell for Wayland compositors (Quickshell) | bundles libcava + m3shapes |
 | `colloid-theme` | [Colloid GTK](https://github.com/vinceliuice/Colloid-gtk-theme) | Colloid GTK and icon themes | https://github.com/vinceliuice/Colloid-icon-theme) (git `main` snapshots, all variants |
 | `disktree` | [tobi/disktree](https://github.com/tobi/disktree) | Interactive disk-usage treemap for Wayland/Hyprland | Rust + GPUI; build via `cargo xtask` |
+| `folio-omacom` | [omacom/folio](https://github.com/omacom/folio) | Files — Omarchy's file manager: quiet, keyboard-first, theme-following (grid/list/columns, previews, plugins) | renamed from `folio` to avoid clash with Fedora's `folio` (GNOME Markdown notes); binary + data paths stay upstream (`/usr/bin/folio`, `/usr/share/folio/plugins`); build from release tag, CMake/Qt6 |
 | `end4-pc` | [pctrade/end4-pC](https://github.com/pctrade/end4-pC) | end4-pC Quickshell shell config (fork of dots-hyprland ii) | config Quickshell fork dots-hyprland untuk Hyprland; base: `illogical-impulse` |
 | `gabarito-fonts` | [google/fonts](https://github.com/google/fonts) | Gabarito variable display font (Google Fonts) | font variabel, font "important" iNiR |
 | `gliff` | [omacom/gliff](https://github.com/omacom/gliff) | Remote desktop for Hyprland over SSH with GPU H.264 | Hyprland on both ends; MIT + BSD-2-Clause |
