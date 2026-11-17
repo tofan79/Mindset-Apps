@@ -57,12 +57,25 @@ rm -f %{buildroot}%{_datadir}/hyprfm/src/qml/Quill/LICENSE
 %license LICENSE
 %doc README.md
 %{_bindir}/hyprfm
+# sejak v0.7.1 hulu juga memasang backend file-chooser xdg-desktop-portal.
+%{_bindir}/xdg-desktop-portal-hyprfm
+%{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.hyprfm.service
+%{_datadir}/systemd/user/xdg-desktop-portal-hyprfm.service
+%{_datadir}/xdg-desktop-portal/portals/hyprfm.portal
+# COPR tidak selalu menghasilkan subpaket debuginfo; jangan biarkan file
+# debug yang tertinggal di buildroot bikin check-files gagal.
+%exclude /usr/lib/debug/usr/bin/xdg-desktop-portal-hyprfm-*.debug
 %{_datadir}/hyprfm/
 %{_datadir}/applications/io.github.soyeb_jim285.HyprFM.desktop
 %{_datadir}/icons/hicolor/scalable/apps/io.github.soyeb_jim285.HyprFM.svg
 %{_datadir}/metainfo/io.github.soyeb_jim285.HyprFM.metainfo.xml
 
 %changelog
+* Tue Nov 17 2026 Mindset Apps <mindset@example.com> - 0.7.1-2
+- Masukkan file backend portal v0.7.1 (binary, DBus, unit systemd, dan
+  definisi portal) ke %files; abaikan sisa file debug bila debuginfo
+  tidak dibuat oleh COPR.
+
 * Wed Oct 21 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
 - Ganti repack AppImage dengan build source tag upstream: CMake + Qt6,
   Quill dan quill-icons dari commit submodule yang di-pin tag.

@@ -70,7 +70,10 @@ Built from the upstream release tag; no vendor binary is bundled.
 
 %build
 %cmake -G Ninja
-%cmake_build
+# v0.5.0 oleh-oleh test upstream memanggil QDragEnterEvent(QPointF, ...) yang
+# tidak lagi ada di Qt 6.11. Aplikasinya sendiri tidak memakai konstruktor itu;
+# bangun hanya target `folio` supaya test yang usang tidak menggagalkan rpm.
+%__cmake --build %{__cmake_builddir} --target folio
 
 %install
 # Upstream tidak punya aturan install() di CMake, jadi pemasangan mengikuti
@@ -80,6 +83,13 @@ install -Dm755 %{_vpath_builddir}/folio %{buildroot}%{_bindir}/folio
 install -Dm644 share/folio.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/folio.svg
 install -Dm644 share/folio.desktop %{buildroot}%{_datadir}/applications/folio.desktop
 install -Dm644 docs/plugins.md %{buildroot}%{_docdir}/%{name}/plugins.md
+# v0.5.0 juga menyediakan backend FileChooser untuk xdg-desktop-portal.
+# File-nya dipakai saat pengguna memilih `folio` di portals.conf, jadi tetap
+# ikut dipasang walaupun secara default belum aktif.
+install -Dm644 share/folio-chooser.desktop %{buildroot}%{_datadir}/applications/folio-chooser.desktop
+install -Dm644 share/folio.portal %{buildroot}%{_datadir}/xdg-desktop-portal/portals/folio.portal
+install -Dm644 share/org.freedesktop.impl.portal.desktop.folio.service \
+    %{buildroot}%{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.folio.service
 
 find plugins -type f | while read -r file; do
     if [ -x "$file" ]; then mode=755; else mode=644; fi
@@ -87,6 +97,7 @@ find plugins -type f | while read -r file; do
 done
 
 desktop-file-validate %{buildroot}%{_datadir}/applications/folio.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/folio-chooser.desktop
 
 %post
 if command -v update-desktop-database >/dev/null 2>&1; then
@@ -110,10 +121,18 @@ fi
 %{_docdir}/%{name}/plugins.md
 %{_bindir}/folio
 %{_datadir}/applications/folio.desktop
+%{_datadir}/applications/folio-chooser.desktop
+%{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.folio.service
 %{_datadir}/icons/hicolor/scalable/apps/folio.svg
+%{_datadir}/xdg-desktop-portal/portals/folio.portal
 %{_datadir}/folio/
 
 %changelog
+* Tue Nov 17 2026 Mindset Apps <mindset@example.com> - 0.5.0-1
+- Bangun hanya target `folio`: test di hulu masih memakai konstruktor
+  QDragEnterEvent(QPointF, ...) yang hilang di Qt 6.11.
+- Pasang backend FileChooser xdg-desktop-portal yang ditambahkan v0.5.0.
+
 * Fri Nov 13 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Paket awal folio-omacom dari tag upstream (CMake + Qt6/QML).
 - Nama diberi akhiran -omacom karena Fedora sudah punya paket `folio`

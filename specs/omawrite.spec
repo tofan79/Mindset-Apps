@@ -8,23 +8,15 @@ Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
 BuildRequires:  gcc-c++
-BuildRequires:  make
-
-# omawrite.pro: QT += core gui widgets printsupport qml quick
-#              quickcontrols2 quickdialogs2 dbus
-# core/gui/widgets/printsupport/dbus ikut qt6-qtbase-devel. qml/quick/
-# quickcontrols2/quickdialogs2 ikut qt6-qtdeclarative-devel (modul
-# QtQuickDialogs2 memang bagian dari qtdeclarative, bukan paket terpisah).
+BuildRequires:  cmake >= 3.21
+BuildRequires:  ninja-build
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 
-# Di Fedora libQt6Quick.so dimiliki paket qt6-qtdeclarative — tidak ada
-# paket "qt6-qtbase-quick". Verified against the F44 repo list.
-#
-# QT += widgets tidak butuh paket terpisah: Fedora memecah qtbase menjadi
-# sub-paket (common/devel/gui/ibase/mysql/odbc/postgresql/static) tapi TIDAK
-# punya qt6-qtbase-widgets. libQt6Widgets.so.6() di-provide oleh
-# qt6-qtbase-gui:
+# libQt6Quick.so dimiliki qt6-qtdeclarative — tidak ada paket
+# "qt6-qtbase-quick". libQt6Widgets.so.6() di-provide oleh qt6-qtbase-gui:
+# Fedora memecah qtbase menjadi sub-paket (common/devel/gui/ibase/...), tapi
+# TIDAK punya qt6-qtbase-widgets.
 #   $ rpm -q --provides qt6-qtbase-gui | grep libQt6Widgets
 #   libQt6Widgets.so.6()(64bit)  libQt6Widgets.so.6(Qt_6)(64bit)  ...
 # Jadi cukup Requires: qt6-qtbase-gui — sudah ada di bawah.
@@ -33,7 +25,7 @@ Requires:       qt6-qtdeclarative
 Requires:       xdg-desktop-portal
 Requires:       hicolor-icon-theme
 
-# Font iA Writer Mono (Regular/Italic/Bold/BoldItalic) TIDAK dipasang ke
+# Font IBM Plex Mono (Regular/Italic/Bold/BoldItalic) TIDAK dipasang ke
 # %{_datadir}/fonts. Src memakainya lewat Qt resource system:
 #   src/resources.qrc  → <file alias="fonts/...">../fonts/...</file>
 #   src/main.cpp       → QFontDatabase::addApplicationFont(":/fonts/...")
@@ -47,7 +39,7 @@ Requires:       hicolor-icon-theme
 %description
 Omawrite is a dead-simple Markdown writing app built with Qt Quick and C++.
 It opens a folder of Markdown files, renders them with live preview, and
-follows the system dark/light mode automatically. The bundled iA Writer Mono
+follows the system dark/light mode automatically. The bundled IBM Plex Mono
 font is compiled into the binary as a Qt resource, so no font needs to be
 installed system-wide.
 
@@ -55,17 +47,14 @@ installed system-wide.
 %autosetup -n %{name}-%{version}
 
 %build
-# .pro tidak mendukung build shadow di luar pohon, jadi tidak bisa memakai
-# %make_build dengan BUILDDIR terpisah. PKGBUILD upstream juga membangun
-# di dalam pohon (mkdir build && cd build && qmake6 ../omawrite.pro).
-mkdir -p build
-pushd build
-qmake6 ../omawrite.pro
-%make_build
-popd
+# Sejak v0.7.3 upstream pindah dari qmake ke CMake; omawrite.pro sudah tidak
+# ada di tarball rilis. CMakeLists tidak punya install(), jadi biner tetap
+# dipasang manual di %install.
+%cmake -G Ninja
+%cmake_build
 
 %install
-install -Dm755 build/omawrite %{buildroot}%{_bindir}/omawrite
+install -Dm755 %{_vpath_builddir}/omawrite %{buildroot}%{_bindir}/omawrite
 install -Dm644 pkgbuild/omawrite.desktop \
   %{buildroot}%{_datadir}/applications/omawrite.desktop
 install -Dm644 pkgbuild/omawrite.svg \

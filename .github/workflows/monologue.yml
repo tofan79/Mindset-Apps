@@ -92,12 +92,12 @@ jobs:
             -o "$FILENAME"
           echo "FILENAME=$FILENAME" >> "$GITHUB_ENV"
           echo "▶ $FILENAME ($(du -h "$FILENAME" | cut -f1))"
-          echo "▶ Top-level: $(tar -tzf "$FILENAME" | head -1 | cut -d/ -f1)"
+          echo "▶ Top-level: $(tar -tzf "$FILENAME" | sed -n '1p' | cut -d/ -f1)"
           # %install dan %files butuh semuanya ada; gagal di sini lebih baik
           # daripada gagal aneh di %install.
           D="${APP_NAME}-${VER}"
           tar -xzf "$FILENAME" -C /tmp
-          for f in LICENSE README.md monologue.pro \
+          for f in LICENSE README.md CMakeLists.txt \
                    pkgbuild/monologue.desktop pkgbuild/monologue.svg; do
             [ -s "/tmp/$D/$f" ] || { echo "missing required file: $f"; exit 1; }
           done

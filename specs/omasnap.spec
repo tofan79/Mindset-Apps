@@ -57,6 +57,7 @@ update-desktop-database -q >/dev/null 2>&1 || :
 %license %{_datadir}/licenses/omasnap/*.txt
 %{_bindir}/omasnap
 %{_datadir}/applications/omasnap.desktop
+%{_datadir}/icons/hicolor/scalable/apps/omasnap.svg
 
 %changelog
 * Tue Nov 10 2026 mindset <mindset@copr> - %{pkg_version}-1

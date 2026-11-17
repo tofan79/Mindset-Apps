@@ -8,16 +8,14 @@ Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
 BuildRequires:  gcc-c++
-BuildRequires:  make
-
-# monologue.pro: QT += core gui qml quick quickcontrols2 multimedia dbus
-# concurrent
-# core/gui/dbus/concurrent ikut qt6-qtbase-devel; qml/quick/quickcontrols2
-# ikut qt6-qtdeclarative-devel; multimedia → qt6-qtmultimedia-devel.
+BuildRequires:  cmake >= 3.21
+BuildRequires:  ninja-build
+BuildRequires:  pkgconfig
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  qt6-qtmultimedia-devel
 BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  turbojpeg-devel
 
 # README upstream: "Install ... libpulse" — perekaman mikrofon lewat
 # PulseAudio-compatible server (PipeWire-Pulse pada sistem modern).
@@ -51,16 +49,14 @@ with the system dark/light mode.
 %autosetup -n %{name}-%{version}
 
 %build
-# .pro tidak mendukung build shadow di luar pohon, jadi tidak bisa memakai
-# %make_build dengan BUILDDIR terpisah; PKGBUILD upstream juga di dalam pohon.
-mkdir -p build
-pushd build
-qmake6 ../monologue.pro
-%make_build
-popd
+# Sejak v0.4.0 upstream pindah dari qmake ke CMake; monologue.pro sudah tidak
+# ada di tarball rilis. CMakeLists tidak punya install(), jadi biner tetap
+# dipasang manual di %install.
+%cmake -G Ninja
+%cmake_build
 
 %install
-install -Dm755 build/monologue %{buildroot}%{_bindir}/monologue
+install -Dm755 %{_vpath_builddir}/monologue %{buildroot}%{_bindir}/monologue
 install -Dm644 pkgbuild/monologue.desktop \
   %{buildroot}%{_datadir}/applications/monologue.desktop
 install -Dm644 pkgbuild/monologue.svg \

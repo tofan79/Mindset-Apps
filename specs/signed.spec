@@ -10,8 +10,9 @@ License:        MIT
 URL:            https://github.com/omacom/signed
 Source0:        %{name}-%{version}.tar.gz
 
-BuildRequires:  gcc
-BuildRequires:  make
+BuildRequires:  gcc-c++
+BuildRequires:  cmake >= 3.21
+BuildRequires:  ninja-build
 BuildRequires:  pkgconfig
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
@@ -38,13 +39,14 @@ modified. On Omarchy the interface follows the theme's accent color.
 %autosetup -n %{name}-%{version}
 
 %build
-mkdir -p build
-cd build
-qmake6 ../signed.pro
-make %{?_smp_mflags}
+# Sejak v0.3.2 upstream pindah dari qmake ke CMake; signed.pro sudah tidak
+# ada di tarball rilis. CMakeLists tidak punya install(), jadi biner tetap
+# dipasang manual di %install.
+%cmake -G Ninja
+%cmake_build
 
 %install
-install -Dpm0755 build/signed %{buildroot}%{_bindir}/signed
+install -Dpm0755 %{_vpath_builddir}/signed %{buildroot}%{_bindir}/signed
 install -Dpm0644 pkgbuild/signed.desktop %{buildroot}%{_datadir}/applications/signed.desktop
 install -Dpm0644 pkgbuild/signed.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/signed.svg
 install -Dpm0644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE

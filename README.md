@@ -19,8 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-60 packages total (59 with successful COPR builds; `folio-omacom` awaits its
-first build).
+60 packages total, all with successful COPR builds.
 
 Packages are listed alphabetically.
 

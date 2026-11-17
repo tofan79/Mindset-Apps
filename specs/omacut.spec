@@ -9,7 +9,8 @@ Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:   x86_64
 
 BuildRequires:  gcc-c++
-BuildRequires:  make
+BuildRequires:  cmake >= 3.21
+BuildRequires:  ninja-build
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  qt6-qtmultimedia-devel
@@ -37,20 +38,16 @@ by the ffmpeg command line tool and the interface with Qt Quick.
 %autosetup -n %{name}-%{version}
 
 %build
-mkdir -p build
-cd build
-# Panggil qmake6 langsung; makro qmake6 tidak ada di semua instalasi rpm-build.
-# make_build dipakai apa adanya karena expand-nya adalah make polos tanpa -C,
-# sedangkan qmake6 sudah menulis Makefile di direktori kerja saat ini. Jangan
-# pakai _nproc_build: makro itu tidak terdefinisi di Fedora 44 sehingga
-# make menerima "-j" tanpa angka dan gagal.
-qmake6 ../%{name}.pro
-%make_build
+# Sejak v0.8.0 upstream pindah dari qmake ke CMake; omacut.pro sudah tidak
+# ada di tarball rilis. Bangun hanya target aplikasi: tes upstream memakai
+# QDragEnterEvent(QPointF, ...) yang tidak lagi valid di Qt 6.11 (butuh
+# QPoint), dan tes memang tidak ikut dipasang ke RPM. CMakeLists tidak punya
+# install(), jadi biner tetap dipasang manual di %install.
+%cmake -G Ninja
+%__cmake --build %{__cmake_builddir} --target omacut
 
 %install
-# Tiap section rpm berjalan di shell terpisah yang berakar di source tree, jadi
-# path di install relatif ke root source, bukan ke build/.
-install -Dpm0755 build/omacut %{buildroot}%{_bindir}/omacut
+install -Dpm0755 %{_vpath_builddir}/omacut %{buildroot}%{_bindir}/omacut
 install -Dpm0644 pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omacut.desktop
 install -Dpm0644 pkgbuild/omacut.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/omacut.svg
 install -Dpm0644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
