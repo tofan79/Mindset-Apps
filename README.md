@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-61 packages total (60 with successful COPR builds; `mister-download-manager` awaits its first build).
+62 packages total (60 with successful COPR builds; `mister-download-manager` and `omaview` await their first build).
 
 Packages are listed alphabetically.
 
@@ -66,6 +66,7 @@ Packages are listed alphabetically.
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) | Dead-simple Markdown writing app built with Qt Quick | — |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | ONLYOFFICE Desktop Editors | — |
 | `omasnap` | [omacom/omasnap](https://github.com/omacom/omasnap) | Native Wayland screenshot and annotation editor for Hyprland | — (Wayland + Hyprland) |
+| `omaview` | [omacom/omaview](https://github.com/omacom/omaview) | Omarchy's picture viewer and media player (photos, video, music, grid view) | CMake + Qt6; build dari tag upstream, target app saja |
 | `openidea` | [l0ng-ai/openidea](https://github.com/l0ng-ai/openidea) | Open-source IDE inspired by IntelliJ IDEA | repack RPM x86_64 upstream; IDE Tauri/WebKit |
 | `orca-ide` | [stablyai/orca](https://github.com/stablyai/orca) | Orca IDE — Multimodal AI-native code editor | — |
 | `oxanium-fonts` | [google/fonts](https://github.com/google/fonts) | Oxanium variable display font (Google Fonts) | font variabel, font "important" iNiR |
