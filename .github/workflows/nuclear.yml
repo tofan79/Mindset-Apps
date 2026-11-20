@@ -25,7 +25,7 @@ jobs:
         id: upstream
         run: |
           set -euo pipefail
-          RELEASE_JSON=$(curl -fsSL --retry 3 "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
+          RELEASE_JSON=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -fsSL --retry 3 "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
           TAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty')
           if [ -z "$TAG" ]; then
             TAG=$(git ls-remote --tags "https://github.com/${{ env.GITHUB_REPO }}.git" \

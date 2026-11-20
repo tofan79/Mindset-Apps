@@ -28,8 +28,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          GTK_JSON=$(curl -fsSL --retry 3 "https://api.github.com/repos/${{ env.GTK_REPO }}/commits/main")
-          ICON_JSON=$(curl -fsSL --retry 3 "https://api.github.com/repos/${{ env.ICON_REPO }}/commits/main")
+          GTK_JSON=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -fsSL --retry 3 "https://api.github.com/repos/${{ env.GTK_REPO }}/commits/main")
+          ICON_JSON=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -fsSL --retry 3 "https://api.github.com/repos/${{ env.ICON_REPO }}/commits/main")
           GTK_SHA=$(jq -er '.sha' <<<"$GTK_JSON")
           ICON_SHA=$(jq -er '.sha' <<<"$ICON_JSON")
           GTK_DATE=$(jq -er '.commit.committer.date' <<<"$GTK_JSON" | cut -c1-10 | tr -d '-')

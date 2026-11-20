@@ -29,7 +29,7 @@ jobs:
         id: upstream
         run: |
           set -euo pipefail
-          VER=$(curl -fsSL --retry 3 \
+          VER=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -fsSL --retry 3 \
             "https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/tags?per_page=100" \
             | jq -r '.[].name | ltrimstr("v")' | sort -V | tail -1)
           [ -n "$VER" ] && [ "$VER" != "null" ] || { echo "no tags found"; exit 1; }

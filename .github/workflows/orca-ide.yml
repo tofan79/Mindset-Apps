@@ -25,7 +25,7 @@ jobs:
       - name: Get upstream latest version
         id: upstream
         run: |
-          RELEASE_JSON=$(curl -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
+          RELEASE_JSON=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
           VER=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty' | sed 's/^v//')
           [ -z "$VER" ] && { echo "⚠ No version found — skipping."; echo "skip=true" >> $GITHUB_OUTPUT; exit 0; }
           echo "version=$VER" >> $GITHUB_OUTPUT

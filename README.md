@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-62 packages total (60 with successful COPR builds; `mister-download-manager` and `omaview` await their first build).
+62 packages total (61 with successful COPR builds; `mister-download-manager` awaits its first successful build).
 
 Packages are listed alphabetically.
 
@@ -53,7 +53,7 @@ Packages are listed alphabetically.
 | `localsend` | [localsend/localsend](https://github.com/localsend/localsend) | LocalSend — Share files to nearby devices, no internet needed | — |
 | `material-symbols-fonts` | [google/material-design-icons](https://github.com/google/material-design-icons) | Material Symbols Rounded variable icon font (Google) | variable Rounded icon font |
 | `mixtapes-git` | [m-obeid/Mixtapes](https://github.com/m-obeid/Mixtapes) | Modern, Linux-first YouTube Music player (daily git build) | daily git build; upstream belum punya tag/release |
-| `mister-download-manager` | [anefzaoui/misterdownloadmanager](https://github.com/anefzaoui/misterdownloadmanager) | Mister Download Manager — parallel downloads, torrent, video/gallery grabber, debrid and browser integration | build dari tag dengan cargo/rust Fedora; extension + native-messaging manifest dibuat di spec |
+| `mister-download-manager` | [anefzaoui/misterdownloadmanager](https://github.com/anefzaoui/misterdownloadmanager) | Mister Download Manager — parallel downloads, torrent, video/gallery grabber, debrid and browser integration | repack RPM x86_64 upstream; build Rust dari source selalutimeout di COPR |
 | `monologue` | [omacom/monologue](https://github.com/omacom/monologue) | Theme-synced webcam recorder with a built-in trim editor | — |
 | `nandoroid-shell` | [na-ive/nandoroid-shell](https://github.com/na-ive/nandoroid-shell) | NAnDoroid Quickshell desktop shell for Hyprland | payload Quickshell Material 3 untuk Hyprland; runtime quickshell/matugen manual |
 | `nautilus-open-any-terminal-git` | [Stunkymonkey/nautilus-open-any-terminal](https://github.com/Stunkymonkey/nautilus-open-any-terminal) | Nautilus extension adding a context menu entry for other terminal emulators | daily git build |

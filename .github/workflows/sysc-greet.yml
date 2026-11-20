@@ -32,7 +32,7 @@ jobs:
       - name: Get upstream latest version
         id: upstream
         run: |
-          RELEASE_JSON=$(curl -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
+          RELEASE_JSON=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -s "https://api.github.com/repos/${{ env.GITHUB_REPO }}/releases/latest")
           VER=$(echo "$RELEASE_JSON" | jq -r '.tag_name' | sed 's/^v//')
           # Release upstream tidak menyertakan asset source (hanya paket deb).
           # Source diambil dari arsip git tag; tag memakai prefix "v" (v1.1.11).

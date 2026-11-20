@@ -32,7 +32,7 @@ jobs:
         id: upstream
         run: |
           set -euo pipefail
-          COMMIT=$(curl -fsSL --retry 3 -H "Accept: application/vnd.github+json" \
+          COMMIT=$(curl -H "Authorization: Bearer ${{ github.token }}"  -fsSL --retry 3 -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ env.GH_PROJECT }}/commits/${{ env.BRANCH }}")
           SHA=$(jq -r '.sha' <<<"$COMMIT")
           [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid SHA from GitHub: $SHA"; exit 1; }
@@ -41,7 +41,7 @@ jobs:
           VER="${DATE}.git${SHORT}"
           # Ambil commit submodule shapes pada tree commit ini; entri submodule
           # mengembalikan field .sha (commit yang di-pin), bukan isi berkas.
-          SUB=$(curl -fsSL --retry 3 -H "Accept: application/vnd.github+json" \
+          SUB=$(curl -H "Authorization: Bearer ${{ github.token }}"  -fsSL --retry 3 -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ env.GH_PROJECT }}/contents/${{ env.SHAPES_DIR }}?ref=$SHA")
           SUB_SHA=$(jq -r '.sha' <<<"$SUB")
           [[ "$SUB_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid submodule SHA: $SUB_SHA"; exit 1; }

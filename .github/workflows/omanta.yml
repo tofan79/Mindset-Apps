@@ -25,7 +25,7 @@ jobs:
       - name: Get upstream latest tag
         id: upstream
         run: |
-          VER=$(curl -s "https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/tags" \
+          VER=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -s "https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/tags" \
             | jq -r '.[0].name | ltrimstr("v")')
           [ -z "$VER" ] && VER="0.0.0"
           echo "version=$VER" >> $GITHUB_OUTPUT

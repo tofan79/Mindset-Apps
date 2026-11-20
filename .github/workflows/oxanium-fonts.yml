@@ -42,7 +42,7 @@ jobs:
         id: upstream
         run: |
           set -euo pipefail
-          SHA=$(curl -fsSL --retry 3 "https://api.github.com/repos/${{ env.GH_REPO }}/commits/${{ env.GH_BRANCH }}" | jq -r '.sha')
+          SHA=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -fsSL --retry 3 "https://api.github.com/repos/${{ env.GH_REPO }}/commits/${{ env.GH_BRANCH }}" | jq -r '.sha')
           [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid SHA from GitHub: $SHA"; exit 1; }
           curl -fsSL --retry 3 \
             "https://raw.githubusercontent.com/${{ env.GH_REPO }}/${SHA}/${{ env.FONT_URL_PATH }}" \

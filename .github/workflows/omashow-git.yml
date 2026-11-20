@@ -31,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           API="https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/commits?sha=${{ env.UPSTREAM_BRANCH }}&per_page=1"
-          COMMIT=$(curl -fsSL --retry 3 "$API")
+          COMMIT=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -fsSL --retry 3 "$API")
           SHA=$(jq -r '.[0].sha' <<<"$COMMIT")
           [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid SHA from GitHub: $SHA"; exit 1; }
           DATE=$(jq -r '.[0].commit.committer.date' <<<"$COMMIT" | cut -c1-10 | tr -d '-')

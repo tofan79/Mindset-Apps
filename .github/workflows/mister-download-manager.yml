@@ -1,8 +1,8 @@
 name: "mister-download-manager - COPR Auto Build"
 
-# Build dari tag hulu dengan cargo/rust Fedora 45 (1.99, memenuhi syarat 1.98
-# dari Cargo.toml MDM). Extension browser dan manifest native-messaging dibuat
-# di spec, jadi tidak ada unduhan artefak biner rilis.
+# Repack RPM x86_64 resmi dari halaman release. Build dari source Rust
+# melewati batas waktu chroot COPR, jadi workflow mengunduh RPM yang sudah
+# dibangun upstream, lalu membungkusnya kembali sebagai SRPM Mindset-Apps.
 
 on:
   schedule:
@@ -72,17 +72,20 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y rpm build-essential wget jq
+          sudo apt-get install -y rpm wget jq
           pip install copr-cli --quiet
 
-      - name: Download source tarball
+      - name: Download upstream RPM
         if: steps.check.outputs.skip == 'false'
         run: |
+          set -euo pipefail
           VER="${{ steps.upstream.outputs.version }}"
-          curl -fsSL "https://github.com/${{ env.UPSTREAM_REPO }}/archive/v${VER}/misterdownloadmanager-${VER}.tar.gz" \
-            -o ~/misterdownloadmanager-${VER}.tar.gz
-          echo "▶ Unduhan: $(du -h ~/misterdownloadmanager-${VER}.tar.gz | cut -f1)"
-          echo "▶ Top-level: $(tar -tzf ~/misterdownloadmanager-${VER}.tar.gz | head -1 | cut -d/ -f1)"
+          RPM="MisterDownloadManager-${VER}-linux-x86_64.rpm"
+          curl -fsSL --retry 3 \
+            "https://github.com/${{ env.UPSTREAM_REPO }}/releases/download/v${VER}/${RPM}" \
+            -o "$HOME/${RPM}"
+          echo "▶ Unduhan: $(du -h "$HOME/${RPM}" | cut -f1)"
+          rpm -qp --qf '%{NAME} %{VERSION}-%{RELEASE} %{ARCH}\n' "$HOME/${RPM}"
 
       - name: Build SRPM
         if: steps.check.outputs.skip == 'false'
@@ -92,7 +95,7 @@ jobs:
           mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
           cp ${{ env.SPEC_FILE }} ~/rpmbuild/SPECS/
           sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
-          cp ~/misterdownloadmanager-${VER}.tar.gz ~/rpmbuild/SOURCES/
+          cp "$HOME/MisterDownloadManager-${VER}-linux-x86_64.rpm" ~/rpmbuild/SOURCES/
           rpmbuild -bs ~/rpmbuild/SPECS/${{ env.APP_NAME }}.spec
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm)
           echo "path=$SRPM" >> $GITHUB_OUTPUT

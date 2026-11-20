@@ -26,8 +26,8 @@ jobs:
         id: upstream
         run: |
           API="https://api.github.com/repos/${{ env.GITHUB_REPO }}/commits/${{ env.BRANCH }}"
-          SHA=$(curl -s "$API" | jq -r '.sha')
-          DATE=$(curl -s "$API" | jq -r '.commit.committer.date' | cut -c1-10 | tr -d '-')
+          SHA=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -s "$API" | jq -r '.sha')
+          DATE=$(curl -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json"  -s "$API" | jq -r '.commit.committer.date' | cut -c1-10 | tr -d '-')
           SHORT="${SHA:0:8}"
           VER="${DATE}.git${SHORT}"
           echo "sha=$SHA" >> $GITHUB_OUTPUT
