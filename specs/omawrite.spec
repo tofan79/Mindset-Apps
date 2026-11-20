@@ -11,6 +11,9 @@ BuildRequires:  gcc-c++
 BuildRequires:  cmake >= 3.21
 BuildRequires:  ninja-build
 BuildRequires:  qt6-qtbase-devel
+# CMake memakai find_package(Qt6 ... GuiPrivate) untuk header wl_surface;
+# di Fedora komponen ini ada di qt6-qtbase-private-devel.
+BuildRequires:  qt6-qtbase-private-devel
 BuildRequires:  qt6-qtdeclarative-devel
 
 # libQt6Quick.so dimiliki qt6-qtdeclarative — tidak ada paket
@@ -26,7 +29,7 @@ Requires:       xdg-desktop-portal
 Requires:       hicolor-icon-theme
 
 # Font IBM Plex Mono (Regular/Italic/Bold/BoldItalic) TIDAK dipasang ke
-# %{_datadir}/fonts. Src memakainya lewat Qt resource system:
+# %%{_datadir}/fonts. Src memakainya lewat Qt resource system:
 #   src/resources.qrc  → <file alias="fonts/...">../fonts/...</file>
 #   src/main.cpp       → QFontDatabase::addApplicationFont(":/fonts/...")
 # jadi font-nya tertanam di dalam biner dan dimuat lewat ":". Menyalinnya
