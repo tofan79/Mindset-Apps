@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-62 packages total (61 with successful COPR builds; `mister-download-manager` awaits its first successful build).
+62 packages total (62 with successful COPR builds).
 
 Packages are listed alphabetically.
 
