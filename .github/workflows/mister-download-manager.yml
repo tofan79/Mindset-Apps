@@ -128,13 +128,34 @@ jobs:
           printf '%s\n' "$OUT"
           BID=$(printf '%s\n' "$OUT" | grep -oE 'Created builds: [0-9]+' | grep -oE '[0-9]+' | head -1)
           echo "build_id=${BID:-unknown}" >> "$GITHUB_OUTPUT"
-          if [ "$RC" -eq 0 ]; then
+
+          # copr-cli memantau lewat API yang kadang balas HTML/503 sehingga
+          # keluar non-zero padahal build sudah masuk antrean. Kalau build ID
+          # sudah ada, jangan percaya RC-nya: cek state akhir langsung dari
+          # REST API sampai terminal (maksimal 30 menit).
+          ok=false
+          STATE=unknown
+          if [ -n "$BID" ]; then
+            for _ in $(seq 1 120); do
+              STATE=$(curl -fsSL --retry 3 \
+                "https://copr.fedorainfracloud.org/api_3/build/$BID" \
+                | jq -r '.state // "unknown"' 2>/dev/null || echo unknown)
+              case "$STATE" in
+                succeeded) ok=true; break ;;
+                failed|cancelled|skipped) break ;;
+              esac
+              sleep 15
+            done
+            echo "▶ COPR build $BID state=$STATE"
+          fi
+
+          if [ "$ok" = "true" ]; then
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
             echo "ok=false" >> "$GITHUB_OUTPUT"
-            echo "::error::Build COPR ${BID:-unknown} gagal, log chroot akan ditampilkan di bawah"
+            echo "::error::Build COPR ${BID:-unknown} gagal (state=$STATE), log chroot akan ditampilkan di bawah"
           fi
-          exit $RC
+          [ "$ok" = "true" ]
 
       - name: Dump COPR chroot log
         if: always() && steps.check.outputs.skip == 'false' && steps.submit.outputs.ok == 'false'
