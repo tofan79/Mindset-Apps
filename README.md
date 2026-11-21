@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-62 packages total (62 with successful COPR builds).
+63 packages total (62 with successful COPR builds; `omarchy-hyprland-titlebars` awaits its first build).
 
 Packages are listed alphabetically.
 
@@ -61,6 +61,7 @@ Packages are listed alphabetically.
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) | Fast embeddable browser automation engine with native rendering | — |
 | `omacut` | [omacom/omacut](https://github.com/omacom/omacut) | Dead-simple video length trimmer built with Qt Quick and ffmpeg | — |
 | `omanta` | [28allday/omanta](https://github.com/28allday/omanta) | Native file manager for Omarchy (Qt Quick + GIO) | — |
+| `omarchy-hyprland-titlebars` | [omacom/omarchy-hyprland-titlebars](https://github.com/omacom/omarchy-hyprland-titlebars) | Native Hyprland plugin for Omarchy's floating workspace titlebars | CMake + C++23; build dari tag, Hyprland 0.57.2 dipin, path `/usr/lib/omarchy-hyprland-titlebars/titlebars.so` |
 | `omareel-git` | [omacom/omareel](https://github.com/omacom/omareel) | Minimal, keyboard-driven video cutter for Wayland compositors | daily git build |
 | `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) | Keyboard-first presentation editor and presenter | daily git build |
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) | Dead-simple Markdown writing app built with Qt Quick | — |
