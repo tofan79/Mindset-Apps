@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-63 packages total (62 with successful COPR builds; `omarchy-hyprland-titlebars` awaits its first build).
+63 packages total (63 with successful COPR builds).
 
 Packages are listed alphabetically.
 
