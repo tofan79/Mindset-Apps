@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-64 packages total (63 with successful COPR builds; `serein` menunggu build pertama).
+65 packages total (64 with successful COPR builds; `omabroadcast` menunggu build pertama).
 
 Packages are listed alphabetically.
 
@@ -59,6 +59,7 @@ Packages are listed alphabetically.
 | `nautilus-open-any-terminal-git` | [Stunkymonkey/nautilus-open-any-terminal](https://github.com/Stunkymonkey/nautilus-open-any-terminal) | Nautilus extension adding a context menu entry for other terminal emulators | daily git build |
 | `nuclear` | [nukeop/nuclear](https://github.com/nukeop/nuclear) | Music player for your desktop built with Tauri and WebKit | repack RPM x86_64 upstream |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) | Fast embeddable browser automation engine with native rendering | — |
+| `omabroadcast` | [28allday/omabroadcast](https://github.com/28allday/omabroadcast) | Live production, recording and streaming studio (Qt6/QML) | repack paket Arch x86_64 upstream; FFmpeg 9.1 bundle + helper WebEngine ikut dipasang (Fedora 45+) |
 | `omacut` | [omacom/omacut](https://github.com/omacom/omacut) | Dead-simple video length trimmer built with Qt Quick and ffmpeg | — |
 | `omanta` | [28allday/omanta](https://github.com/28allday/omanta) | Native file manager for Omarchy (Qt Quick + GIO) | — |
 | `omarchy-hyprland-titlebars` | [omacom/omarchy-hyprland-titlebars](https://github.com/omacom/omarchy-hyprland-titlebars) | Native Hyprland plugin for Omarchy's floating workspace titlebars | CMake + C++23; build dari tag, Hyprland 0.57.2 dipin, path `/usr/lib/omarchy-hyprland-titlebars/titlebars.so` |
