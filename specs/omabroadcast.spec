@@ -18,10 +18,14 @@
 # menyediakan libbz2.so.1. Di %install DT_NEEDED diganti memakai patchelf
 # supaya dependency RPM bisa.resolve dan runtime tidak mencari file yang
 # tidak ada di Fedora.
+#
+# Binary juga membawa qt_version_tag@Qt_6.12 (Arch rolling); Fedora 45 punya
+# Qt 6.11. Tag versinya diganti ke Qt_6.11 di %install (same length), karena
+# satu-satunya simbol yang memakai versi itu adalah qt_version_tag.
 
 Name:           omabroadcast
 Version:        %{pkg_version}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Live production, recording and streaming studio for the desktop
 
 License:        MIT AND GPL-3.0-or-later AND GPL-2.0-or-later AND BSD-3-Clause AND MPL-2.0 AND ISC AND Apache-2.0 AND LicenseRef-AOMPL-1.0
@@ -35,6 +39,7 @@ ExclusiveArch:  x86_64
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  patchelf
+BuildRequires:  python3
 
 %description
 OmaBroadcast is a Qt6/QML live-production app for recording, replaying and
@@ -57,6 +62,16 @@ cp -a usr %{buildroot}/
 find %{buildroot}%{_prefix}/lib/%{name}/ffmpeg/lib -type f -name '*.so.*' | while read -r f; do
     if patchelf --print-needed "$f" | grep -qx 'libbz2.so.1.0'; then
         patchelf --replace-needed libbz2.so.1.0 libbz2.so.1 "$f"
+    fi
+done
+
+# Arch menandai qt_version_tag dengan Qt_6.12; Fedora 45 menyediakan Qt_6.11.
+# Hanya tag versi yang diganti (panjang sama), bukan simbol/library.
+for f in %{buildroot}%{_bindir}/omabroadcast \
+         %{buildroot}%{_prefix}/lib/%{name}/omabroadcast-browser; do
+    [ -f "$f" ] || continue
+    if grep -q 'Qt_6.12' "$f"; then
+        python3 -c 'import sys; p=sys.argv[1]; d=open(p,"rb").read(); open(p,"wb").write(d.replace(b"Qt_6.12",b"Qt_6.11"))' "$f"
     fi
 done
 
@@ -86,6 +101,9 @@ fi
 %{_datadir}/icons/hicolor/scalable/apps/omabroadcast.svg
 
 %changelog
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-3
+- Perbaikan: qt_version_tag@Qt_6.12 diganti ke Qt_6.11 (versi Fedora 45).
+
 * Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
 - Perbaikan: DT_NEEDED libbz2.so.1.0 diganti ke libbz2.so.1 (nama soname Fedora).
 - Release dinaikkan supaya RPM lama tidak dipakai ulang dari cache repo.
