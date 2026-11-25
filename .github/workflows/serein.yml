@@ -50,7 +50,7 @@ jobs:
           # RPM Version tidak boleh mengandung '-'. Konversi tanda hubung
           # pertama jadi '~', sama seperti helper packaging upstream.
           VER="${TAG#v}"
-          VER="${VER/-/~}"
+          VER=$(printf '%s' "$VER" | sed 's/-/~/')
           [[ "$VER" =~ ^[0-9]+\.[0-9]+\.[0-9]+(~[A-Za-z0-9.]+)?$ ]] \
             || { echo "invalid version: $VER"; exit 1; }
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
