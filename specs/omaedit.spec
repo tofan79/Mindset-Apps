@@ -33,7 +33,7 @@
 
 Name:           omaedit
 Version:        %{pkg_version}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Video editor with media, edit, colour, audio and delivery workspaces
 
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND BSD-2-Clause AND BSD-3-Clause AND Apache-2.0 AND MIT AND Zlib AND ISC AND OFL-1.1 AND LicenseRef-AOMPL-1.0 AND LicenseRef-Intel-Simplified-Software-License
@@ -63,7 +63,6 @@ Requires:       glslang
 Requires:       spirv-tools
 Requires:       vulkan-loader
 Requires:       ffmpeg-free >= 9
-Requires:       whisper-cpp
 Requires:       udisks2
 Requires:       blas
 Requires:       lapack
@@ -401,3 +400,6 @@ fi
 * Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
 - Ganti nama dependensi Arch ke nama paket Fedora/RakuOS: opus-libs -> opus,
   snappy-libs -> snappy, zlib -> zlib-ng-compat.
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-3
+- Hapus Requires: whisper-cpp; tidak dipakai binary/library apa pun dan
+  menarik seluruh stack ROCm (~5.9 GiB) lewat hipblas/rocblas.
