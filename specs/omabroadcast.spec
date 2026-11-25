@@ -10,6 +10,11 @@
 # Binary membutuhkan glibc sampai 2.44 dan RUNPATH absolut
 # /usr/lib/omabroadcast/ffmpeg/lib, jadi paket ini ditujukan untuk Fedora 45+
 # ( Fedora 45 memakai glibc 2.44 ).
+#
+# FFmpeg bundle upstream menautkan libbz2.so.1.0 (nama soname Arch); Fedora
+# menyediakan libbz2.so.1. Di %install DT_NEEDED diganti memakai patchelf
+# supaya dependency RPM bisa.resolve dan runtime tidak mencari file yang
+# tidak ada di Fedora.
 
 Name:           omabroadcast
 Version:        %{pkg_version}
@@ -26,6 +31,7 @@ Source0:        omabroadcast-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
 BuildRequires:  desktop-file-utils
+BuildRequires:  patchelf
 
 %description
 OmaBroadcast is a Qt6/QML live-production app for recording, replaying and
@@ -42,6 +48,14 @@ recompiled locally.
 rm -rf %{buildroot}
 mkdir -p %{buildroot}
 cp -a usr %{buildroot}/
+
+# libavformat bundle upstream (Arch) meminta libbz2.so.1.0; Fedora memakai
+# libbz2.so.1. Ganti DT_NEEDED-nya supaya dependency RPM bisa resolve.
+find %{buildroot}%{_prefix}/lib/%{name}/ffmpeg/lib -type f -name '*.so.*' | while read -r f; do
+    if patchelf --print-needed "$f" | grep -qx 'libbz2.so.1.0'; then
+        patchelf --replace-needed libbz2.so.1.0 libbz2.so.1 "$f"
+    fi
+done
 
 desktop-file-validate %{buildroot}%{_datadir}/applications/omabroadcast.desktop
 
@@ -73,3 +87,4 @@ fi
 - Paket awal: repack paket Arch x86_64 upstream v0.1.0-62.
 - Versi memakai pkgver.pkgrel agar rebuild pkgrel memicu workflow.
 - FFmpeg bundle, helper WebEngine, dan lisensi pihak ketiga ikut dipasang.
+- Perbaikan: DT_NEEDED libbz2.so.1.0 diganti ke libbz2.so.1 (nama soname Fedora).
