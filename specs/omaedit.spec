@@ -33,7 +33,7 @@
 
 Name:           omaedit
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Video editor with media, edit, colour, audio and delivery workspaces
 
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND BSD-2-Clause AND BSD-3-Clause AND Apache-2.0 AND MIT AND Zlib AND ISC AND OFL-1.1 AND LicenseRef-AOMPL-1.0 AND LicenseRef-Intel-Simplified-Software-License
@@ -71,12 +71,12 @@ Requires:       tbb
 Requires:       bzip2-libs
 Requires:       xz-libs
 Requires:       lame-libs
-Requires:       opus-libs
-Requires:       snappy-libs
+Requires:       opus
+Requires:       snappy
 Requires:       libva
 Requires:       libdrm
 Requires:       libvorbis
-Requires:       zlib
+Requires:       zlib-ng-compat
 Requires:       lz4-libs
 Recommends:     jetbrains-mono-fonts
 Recommends:     google-noto-fonts
@@ -398,3 +398,6 @@ fi
   dihitung ulang.
 - Shim kompatibilitas overload by-value (&&) Qt 6.12, QObject::disconnect,
   dan QReadWriteLock::destroyRecursiveHelper.
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
+- Ganti nama dependensi Arch ke nama paket Fedora/RakuOS: opus-libs -> opus,
+  snappy-libs -> snappy, zlib -> zlib-ng-compat.
