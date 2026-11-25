@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-65 packages total (64 with successful COPR builds; `omabroadcast` menunggu build pertama).
+65 packages total (65 with successful COPR builds).
 
 Packages are listed alphabetically.
 
