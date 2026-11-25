@@ -1,0 +1,214 @@
+name: "omaedit - COPR Auto Build"
+
+# OmaEdit hanya merilis paket Arch .pkg.tar.zst (plus source tarball), bukan
+# RPM/AppImage. Build dari sumber memakai makepkg/pacman, menarik FFmpeg 9.1
+# saat build, dan mengasumsikan Qt 6.12 yang tidak ada di Fedora 45. Workflow
+# mengambil paket Arch itu, memverifikasi SHA256, lalu specs/omaedit.spec
+# memasang ulang payload-nya sebagai RPM.
+#
+# Semua rilis upstream berstatus prerelease, jadi daftar /releases dipakai,
+# bukan /releases/latest. Versi RPM = <pkgver>.<pkgrel> dari nama asset
+# (mis. 0.2.6-1 → 0.2.6.1) supaya pkgrel baru pada tag yang sama tetap build.
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # tiap hari, jam 07.00 WIB (00:00 UTC)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Build paksa walaupun versi sama (mis. setelah ubah spec)'
+        type: boolean
+        default: false
+
+env:
+  APP_NAME:       "omaedit"
+  UPSTREAM_REPO:  "28allday/omaedit"
+  COPR_PROJECT:   "Mindset-Apps"
+  SPEC_FILE:      "specs/omaedit.spec"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Get upstream release
+        id: upstream
+        run: |
+          set -euo pipefail
+          RELEASES=$(curl -fsSL --retry 3 \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/releases")
+
+          LINE=$(printf '%s' "$RELEASES" | jq -r '
+            [ .[] | select(any(.assets[]?; .name | test("-x86_64\\.pkg\\.tar\\.zst$"))) ][0]
+            | [ .tag_name,
+                ([.assets[] | select(.name | test("-x86_64\\.pkg\\.tar\\.zst$"))][0].name) ]
+            | @tsv')
+          TAG=$(printf '%s' "$LINE" | cut -f1)
+          ASSET=$(printf '%s' "$LINE" | cut -f2)
+          if [ -z "$TAG" ] || [ -z "$ASSET" ] || [ "$TAG" = "null" ] || [ "$ASSET" = "null" ]; then
+            echo "⚠ Tidak ada asset paket Arch x86_64 — skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # omaedit-<pkgver>-<pkgrel>-x86_64.pkg.tar.zst → <pkgver>.<pkgrel>
+          if [[ $ASSET =~ ^omaedit-([0-9][^-]*)-([0-9]+)-x86_64\.pkg\.tar\.zst$ ]]; then
+            VER="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+          else
+            echo "nama asset tak dikenal: $ASSET"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "asset=$ASSET" >> "$GITHUB_OUTPUT"
+          echo "▶ Upstream: $TAG → $VER ($ASSET)"
+
+      - name: Get current COPR version
+        id: copr
+        if: steps.upstream.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          CURRENT=$(curl -fsSL --retry 3 \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        if: steps.upstream.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          UP="${{ steps.upstream.outputs.version }}"
+          REL=$(awk '/^Release:/{print $2; exit}' "${{ env.SPEC_FILE }}" | cut -d% -f1)
+          UP_FULL="$UP-$REL"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "🔨 Force build diminta (versi $UP_FULL)"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          elif [ "$UP_FULL" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP_FULL), skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "🆕 Update $CP → $UP_FULL"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y rpm curl jq zstd
+          pip install copr-cli --quiet
+
+      - name: Download and verify Arch package
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.upstream.outputs.tag }}"
+          ASSET="${{ steps.upstream.outputs.asset }}"
+          BASE="https://github.com/${{ env.UPSTREAM_REPO }}/releases/download/${TAG}"
+          curl -fsSL --retry 3 "$BASE/$ASSET" -o "$ASSET"
+          curl -fsSL --retry 3 "$BASE/SHA256SUMS" -o SHA256SUMS
+          grep -F " $ASSET" SHA256SUMS | sha256sum -c -
+          echo "▶ Paket: $(du -h "$ASSET" | cut -f1) (SHA256 OK)"
+
+      - name: Unpack payload and build source tarball
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          VER="${{ steps.upstream.outputs.version }}"
+          ASSET="${{ steps.upstream.outputs.asset }}"
+          mkdir -p stage/"omaedit-$VER" payload
+          tar --zstd -xf "$ASSET" -C payload
+          rm -f payload/.PKGINFO payload/.MTREE payload/.BUILDINFO
+          for f in usr/bin/omaedit \
+                   usr/share/applications/omaedit.desktop \
+                   usr/share/metainfo/org.omatools.omaedit.metainfo.xml \
+                   usr/share/mime/packages/omaedit-project.xml \
+                   usr/share/licenses/omaedit/LICENSE; do
+            [ -e "payload/$f" ] || { echo "missing payload: $f"; exit 1; }
+          done
+          [ -d payload/usr/lib/omaedit/ffmpeg/lib ] || { echo "missing FFmpeg bundle"; exit 1; }
+          [ -d payload/usr/lib/omaedit/lib ] || { echo "missing carried libs"; exit 1; }
+          mv payload/usr stage/"omaedit-$VER"/usr
+          tar -czf "omaedit-$VER.tar.gz" -C stage "omaedit-$VER"
+          echo "▶ Tarball: $(du -h "omaedit-$VER.tar.gz" | cut -f1)"
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        run: |
+          set -euo pipefail
+          VER="${{ steps.upstream.outputs.version }}"
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp "${{ env.SPEC_FILE }}" ~/rpmbuild/SPECS/
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/"${{ env.APP_NAME }}.spec"
+          cp "omaedit-$VER.tar.gz" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/"${{ env.APP_NAME }}.spec"
+          SRPM=$(find ~/rpmbuild/SRPMS -maxdepth 1 -type f -name '*.src.rpm' -print -quit)
+          [[ -n "$SRPM" ]] || { echo "SRPM was not created"; exit 1; }
+          echo "path=$SRPM" >> "$GITHUB_OUTPUT"
+          echo "▶ SRPM: $SRPM"
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Sync COPR project chroots
+        if: steps.check.outputs.skip == 'false'
+        uses: ./.github/actions/sync-copr-chroots
+        with:
+          project: ${{ env.COPR_PROJECT }}
+
+      - name: Submit to COPR
+        id: submit
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set +e
+          OUT=$(copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }} 2>&1)
+          RC=$?
+          printf '%s\n' "$OUT"
+          BID=$(printf '%s\n' "$OUT" | grep -oE 'Created builds: [0-9]+' | grep -oE '[0-9]+' | head -1)
+          echo "build_id=${BID:-unknown}" >> "$GITHUB_OUTPUT"
+
+          ok=false
+          STATE=unknown
+          if [ -n "$BID" ]; then
+            for _ in $(seq 1 120); do
+              STATE=$(curl -fsSL --retry 3 \
+                "https://copr.fedorainfracloud.org/api_3/build/$BID" \
+                | jq -r '.state // "unknown"' 2>/dev/null || echo unknown)
+              case "$STATE" in
+                succeeded) ok=true; break ;;
+                failed|cancelled|skipped) break ;;
+              esac
+              sleep 15
+            done
+            echo "▶ COPR build $BID state=$STATE"
+          fi
+
+          if [ "$ok" = "true" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Build COPR ${BID:-unknown} gagal (state=$STATE), log chroot akan ditampilkan di bawah"
+          fi
+          [ "$ok" = "true" ]
+
+      - name: Dump COPR chroot log
+        if: always() && steps.check.outputs.skip == 'false' && steps.submit.outputs.ok == 'false'
+        uses: ./.github/actions/dump-copr-log
+        with:
+          build-id: ${{ steps.submit.outputs.build_id }}

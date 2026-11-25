@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-65 packages total (65 with successful COPR builds).
+67 packages total (65 with successful COPR builds; `omaaudio` dan `omaedit` menunggu build COPR pertama).
 
 Packages are listed alphabetically.
 
@@ -59,11 +59,13 @@ Packages are listed alphabetically.
 | `nautilus-open-any-terminal-git` | [Stunkymonkey/nautilus-open-any-terminal](https://github.com/Stunkymonkey/nautilus-open-any-terminal) | Nautilus extension adding a context menu entry for other terminal emulators | daily git build |
 | `nuclear` | [nukeop/nuclear](https://github.com/nukeop/nuclear) | Music player for your desktop built with Tauri and WebKit | repack RPM x86_64 upstream |
 | `obscura` | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) | Fast embeddable browser automation engine with native rendering | — |
+| `omaaudio` | [28allday/omaaudio](https://github.com/28allday/omaaudio) | Audio editor for Omarchy: edit, arrange, repair, mix and deliver sound | repack paket Arch x86_64 upstream v0.2.0-beta.1; shim kompatibilitas Qt 6.12 → 6.11; build dari `/releases` (semua rilis prerelease) |
 | `omabroadcast` | [28allday/omabroadcast](https://github.com/28allday/omabroadcast) | Live production, recording and streaming studio (Qt6/QML) | repack paket Arch x86_64 upstream; FFmpeg 9.1 bundle + helper WebEngine ikut dipasang (Fedora 45+) |
 | `omacut` | [omacom/omacut](https://github.com/omacom/omacut) | Dead-simple video length trimmer built with Qt Quick and ffmpeg | — |
+| `omaedit` | [28allday/omaedit](https://github.com/28allday/omaedit) | Video editor with media, edit, colour, audio and delivery workspaces | repack paket Arch x86_64 upstream v0.2.6; FFmpeg 9.1 + OpenAPV + carried libs ikut dipasang; shim Qt 6.12 → 6.11; build dari `/releases` (semua rilis prerelease) |
 | `omanta` | [28allday/omanta](https://github.com/28allday/omanta) | Native file manager for Omarchy (Qt Quick + GIO) | — |
 | `omarchy-hyprland-titlebars` | [omacom/omarchy-hyprland-titlebars](https://github.com/omacom/omarchy-hyprland-titlebars) | Native Hyprland plugin for Omarchy's floating workspace titlebars | CMake + C++23; build dari tag, Hyprland 0.57.2 dipin, path `/usr/lib/omarchy-hyprland-titlebars/titlebars.so` |
-| `omareel-git` | [omacom/omareel](https://github.com/omacom/omareel) | Minimal, keyboard-driven video cutter for Wayland compositors | daily git build |
+| `omareel-git` | [omacom/omareel](https://github.com/omacom/omareel) | Native screen recorder and editor for Omarchy/Hyprland (region/window/monitor, cursor effects, MP4/GIF export) | daily git build |
 | `omashow-git` | [28allday/omashow](https://github.com/28allday/omashow) | Keyboard-first presentation editor and presenter | daily git build |
 | `omawrite` | [omacom/omawrite](https://github.com/omacom/omawrite) | Dead-simple Markdown writing app built with Qt Quick | — |
 | `onlyoffice` | [ONLYOFFICE/DesktopEditors](https://github.com/ONLYOFFICE/DesktopEditors) | ONLYOFFICE Desktop Editors | — |
