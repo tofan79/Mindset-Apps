@@ -24,6 +24,9 @@ BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(zlib)
+# v0.7.0+ memakai fontconfig untuk font preview; CMake menggagalkan configure
+# kalau pkgconfig(fontconfig) tidak ada.
+BuildRequires:  pkgconfig(fontconfig)
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  desktop-file-utils
@@ -69,11 +72,10 @@ Built from the upstream release tag; no vendor binary is bundled.
 %autosetup -n folio-%{version}
 
 %build
-%cmake -G Ninja
-# v0.5.0 oleh-oleh test upstream memanggil QDragEnterEvent(QPointF, ...) yang
-# tidak lagi ada di Qt 6.11. Aplikasinya sendiri tidak memakai konstruktor itu;
-# bangun hanya target `folio` supaya test yang usang tidak menggagalkan rpm.
-%__cmake --build %{__cmake_builddir} --target folio
+# v0.7.0 menyediakan opsi BUILD_TESTING=OFF, jadi test usang yang memanggil
+# QDragEnterEvent(QPointF, ...) tidak perlu dibangun sama sekali.
+%cmake -G Ninja -DBUILD_TESTING=OFF
+%cmake_build
 
 %install
 # Upstream tidak punya aturan install() di CMake, jadi pemasangan mengikuti
@@ -90,6 +92,9 @@ install -Dm644 share/folio-chooser.desktop %{buildroot}%{_datadir}/applications/
 install -Dm644 share/folio.portal %{buildroot}%{_datadir}/xdg-desktop-portal/portals/folio.portal
 install -Dm644 share/org.freedesktop.impl.portal.desktop.folio.service \
     %{buildroot}%{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.folio.service
+# v0.7.x menambah service FileManager1 untuk integrasi "Open With"/portal.
+install -Dm644 share/org.freedesktop.FileManager1.service \
+    %{buildroot}%{_datadir}/dbus-1/services/org.freedesktop.FileManager1.service
 
 find plugins -type f | while read -r file; do
     if [ -x "$file" ]; then mode=755; else mode=644; fi
@@ -122,12 +127,20 @@ fi
 %{_bindir}/folio
 %{_datadir}/applications/folio.desktop
 %{_datadir}/applications/folio-chooser.desktop
+%{_datadir}/dbus-1/services/org.freedesktop.FileManager1.service
 %{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.folio.service
 %{_datadir}/icons/hicolor/scalable/apps/folio.svg
 %{_datadir}/xdg-desktop-portal/portals/folio.portal
 %{_datadir}/folio/
 
 %changelog
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - 0.7.3-1
+- Tambah BuildRequires pkgconfig(fontconfig): sejak v0.7.0 CMake mengharuskan
+  fontconfig untuk preview font.
+- Bangun dengan -DBUILD_TESTING=OFF (opsi upstream) sehingga test usang tidak
+  perlu di-skipped lewat target build.
+- Pasang service org.freedesktop.FileManager1.service yang ditambahkan v0.7.x.
+
 * Tue Nov 17 2026 Mindset Apps <mindset@example.com> - 0.5.0-1
 - Bangun hanya target `folio`: test di hulu masih memakai konstruktor
   QDragEnterEvent(QPointF, ...) yang hilang di Qt 6.11.
