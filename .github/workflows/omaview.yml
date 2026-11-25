@@ -56,7 +56,6 @@ jobs:
           CURRENT=$(curl -fsSL --retry 3 \
             "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
             | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
-          CURRENT="${CURRENT%-*}"
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "▶ COPR: $CURRENT"
 
@@ -65,15 +64,17 @@ jobs:
         run: |
           set -euo pipefail
           UP="${{ steps.upstream.outputs.version }}"
+          REL=$(awk '/^Release:/{print $2; exit}' "${{ env.SPEC_FILE }}" | cut -d% -f1)
+          UP_FULL="$UP-$REL"
           CP="${{ steps.copr.outputs.version }}"
           if [ "${{ inputs.force }}" = "true" ]; then
-            echo "🔨 Force build diminta (versi $UP)"
+            echo "🔨 Force build diminta (versi $UP_FULL)"
             echo "skip=false" >> "$GITHUB_OUTPUT"
-          elif [ "$UP" = "$CP" ]; then
-            echo "✅ Up-to-date ($UP), skip."
+          elif [ "$UP_FULL" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP_FULL), skip."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            echo "🆕 Update $CP → $UP"
+            echo "🆕 Update $CP → $UP_FULL"
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 

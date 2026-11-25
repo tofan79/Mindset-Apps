@@ -8,7 +8,7 @@
 
 Name:           omaview
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Omarchy's picture viewer and media player
 License:        MIT
 URL:            https://github.com/omacom/omaview
@@ -34,7 +34,7 @@ Requires:       qt6-qtmultimedia
 Requires:       qt6-qtsvg
 Requires:       qt6-qtwayland
 Requires:       qt6-qtimageformats
-Requires:       wayland
+Requires:       libwayland-client
 Requires:       hicolor-icon-theme
 Requires:       ffmpeg
 Requires:       wl-clipboard
@@ -91,6 +91,10 @@ fi
 %{_datadir}/icons/hicolor/scalable/apps/omaview.svg
 
 %changelog
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
+- Perbaikan dependency: `wayland` (nama paket Arch) diganti `libwayland-client`
+  supaya bisa resolve di Fedora/RakuOS.
+
 * Fri Nov 20 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Initial COPR package from upstream tag v%{version}.
 - Build only the omaview target; UI/CLI tests need a desktop session.
