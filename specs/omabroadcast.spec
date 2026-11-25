@@ -20,12 +20,13 @@
 # tidak ada di Fedora.
 #
 # Binary juga membawa qt_version_tag@Qt_6.12 (Arch rolling); Fedora 45 punya
-# Qt 6.11. Tag versinya diganti ke Qt_6.11 di %install (same length), karena
-# satu-satunya simbol yang memakai versi itu adalah qt_version_tag.
+# Qt 6.11. Tag versinya diganti ke Qt_6.11 di %install. Selain string, hash
+# entri .gnu.version_r juga harus dihitung ulang; kalau tidak, dynamic linker
+# menolak dengan "version `Qt_6.11' not found" walaupun stringnya sudah benar.
 
 Name:           omabroadcast
 Version:        %{pkg_version}
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Live production, recording and streaming studio for the desktop
 
 License:        MIT AND GPL-3.0-or-later AND GPL-2.0-or-later AND BSD-3-Clause AND MPL-2.0 AND ISC AND Apache-2.0 AND LicenseRef-AOMPL-1.0
@@ -66,12 +67,78 @@ find %{buildroot}%{_prefix}/lib/%{name}/ffmpeg/lib -type f -name '*.so.*' | whil
 done
 
 # Arch menandai qt_version_tag dengan Qt_6.12; Fedora 45 menyediakan Qt_6.11.
-# Hanya tag versi yang diganti (panjang sama), bukan simbol/library.
+# Ganti string versi dan hitung ulang hash di .gnu.version_r supaya dynamic
+# linker menerima versi yang baru.
 for f in %{buildroot}%{_bindir}/omabroadcast \
          %{buildroot}%{_prefix}/lib/%{name}/omabroadcast-browser; do
     [ -f "$f" ] || continue
     if grep -q 'Qt_6.12' "$f"; then
-        python3 -c 'import sys; p=sys.argv[1]; d=open(p,"rb").read(); open(p,"wb").write(d.replace(b"Qt_6.12",b"Qt_6.11"))' "$f"
+        python3 - "$f" <<'PY'
+import struct
+import sys
+
+path = sys.argv[1]
+data = bytearray(open(path, "rb").read())
+data = bytearray(data.replace(b"Qt_6.12", b"Qt_6.11"))
+
+e_shoff = struct.unpack_from("<Q", data, 0x28)[0]
+e_shentsize = struct.unpack_from("<H", data, 0x3a)[0]
+e_shnum = struct.unpack_from("<H", data, 0x3c)[0]
+e_shstrndx = struct.unpack_from("<H", data, 0x3e)[0]
+
+
+def get_section(index):
+    values = struct.unpack_from("<IIQQQQIIQQ", data, e_shoff + index * e_shentsize)
+    return {"name": values[0], "off": values[4], "size": values[5], "link": values[6]}
+
+
+def string_at(section, offset):
+    start = section["off"] + offset
+    end = data.index(0, start)
+    return data[start:end].decode("ascii", "replace")
+
+
+shstr = get_section(e_shstrndx)
+sections = {}
+for index in range(e_shnum):
+    section = get_section(index)
+    sections[string_at(shstr, section["name"])] = section
+
+version_r = sections[".gnu.version_r"]
+dynstr = sections[".dynstr"]
+
+
+def elf_hash(value):
+    result = 0
+    for char in value.encode():
+        result = (result << 4) + char
+        high = result & 0xF0000000
+        if high:
+            result ^= high >> 24
+        result &= ~high
+    return result & 0xFFFFFFFF
+
+
+offset = version_r["off"]
+end = offset + version_r["size"]
+while offset < end:
+    vn_version, vn_count, vn_file, vn_aux, vn_next = struct.unpack_from("<HHIII", data, offset)
+    aux = offset + vn_aux
+    for _ in range(vn_count):
+        vna_hash, vna_flags, vna_other, vna_name, vna_next = struct.unpack_from("<IHHII", data, aux)
+        if string_at(dynstr, vna_name) == "Qt_6.11":
+            wanted = elf_hash("Qt_6.11")
+            if vna_hash != wanted:
+                struct.pack_into("<I", data, aux, wanted)
+        if vna_next == 0:
+            break
+        aux += vna_next
+    if vn_next == 0:
+        break
+    offset += vn_next
+
+open(path, "wb").write(data)
+PY
     fi
 done
 
@@ -101,6 +168,10 @@ fi
 %{_datadir}/icons/hicolor/scalable/apps/omabroadcast.svg
 
 %changelog
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-4
+- Perbaikan: hash .gnu.version_r ikut dihitung ulang setelah qt_version_tag
+  diganti ke Qt_6.11, supaya dynamic linker tidak menolak versi tersebut.
+
 * Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-3
 - Perbaikan: qt_version_tag@Qt_6.12 diganti ke Qt_6.11 (versi Fedora 45).
 
