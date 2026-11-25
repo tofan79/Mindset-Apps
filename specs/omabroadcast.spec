@@ -7,6 +7,9 @@
 # Versi = <pkgver>.<pkgrel> dari nama asset, mis. 0.1.0.62. Ini membuat pkgrel
 # baru dengan tag yang sama tetap memicu build.
 #
+# Perubahan spec tanpa ganti upstream versi menaikkan Release (-1 → -2 ...),
+# supaya NEVRA unik dan klien tidak memakai RPM lama dari cache repo.
+#
 # Binary membutuhkan glibc sampai 2.44 dan RUNPATH absolut
 # /usr/lib/omabroadcast/ffmpeg/lib, jadi paket ini ditujukan untuk Fedora 45+
 # ( Fedora 45 memakai glibc 2.44 ).
@@ -18,7 +21,7 @@
 
 Name:           omabroadcast
 Version:        %{pkg_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Live production, recording and streaming studio for the desktop
 
 License:        MIT AND GPL-3.0-or-later AND GPL-2.0-or-later AND BSD-3-Clause AND MPL-2.0 AND ISC AND Apache-2.0 AND LicenseRef-AOMPL-1.0
@@ -83,8 +86,11 @@ fi
 %{_datadir}/icons/hicolor/scalable/apps/omabroadcast.svg
 
 %changelog
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-2
+- Perbaikan: DT_NEEDED libbz2.so.1.0 diganti ke libbz2.so.1 (nama soname Fedora).
+- Release dinaikkan supaya RPM lama tidak dipakai ulang dari cache repo.
+
 * Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-1
 - Paket awal: repack paket Arch x86_64 upstream v0.1.0-62.
 - Versi memakai pkgver.pkgrel agar rebuild pkgrel memicu workflow.
 - FFmpeg bundle, helper WebEngine, dan lisensi pihak ketiga ikut dipasang.
-- Perbaikan: DT_NEEDED libbz2.so.1.0 diganti ke libbz2.so.1 (nama soname Fedora).
