@@ -23,10 +23,17 @@
 # Qt 6.11. Tag versinya diganti ke Qt_6.11 di %install. Selain string, hash
 # entri .gnu.version_r juga harus dihitung ulang; kalau tidak, dynamic linker
 # menolak dengan "version `Qt_6.11' not found" walaupun stringnya sudah benar.
+#
+# Qt 6.12 juga menambah overload QVariant/QJsonDocument/QFile::copy yang
+# menerima argumen by-value (&&). Overload itu tidak ada di Qt 6.11, jadi
+# biner Arch menghasilkan "undefined symbol ... version Qt_6". Karena paket
+# ini tetap repack (bukan build ulang), %install membuat shim kecil yang
+# meneruskan overload && ke overload const& milik Qt 6.11, lalu menambahkannya
+# ke DT_NEEDED binary utama.
 
 Name:           omabroadcast
 Version:        %{pkg_version}
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Live production, recording and streaming studio for the desktop
 
 License:        MIT AND GPL-3.0-or-later AND GPL-2.0-or-later AND BSD-3-Clause AND MPL-2.0 AND ISC AND Apache-2.0 AND LicenseRef-AOMPL-1.0
@@ -39,6 +46,7 @@ Source0:        omabroadcast-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
 BuildRequires:  desktop-file-utils
+BuildRequires:  gcc
 BuildRequires:  patchelf
 BuildRequires:  python3
 
@@ -142,6 +150,57 @@ PY
     fi
 done
 
+# Qt 6.12 menambah overload by-value (&&) yang tidak ada di Qt 6.11. Shim ini
+# meneruskannya ke overload const& yang tersedia di Fedora. Tidak perlu link
+# ke libQt6Core saat build: simbol akan di-resolve dari DT_NEEDED binary utama.
+mkdir -p %{buildroot}%{_libdir}
+cat > %{_builddir}/omabroadcast-qtcompat.c <<'EOF'
+/* Kompatibilitas ABI Qt 6.12 -> 6.11 untuk biner omabroadcast upstream Arch. */
+
+extern void t_qstringlist(void *, const void *) __asm__("_ZN8QVariantC1ERK5QListI7QStringE");
+void s_qstringlist(void *self, const void *v) __asm__("_ZN8QVariantC1EO5QListI7QStringE");
+void s_qstringlist(void *self, const void *v) { t_qstringlist(self, v); }
+
+extern void t_qstring(void *, const void *) __asm__("_ZN8QVariantC1ERK7QString");
+void s_qstring(void *self, const void *v) __asm__("_ZN8QVariantC1EO7QString");
+void s_qstring(void *self, const void *v) { t_qstring(self, v); }
+
+extern void t_qlist(void *, const void *) __asm__("_ZN8QVariantC1ERK5QListIS_E");
+void s_qlist(void *self, const void *v) __asm__("_ZN8QVariantC1EO5QListIS_E");
+void s_qlist(void *self, const void *v) { t_qlist(self, v); }
+
+extern unsigned char t_qfile_copy(void *, const void *, const void *) __asm__("_ZN5QFile4copyERK7QStringS2_");
+unsigned char s_qfile_copy(void *self, const void *a, const void *b, const void *opt)
+    __asm__("_ZN5QFile4copyERK7QStringS2_St8optionalI6QFlagsIN11QFileDevice10PermissionEEE");
+unsigned char s_qfile_copy(void *self, const void *a, const void *b, const void *opt)
+{
+    (void)opt;
+    return t_qfile_copy(self, a, b);
+}
+
+extern void t_qmap(void *, const void *) __asm__("_ZN8QVariantC1ERK4QMapI7QStringS_E");
+void s_qmap(void *self, const void *v) __asm__("_ZN8QVariantC1EO4QMapI7QStringS_E");
+void s_qmap(void *self, const void *v) { t_qmap(self, v); }
+
+extern void t_qbytearray(void *, const void *) __asm__("_ZN8QVariantC1ERK10QByteArray");
+void s_qbytearray(void *self, const void *v) __asm__("_ZN8QVariantC1EO10QByteArray");
+void s_qbytearray(void *self, const void *v) { t_qbytearray(self, v); }
+
+extern void t_jsonarray(void *, const void *) __asm__("_ZN13QJsonDocumentC1ERK10QJsonArray");
+void s_jsonarray(void *self, const void *v) __asm__("_ZN13QJsonDocumentC1EO10QJsonArray");
+void s_jsonarray(void *self, const void *v) { t_jsonarray(self, v); }
+
+extern void t_jsonobject(void *, const void *) __asm__("_ZN13QJsonDocumentC1ERK11QJsonObject");
+void s_jsonobject(void *self, const void *v) __asm__("_ZN13QJsonDocumentC1EO11QJsonObject");
+void s_jsonobject(void *self, const void *v) { t_jsonobject(self, v); }
+EOF
+gcc -shared -fPIC -O2 -Wl,-soname,libomabroadcast-qtcompat.so \
+    %{_builddir}/omabroadcast-qtcompat.c \
+    -o %{buildroot}%{_libdir}/libomabroadcast-qtcompat.so
+
+# Muat shim sebelum libQt6Core resolve simbol-simbol tersebut.
+patchelf --add-needed libomabroadcast-qtcompat.so %{buildroot}%{_bindir}/omabroadcast
+
 desktop-file-validate %{buildroot}%{_datadir}/applications/omabroadcast.desktop
 
 %post
@@ -163,11 +222,16 @@ fi
 %files
 %license %{_datadir}/licenses/%{name}/
 %{_bindir}/omabroadcast
+%{_libdir}/libomabroadcast-qtcompat.so
 %{_prefix}/lib/%{name}/
 %{_datadir}/applications/omabroadcast.desktop
 %{_datadir}/icons/hicolor/scalable/apps/omabroadcast.svg
 
 %changelog
+* Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-5
+- Perbaikan: shim kompatibilitas untuk overload by-value (&&) Qt 6.12 yang
+  tidak ada di Qt 6.11; mengatasi "undefined symbol ... version Qt_6".
+
 * Wed Nov 25 2026 Mindset Apps <mindset@example.com> - %{pkg_version}-4
 - Perbaikan: hash .gnu.version_r ikut dihitung ulang setelah qt_version_tag
   diganti ke Qt_6.11, supaya dynamic linker tidak menolak versi tersebut.
