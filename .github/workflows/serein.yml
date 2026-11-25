@@ -1,0 +1,200 @@
+name: "serein - COPR Auto Build"
+
+# Serein belum punya rilis stabil: semua rilis adalah nightly pre-release
+# (v1.0.0-nightly.YYYYMMDD.RUN). Tiap rilis menyediakan RPM Fedora 44 x86_64,
+# jadi workflow ini memakai artifact itu dan di-repack oleh specs/serein.spec.
+# Build dari sumber tidak dipakai karena butuh Rust 1.99.1, dependensi git, dan
+# BoringSSL yang dibangun dari source — terlalu berat/rapuh untuk COPR.
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # tiap hari, jam 07.00 WIB (00:00 UTC)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Build paksa walaupun versi sama (mis. setelah ubah spec)'
+        type: boolean
+        default: false
+
+env:
+  APP_NAME:       "serein"
+  UPSTREAM_REPO:  "ViceVerse-cz/Serein"
+  COPR_PROJECT:   "Mindset-Apps"
+  SPEC_FILE:      "specs/serein.spec"
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Get upstream nightly release
+        id: upstream
+        run: |
+          set -euo pipefail
+          RELEASE_JSON=$(curl -fsSL --retry 3 \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/releases?per_page=10")
+
+          TAG=$(printf '%s' "$RELEASE_JSON" | jq -r '.[0].tag_name // empty')
+          ASSET=$(printf '%s' "$RELEASE_JSON" | jq -r '
+            [.[0].assets[]? | select(.name | test("-Linux-fedora-44-.*x86_64\\.rpm$"))]
+            | .[0].name // empty')
+          if [ -z "$TAG" ] || [ -z "$ASSET" ]; then
+            echo "⚠ Tidak ada rilis dengan RPM Fedora 44 — skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # RPM Version tidak boleh mengandung '-'. Konversi tanda hubung
+          # pertama jadi '~', sama seperti helper packaging upstream.
+          VER="${TAG#v}"
+          VER="${VER/-/~}"
+          [[ "$VER" =~ ^[0-9]+\.[0-9]+\.[0-9]+(~[A-Za-z0-9.]+)?$ ]] \
+            || { echo "invalid version: $VER"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "asset=$ASSET" >> "$GITHUB_OUTPUT"
+          echo "▶ Upstream: $TAG → $VER ($ASSET)"
+
+      - name: Get current COPR version
+        id: copr
+        if: steps.upstream.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          CURRENT=$(curl -fsSL --retry 3 \
+            "https://copr.fedorainfracloud.org/api_3/build/list/?ownername=${{ secrets.COPR_USERNAME }}&projectname=${{ env.COPR_PROJECT }}&packagename=${{ env.APP_NAME }}" \
+            | jq -r '[.items[] | select(.state == "succeeded") | .source_package.version][0] // "none"')
+          CURRENT="${CURRENT%-*}"
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "▶ COPR: $CURRENT"
+
+      - name: Smart Skip
+        id: check
+        if: steps.upstream.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          UP="${{ steps.upstream.outputs.version }}"
+          CP="${{ steps.copr.outputs.version }}"
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "🔨 Force build diminta (versi $UP)"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          elif [ "$UP" = "$CP" ]; then
+            echo "✅ Up-to-date ($UP), skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "🆕 Update $CP → $UP"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y rpm cpio curl jq
+          pip install copr-cli --quiet
+
+      - name: Download and verify upstream RPM
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.upstream.outputs.tag }}"
+          ASSET="${{ steps.upstream.outputs.asset }}"
+          BASE="https://github.com/${{ env.UPSTREAM_REPO }}/releases/download/${TAG}"
+          curl -fsSL --retry 3 "$BASE/$ASSET" -o "$ASSET"
+          curl -fsSL --retry 3 "$BASE/SHA256SUMS.txt" -o SHA256SUMS.txt
+          grep -F "./$ASSET" SHA256SUMS.txt | sed 's#^[.]/##' | sha256sum -c -
+          echo "▶ RPM: $(du -h "$ASSET" | cut -f1) (SHA256 OK)"
+
+      - name: Unpack payload and build source tarball
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          VER="${{ steps.upstream.outputs.version }}"
+          ASSET="${{ steps.upstream.outputs.asset }}"
+          mkdir -p stage/"serein-$VER" payload
+          rpm2cpio "$ASSET" | (cd payload && cpio -idm --quiet)
+          [ -f payload/usr/bin/serein ] || { echo "missing payload/usr/bin/serein"; exit 1; }
+          [ -f payload/usr/share/applications/cz.viceverse.serein.desktop ] \
+            || { echo "missing desktop file"; exit 1; }
+          [ -d payload/usr/share/doc/serein/licenses ] \
+            || { echo "missing licenses/ (MPL source obligation)"; exit 1; }
+          mv payload/usr stage/"serein-$VER"/usr
+          tar -czf "serein-$VER.tar.gz" -C stage "serein-$VER"
+          echo "▶ Tarball: $(du -h "serein-$VER.tar.gz" | cut -f1)"
+
+      - name: Build SRPM
+        if: steps.check.outputs.skip == 'false'
+        id: srpm
+        run: |
+          set -euo pipefail
+          VER="${{ steps.upstream.outputs.version }}"
+          mkdir -p ~/rpmbuild/{SPECS,SOURCES,SRPMS}
+          cp "${{ env.SPEC_FILE }}" ~/rpmbuild/SPECS/
+          sed -i "s/%{pkg_version}/$VER/g" ~/rpmbuild/SPECS/"${{ env.APP_NAME }}.spec"
+          cp "serein-$VER.tar.gz" ~/rpmbuild/SOURCES/
+          rpmbuild -bs ~/rpmbuild/SPECS/"${{ env.APP_NAME }}.spec"
+          SRPM=$(find ~/rpmbuild/SRPMS -maxdepth 1 -type f -name '*.src.rpm' -print -quit)
+          [[ -n "$SRPM" ]] || { echo "SRPM was not created"; exit 1; }
+          echo "path=$SRPM" >> "$GITHUB_OUTPUT"
+          echo "▶ SRPM: $SRPM"
+
+      - name: Setup COPR credentials
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr << EOF
+          [copr-cli]
+          username = ${{ secrets.COPR_USERNAME }}
+          login    = ${{ secrets.COPR_LOGIN }}
+          token    = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+
+      - name: Sync COPR project chroots
+        if: steps.check.outputs.skip == 'false'
+        uses: ./.github/actions/sync-copr-chroots
+        with:
+          project: ${{ env.COPR_PROJECT }}
+
+      - name: Submit to COPR
+        id: submit
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set +e
+          OUT=$(copr-cli build ${{ env.COPR_PROJECT }} ${{ steps.srpm.outputs.path }} 2>&1)
+          RC=$?
+          printf '%s\n' "$OUT"
+          BID=$(printf '%s\n' "$OUT" | grep -oE 'Created builds: [0-9]+' | grep -oE '[0-9]+' | head -1)
+          echo "build_id=${BID:-unknown}" >> "$GITHUB_OUTPUT"
+
+          ok=false
+          STATE=unknown
+          if [ -n "$BID" ]; then
+            for _ in $(seq 1 120); do
+              STATE=$(curl -fsSL --retry 3 \
+                "https://copr.fedorainfracloud.org/api_3/build/$BID" \
+                | jq -r '.state // "unknown"' 2>/dev/null || echo unknown)
+              case "$STATE" in
+                succeeded) ok=true; break ;;
+                failed|cancelled|skipped) break ;;
+              esac
+              sleep 15
+            done
+            echo "▶ COPR build $BID state=$STATE"
+          fi
+
+          if [ "$ok" = "true" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Build COPR ${BID:-unknown} gagal (state=$STATE), log chroot akan ditampilkan di bawah"
+          fi
+          [ "$ok" = "true" ]
+
+      - name: Dump COPR chroot log
+        if: always() && steps.check.outputs.skip == 'false' && steps.submit.outputs.ok == 'false'
+        uses: ./.github/actions/dump-copr-log
+        with:
+          build-id: ${{ steps.submit.outputs.build_id }}

@@ -19,7 +19,7 @@ sudo dnf install zoom
 ```
 ## Available packages
 
-63 packages total (63 with successful COPR builds).
+64 packages total (63 with successful COPR builds; `serein` menunggu build pertama).
 
 Packages are listed alphabetically.
 
@@ -76,6 +76,7 @@ Packages are listed alphabetically.
 | `rakuos-bootstrap` | [tofan79/rakuos-bootstrap](https://github.com/tofan79/rakuos-bootstrap) | Wizard pasca-install untuk RakuOS minimal | wizard pasca-install RakuOS minimal, release tag |
 | `rakuos-shell-picker` | [tofan79/rakuos-shell-picker](https://github.com/tofan79/rakuos-shell-picker) | Pick the desktop shell (Noctalia/DMS/Caelestia/Ambxst) on Hyprland | Rust + GTK4; pilih desktop shell di atas Hyprland |
 | `sekaipop-shell` | [Blapples/SekaiPop](https://github.com/Blapples/SekaiPop) | SekaiPop Quickshell desktop shell for Hyprland | payload Quickshell Project Sekai untuk Hyprland; daily git build |
+| `serein` | [ViceVerse-cz/Serein](https://github.com/ViceVerse-cz/Serein) | Ambient AI desktop companion dengan memory lokal dan konektor opsional | nightly pre-release; repack RPM Fedora 44 upstream, versi memakai `~nightly` |
 | `signed` | [omacom/signed](https://github.com/omacom/signed) | Sign PDFs and fill them in with text and dates | — |
 | `software-center` | [tofan79/software-center](https://github.com/tofan79/software-center) | Software Center — install and manage apps, Flatpaks, and system updates | — |
 | `sonora` | [sonorahq/sonora](https://github.com/sonorahq/sonora) | Native music streaming client built with Rust and GPUI | repack AppImage x86_64 upstream |
